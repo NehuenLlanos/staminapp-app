@@ -1,17 +1,11 @@
 package com.staminapp
 
-import androidx.compose.foundation.Image
-import androidx.compose.foundation.background
+import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
 
-import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Home
-import androidx.compose.material.icons.filled.Menu
-import androidx.compose.material.icons.filled.Search
 import androidx.compose.material.icons.outlined.Home
 import androidx.compose.material.icons.outlined.Person
 import androidx.compose.material.icons.outlined.Search
@@ -21,13 +15,11 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.modifier.modifierLocalOf
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
-import androidx.navigation.NavHostController
 import com.staminapp.ui.theme.StaminappAppTheme
 
 @Composable
@@ -42,7 +34,7 @@ fun HomeScaffold(navController: NavController) {
             TopAppBar {
                 Image(
                     modifier = Modifier
-                        .padding(10.dp)
+                        .padding(15.dp)
                         .weight(1f),
                     painter = painterResource(id = R.drawable.logoblack),
                     contentDescription = "Logo",
@@ -87,7 +79,7 @@ fun HomeScaffold(navController: NavController) {
         Column(
             modifier = Modifier
                 .verticalScroll(scrollState)
-                .padding(horizontal = 16.dp)
+                .padding(horizontal = 16.dp, vertical = 10.dp)
                 .fillMaxWidth()
         ) {
             Text(text = "BUENOS DÍAS, USUARIO", color = MaterialTheme.colors.primaryVariant)
@@ -98,8 +90,8 @@ fun HomeScaffold(navController: NavController) {
                     horizontalArrangement = Arrangement.SpaceBetween
                 ) {
 
-                    RecentCard()
-                    RecentCard()
+                    RecentCard(navController)
+                    RecentCard(navController)
                 }
             }
             Text(text = "Mi Biblioteca", color = MaterialTheme.colors.primaryVariant)
@@ -108,8 +100,8 @@ fun HomeScaffold(navController: NavController) {
                     modifier = Modifier.padding(vertical = 10.dp).fillMaxWidth(),
                     horizontalArrangement = Arrangement.SpaceBetween
                 ) {
-                    RoutineCard()
-                    RoutineCard()
+                    RoutineCard(navController)
+                    RoutineCard(navController)
                 }
             }
         }
@@ -117,16 +109,17 @@ fun HomeScaffold(navController: NavController) {
 }
 
 @Composable
-fun RecentCard() {
+fun RecentCard(navController: NavController) {
     Card(
+        modifier = Modifier.clickable{navController.navigate(Destination.Routine.route)},
         backgroundColor = MaterialTheme.colors.primaryVariant,
         shape = RoundedCornerShape(15.dp),
         elevation = 5.dp,
-//        onClick = { /* TODO */ }
     ) {
         Box(modifier = Modifier
             .height(64.dp)
-            .width(160.dp)) {
+            .width(160.dp),
+        ) {
             Row() {
                 Image(
                     modifier = Modifier
@@ -150,11 +143,12 @@ fun RecentCard() {
 }
 
 @Composable
-fun RoutineCard() {
+fun RoutineCard(navController: NavController) {
     Card(
         modifier = Modifier
             .width(160.dp)
-            .height(160.dp),
+            .height(160.dp)
+            .clickable{navController.navigate(Destination.Routine.route)},
         shape = RoundedCornerShape(15.dp),
         elevation = 5.dp
     ) {
@@ -200,24 +194,3 @@ fun DefaultPreview() {
 //        HomeScreen()
     }
 }
-
-//@Composable
-//fun HomeScreen(navController: NavHostController) {
-//    Column(
-//        modifier = Modifier.fillMaxSize(),
-//        horizontalAlignment = Alignment.CenterHorizontally,
-//        verticalArrangement = Arrangement.SpaceEvenly
-//    ) {
-//        Text(text = "Home screen")
-//        Button(onClick = {
-//            navController.navigate(Destination.Profile.route)
-//        }) {
-//            Text(text = "to Profile screen")
-//        }
-//        Button(onClick = {
-//            navController.navigate(Destination.List.route)
-//        }) {
-//            Text(text = "to Routine screen")
-//        }
-//    }
-//}
