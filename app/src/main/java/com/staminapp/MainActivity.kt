@@ -54,7 +54,7 @@ class MainActivity : ComponentActivity() {
                 ) {
 //                    val navController = rememberNavController()
 //                    NavigationAppHost(navController = navController)
-                    SignInScreen()
+                    HomeScreen2()
                 }
             }
         }

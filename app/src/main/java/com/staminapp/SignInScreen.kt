@@ -30,7 +30,7 @@ fun SignInScreen() {
                 .background(MaterialTheme.colors.background),
             horizontalAlignment = Alignment.CenterHorizontally,
             ) {
-            LogoImage()
+            LogoImage(Modifier)
             UsernameTextField(Modifier.padding(top = 70.dp))
             PasswordTextField(Modifier.padding(top = 20.dp))
             SignInButton(Modifier.padding(top = 30.dp))
@@ -39,8 +39,9 @@ fun SignInScreen() {
 }
 
 @Composable
-fun LogoImage() {
+fun LogoImage(modifier: Modifier) {
         Image(
+            modifier = modifier,
             painter = painterResource(id = R.drawable.logo),
             contentDescription = "Hola",
         )
@@ -98,10 +99,3 @@ fun SignInButton(modifier: Modifier) {
     }
 }
 
-@Preview(showBackground = true)
-@Composable
-fun DefaultPreview() {
-    StaminappAppTheme {
-        SignInScreen()
-    }
-}
