@@ -1,5 +1,15 @@
 package com.staminapp
 
+import android.content.res.Resources
+import android.graphics.Bitmap
+import android.graphics.BitmapFactory
+import android.graphics.ImageDecoder
+import android.media.Image
+import android.os.Build
+import android.provider.MediaStore
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContract
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
@@ -9,6 +19,7 @@ import androidx.compose.material.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.modifier.modifierLocalConsumer
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
@@ -40,10 +51,10 @@ fun SignInScreen() {
 
 @Composable
 fun LogoImage() {
-        Image(
-            painter = painterResource(id = R.drawable.logo),
-            contentDescription = "Hola",
-        )
+    Image(
+        painter = painterResource(id = R.drawable.logo),
+        contentDescription = "Hola",
+    )
 }
 
 @Composable
