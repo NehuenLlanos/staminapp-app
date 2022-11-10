@@ -3,7 +3,10 @@ package com.staminapp
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
+
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Home
@@ -79,11 +82,35 @@ fun HomeScaffold() {
             }
         }
     ) {
-        Column() {
+        val scrollState = rememberScrollState()
+        Column(
+            modifier = Modifier
+                .verticalScroll(scrollState)
+                .padding(horizontal = 20.dp)
+                .fillMaxWidth()
+        ) {
             Text(text = "BUENOS DÍAS, USUARIO", color = MaterialTheme.colors.primaryVariant)
-            RecentCard()
+
+            for(i in 1..4) {
+                Row(
+                    modifier = Modifier.padding(vertical = 10.dp).fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceBetween
+                ) {
+
+                    RecentCard()
+                    RecentCard()
+                }
+            }
             Text(text = "Mi Biblioteca", color = MaterialTheme.colors.primaryVariant)
-            RoutineCard()
+            for(i in 1..10) {
+                Row(
+                    modifier = Modifier.padding(vertical = 10.dp).fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceBetween
+                ) {
+                    RoutineCard()
+                    RoutineCard()
+                }
+            }
         }
     }
 }
@@ -101,7 +128,9 @@ fun RecentCard() {
             .width(160.dp)) {
             Row() {
                 Image(
-                    modifier = Modifier.fillMaxHeight().width(56.dp),
+                    modifier = Modifier
+                        .fillMaxHeight()
+                        .width(56.dp),
                     painter = painterResource(id = R.drawable.tincho2),
                     contentDescription = "Logo",
                     contentScale = ContentScale.Crop
@@ -122,7 +151,9 @@ fun RecentCard() {
 @Composable
 fun RoutineCard() {
     Card(
-        modifier = Modifier.width(160.dp).height(160.dp),
+        modifier = Modifier
+            .width(160.dp)
+            .height(160.dp),
         shape = RoundedCornerShape(15.dp),
         elevation = 5.dp
     ) {
