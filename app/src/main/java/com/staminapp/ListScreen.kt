@@ -19,22 +19,22 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 
-@Composable
-fun ListScreen(navController: NavHostController) {
-    val elements = MutableList(100) { it }
-    LazyColumn(modifier = Modifier.background(Color.LightGray)) {
-        items(elements) {
-            Row(modifier = Modifier
-                .padding(4.dp)
-                .fillMaxWidth()
-                .clip(RoundedCornerShape(4.dp))
-                .background(Color.White)
-                .padding(4.dp)
-                .clickable { navController.navigate(Destination.Routine.createRoute(it)) }
-            ) {
-                Text(text = "Element $it")
-            }
-        }
-    }
-}
+//@Composable
+//fun ListScreen(navController: NavHostController) {
+//    val elements = MutableList(100) { it }
+//    LazyColumn(modifier = Modifier.background(Color.LightGray)) {
+//        items(elements) {
+//            Row(modifier = Modifier
+//                .padding(4.dp)
+//                .fillMaxWidth()
+//                .clip(RoundedCornerShape(4.dp))
+//                .background(Color.White)
+//                .padding(4.dp)
+//                .clickable { navController.navigate(Destination.Routine.createRoute(it)) }
+//            ) {
+//                Text(text = "Element $it")
+//            }
+//        }
+//    }
+//}
 
