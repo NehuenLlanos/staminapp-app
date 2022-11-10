@@ -18,10 +18,11 @@ import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.navigation.NavHostController
 import com.staminapp.ui.theme.StaminappAppTheme
 
 @Composable
-fun SignInScreen() {
+fun SignInScreen(navController: NavHostController) {
 //    Surface(modifier = Modifier.fillMaxSize(), color = MaterialTheme.colors.background) {
         Column(
             modifier = Modifier
@@ -33,7 +34,7 @@ fun SignInScreen() {
             LogoImage(Modifier)
             UsernameTextField(Modifier.padding(top = 70.dp))
             PasswordTextField(Modifier.padding(top = 20.dp))
-            SignInButton(Modifier.padding(top = 30.dp))
+            SignInButton(Modifier.padding(top = 30.dp), navController)
         }
 //    }
 }
@@ -42,7 +43,7 @@ fun SignInScreen() {
 fun LogoImage(modifier: Modifier) {
         Image(
             modifier = modifier,
-            painter = painterResource(id = R.drawable.logo),
+            painter = painterResource(id = R.drawable.logofc),
             contentDescription = "Hola",
         )
 }
@@ -86,11 +87,11 @@ fun PasswordTextField(modifier: Modifier) {
 }
 
 @Composable
-fun SignInButton(modifier: Modifier) {
+fun SignInButton(modifier: Modifier, navController: NavHostController) {
     Button(
         modifier = modifier,
         onClick = {
-            //your onclick code
+            navController.navigate(Destination.Home.route)
         },
         colors = ButtonDefaults.buttonColors(backgroundColor = MaterialTheme.colors.primary),
         shape = RoundedCornerShape(50.dp)

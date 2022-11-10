@@ -34,12 +34,13 @@ import androidx.compose.ui.unit.dp
 
 
 sealed class Destination(val route: String) {
+    object SignIn: Destination("sign-in")
     object Home: Destination("home")
     object Profile: Destination("profile")
-    object List: Destination("list")
-    object Routine: Destination("routine/{elementId}") {
-        fun createRoute(elementId: Int) = "routine/$elementId"
-    }
+//    object List: Destination("list")
+//    object Routine: Destination("routine/{elementId}") {
+//        fun createRoute(elementId: Int) = "routine/$elementId"
+//    }
 }
 
 class MainActivity : ComponentActivity() {
@@ -52,9 +53,8 @@ class MainActivity : ComponentActivity() {
                     modifier = Modifier.fillMaxSize(),
                     color = MaterialTheme.colors.background
                 ) {
-//                    val navController = rememberNavController()
-//                    NavigationAppHost(navController = navController)
-                    HomeScreen2()
+                    val navController = rememberNavController()
+                    NavigationAppHost(navController = navController)
                 }
             }
         }
@@ -64,17 +64,18 @@ class MainActivity : ComponentActivity() {
 fun NavigationAppHost(navController: NavHostController) {
     val ctx = LocalContext.current
 
-    NavHost(navController = navController, startDestination = "home") {
+    NavHost(navController = navController, startDestination = "sign-in") {
+        composable(Destination.SignIn.route) { SignInScreen(navController) }
         composable(Destination.Home.route) { HomeScreen(navController) }
         composable(Destination.Profile.route) { ProfileScreen() }
-        composable(Destination.List.route) { ListScreen(navController) }
-        composable(Destination.Routine.route) { navBackStackEntry ->
-            val elementId = navBackStackEntry.arguments?.getString("elementId")
-            if (elementId == null) {
-                Toast.makeText(ctx, "ElementId is required", Toast.LENGTH_SHORT).show()
-            } else {
-                RoutineScreen(elementId = elementId.toInt())
-            }
-        }
+//        composable(Destination.List.route) { ListScreen(navController) }
+//        composable(Destination.Routine.route) { navBackStackEntry ->
+//            val elementId = navBackStackEntry.arguments?.getString("elementId")
+//            if (elementId == null) {
+//                Toast.makeText(ctx, "ElementId is required", Toast.LENGTH_SHORT).show()
+//            } else {
+//                RoutineScreen(elementId = elementId.toInt())
+//            }
+//        }
     }
 }

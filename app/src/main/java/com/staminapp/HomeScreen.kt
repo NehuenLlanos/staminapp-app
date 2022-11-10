@@ -26,16 +26,17 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.navigation.NavController
 import androidx.navigation.NavHostController
 import com.staminapp.ui.theme.StaminappAppTheme
 
 @Composable
-fun HomeScreen2() {
-    HomeScaffold()
+fun HomeScreen(navController: NavController) {
+    HomeScaffold(navController)
 }
 
 @Composable
-fun HomeScaffold() {
+fun HomeScaffold(navController: NavController) {
     Scaffold(
         topBar = {
             TopAppBar {
@@ -43,7 +44,7 @@ fun HomeScaffold() {
                     modifier = Modifier
                         .padding(10.dp)
                         .weight(1f),
-                    painter = painterResource(id = R.drawable.logo),
+                    painter = painterResource(id = R.drawable.logoblack),
                     contentDescription = "Logo",
                     )
             }
@@ -64,7 +65,7 @@ fun HomeScaffold() {
                     BottomNavigationItem(icon = {
                         Icon(Icons.Outlined.Search, contentDescription = "Explorar")
                     },
-                        label = { Text(text = "Home") },
+                        label = { Text(text = "Explore") },
                         selected = (selectedIndex == 0),
                         onClick = {
                             selectedIndex = 0
@@ -73,10 +74,10 @@ fun HomeScaffold() {
                     BottomNavigationItem(icon = {
                         Icon(Icons.Outlined.Person, contentDescription = "Perfil")
                     },
-                        label = { Text(text = "Home") },
+                        label = { Text(text = "Profile") },
                         selected = (selectedIndex == 0),
                         onClick = {
-                            selectedIndex = 0
+                            navController.navigate(Destination.Profile.route)
                         })
                 }
             }
@@ -86,12 +87,12 @@ fun HomeScaffold() {
         Column(
             modifier = Modifier
                 .verticalScroll(scrollState)
-                .padding(horizontal = 20.dp)
+                .padding(horizontal = 16.dp)
                 .fillMaxWidth()
         ) {
             Text(text = "BUENOS DÍAS, USUARIO", color = MaterialTheme.colors.primaryVariant)
 
-            for(i in 1..4) {
+            for(i in 1..2) {
                 Row(
                     modifier = Modifier.padding(vertical = 10.dp).fillMaxWidth(),
                     horizontalArrangement = Arrangement.SpaceBetween
@@ -118,7 +119,7 @@ fun HomeScaffold() {
 @Composable
 fun RecentCard() {
     Card(
-        backgroundColor = MaterialTheme.colors.secondary,
+        backgroundColor = MaterialTheme.colors.primaryVariant,
         shape = RoundedCornerShape(15.dp),
         elevation = 5.dp,
 //        onClick = { /* TODO */ }
@@ -196,27 +197,27 @@ fun RoutineCard() {
 @Composable
 fun DefaultPreview() {
     StaminappAppTheme {
-        HomeScreen2()
+//        HomeScreen()
     }
 }
 
-@Composable
-fun HomeScreen(navController: NavHostController) {
-    Column(
-        modifier = Modifier.fillMaxSize(),
-        horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.SpaceEvenly
-    ) {
-        Text(text = "Home screen")
-        Button(onClick = {
-            navController.navigate(Destination.Profile.route)
-        }) {
-            Text(text = "to Profile screen")
-        }
-        Button(onClick = {
-            navController.navigate(Destination.List.route)
-        }) {
-            Text(text = "to Routine screen")
-        }
-    }
-}
+//@Composable
+//fun HomeScreen(navController: NavHostController) {
+//    Column(
+//        modifier = Modifier.fillMaxSize(),
+//        horizontalAlignment = Alignment.CenterHorizontally,
+//        verticalArrangement = Arrangement.SpaceEvenly
+//    ) {
+//        Text(text = "Home screen")
+//        Button(onClick = {
+//            navController.navigate(Destination.Profile.route)
+//        }) {
+//            Text(text = "to Profile screen")
+//        }
+//        Button(onClick = {
+//            navController.navigate(Destination.List.route)
+//        }) {
+//            Text(text = "to Routine screen")
+//        }
+//    }
+//}
