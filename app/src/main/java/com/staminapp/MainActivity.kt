@@ -4,12 +4,19 @@ import android.os.Bundle
 import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.compose.foundation.Image
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.material.MaterialTheme
-import androidx.compose.material.Surface
-import androidx.compose.material.Text
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.material.*
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.navigation.NavBackStackEntry
@@ -19,6 +26,12 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.staminapp.ui.theme.StaminappAppTheme
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.text.input.PasswordVisualTransformation
+import androidx.compose.ui.unit.dp
+
 
 sealed class Destination(val route: String) {
     object Home: Destination("home")
@@ -39,14 +52,14 @@ class MainActivity : ComponentActivity() {
                     modifier = Modifier.fillMaxSize(),
                     color = MaterialTheme.colors.background
                 ) {
-                    val navController = rememberNavController()
-                    NavigationAppHost(navController = navController)
+//                    val navController = rememberNavController()
+//                    NavigationAppHost(navController = navController)
+                    SignInScreen()
                 }
             }
         }
     }
 }
-
 @Composable
 fun NavigationAppHost(navController: NavHostController) {
     val ctx = LocalContext.current
@@ -57,24 +70,11 @@ fun NavigationAppHost(navController: NavHostController) {
         composable(Destination.List.route) { ListScreen(navController) }
         composable(Destination.Routine.route) { navBackStackEntry ->
             val elementId = navBackStackEntry.arguments?.getString("elementId")
-            if (elementId == null ) {
+            if (elementId == null) {
                 Toast.makeText(ctx, "ElementId is required", Toast.LENGTH_SHORT).show()
             } else {
                 RoutineScreen(elementId = elementId.toInt())
             }
         }
-    }
-}
-
-@Composable
-fun Greeting(name: String) {
-    Text(text = "Hello $name!")
-}
-
-@Preview(showBackground = true)
-@Composable
-fun DefaultPreview() {
-    StaminappAppTheme {
-        Greeting("Android")
     }
 }
