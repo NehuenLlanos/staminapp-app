@@ -1,6 +1,7 @@
 package com.staminapp
 
 import android.os.Bundle
+import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.Image
@@ -16,7 +17,14 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.input.TextFieldValue
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.navigation.NavBackStackEntry
+import androidx.navigation.NavController
+import androidx.navigation.NavHostController
+import androidx.navigation.compose.NavHost
+import androidx.navigation.compose.composable
+import androidx.navigation.compose.rememberNavController
 import com.staminapp.ui.theme.StaminappAppTheme
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.setValue
@@ -25,84 +33,48 @@ import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.unit.dp
 
 
+sealed class Destination(val route: String) {
+    object Home: Destination("home")
+    object Profile: Destination("profile")
+    object List: Destination("list")
+    object Routine: Destination("routine/{elementId}") {
+        fun createRoute(elementId: Int) = "routine/$elementId"
+    }
+}
+
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
             StaminappAppTheme {
-                SignInCard()
+                // A surface container using the 'background' color from the theme
+                Surface(
+                    modifier = Modifier.fillMaxSize(),
+                    color = MaterialTheme.colors.background
+                ) {
+//                    val navController = rememberNavController()
+//                    NavigationAppHost(navController = navController)
+                    SignInScreen()
+                }
             }
         }
     }
 }
-
 @Composable
-fun SignInCard() {
-    Surface(modifier = Modifier.fillMaxSize(), color = MaterialTheme.colors.background) {
-        Column(modifier = Modifier.padding(24.dp)) {
-            UsernameTextField()
-            PasswordTextField()
-            SignInButton()
+fun NavigationAppHost(navController: NavHostController) {
+    val ctx = LocalContext.current
+
+    NavHost(navController = navController, startDestination = "home") {
+        composable(Destination.Home.route) { HomeScreen(navController) }
+        composable(Destination.Profile.route) { ProfileScreen() }
+        composable(Destination.List.route) { ListScreen(navController) }
+        composable(Destination.Routine.route) { navBackStackEntry ->
+            val elementId = navBackStackEntry.arguments?.getString("elementId")
+            if (elementId == null) {
+                Toast.makeText(ctx, "ElementId is required", Toast.LENGTH_SHORT).show()
+            } else {
+                RoutineScreen(elementId = elementId.toInt())
+            }
         }
-    }
-}
-
-@Composable
-fun UsernameTextField() {
-    var text by remember { mutableStateOf(TextFieldValue("")) }
-    Surface(modifier = Modifier.padding(24.dp)) {
-        TextField(
-            value = text,
-            onValueChange = {
-                text = it
-            },
-            label = { Text(text = "Email") },
-        )
-    }
-}
-
-@Composable
-fun PasswordTextField() {
-    var password by remember { mutableStateOf(TextFieldValue("")) }
-    Surface(modifier = Modifier.padding(24.dp)) {
-        TextField(
-            value = password,
-            onValueChange = {
-                password = it
-            },
-            label = { Text(text = "Contrasenia") },
-            visualTransformation = PasswordVisualTransformation(),
-            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password)
-        )
-    }
-}
-
-@Composable
-fun SignInButton() {
-    Surface(modifier = Modifier.padding(24.dp)) {
-        Button(
-            onClick = {
-            //your onclick code
-            },
-            colors = ButtonDefaults.buttonColors(backgroundColor = MaterialTheme.colors.primary),
-            shape = RoundedCornerShape(50.dp)) {
-            Text(text = "Ingresar",color = MaterialTheme.colors.background)
-
-        }
-    }
-}
-
-
-
-@Composable
-fun Greeting(name: String) {
-    Text(text = "Hello $name!")
-}
-
-@Preview(showBackground = true)
-@Composable
-fun DefaultPreview() {
-    StaminappAppTheme {
-        SignInCard()
     }
 }
