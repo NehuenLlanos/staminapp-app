@@ -19,9 +19,12 @@ import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import com.staminapp.ui.theme.StaminappAppTheme
 
@@ -95,10 +98,14 @@ fun HomeScaffold(navController: NavController) {
         Column(
             modifier = Modifier
                 .verticalScroll(scrollState)
-                .padding(horizontal = 16.dp, vertical = 10.dp)
+                .padding(horizontal = 16.dp)
                 .fillMaxWidth()
         ) {
-            Text(text = "BUENOS DÍAS, USUARIO", color = MaterialTheme.colors.primaryVariant)
+            Text(text = "BUENOS DÍAS, USUARIO",
+                color = MaterialTheme.colors.primaryVariant,
+                fontSize = 40.sp,
+                fontWeight = FontWeight.Bold
+            )
 
             for(i in 1..2) {
                 Row(
@@ -109,14 +116,18 @@ fun HomeScaffold(navController: NavController) {
                     RecentCard(navController, Modifier.weight(1f))
                 }
             }
-            Text(text = "Mi Biblioteca", color = MaterialTheme.colors.primaryVariant)
+            Text(text = "Mi Biblioteca",
+                color = MaterialTheme.colors.primaryVariant,
+                fontSize = 25.sp,
+                fontWeight = FontWeight.Bold
+            )
             for(i in 1..10) {
                 Row(
-                    modifier = Modifier.padding(vertical = 10.dp).fillMaxWidth(),
-                    horizontalArrangement = Arrangement.SpaceBetween
+                    modifier = Modifier.padding(vertical = 4.dp).fillMaxWidth(),
+                    horizontalArrangement = Arrangement.spacedBy(8.dp)
                 ) {
-                    RoutineCard(navController)
-                    RoutineCard(navController)
+                    RoutineCard(navController, Modifier.weight(1f))
+                    RoutineCard(navController, Modifier.weight(1f))
                 }
             }
         }
@@ -158,16 +169,13 @@ fun RecentCard(navController: NavController, modifier: Modifier = Modifier) {
 }
 
 @Composable
-fun RoutineCard(navController: NavController) {
+fun RoutineCard(navController: NavController, modifier: Modifier = Modifier) {
     Card(
-        modifier = Modifier
-            .width(160.dp)
-            .height(160.dp)
-            .clickable{navController.navigate(Destination.Routine.route)},
+        modifier = modifier.clickable{navController.navigate(Destination.Routine.route)},
         shape = RoundedCornerShape(15.dp),
         elevation = 5.dp
     ) {
-        Box(modifier = Modifier.fillMaxSize()) {
+        Box(modifier = Modifier.fillMaxWidth().height(160.dp)) {
             Image(
                 painter = painterResource(id = R.drawable.tincho2),
                 contentDescription = "Routine",
@@ -202,10 +210,4 @@ fun RoutineCard(navController: NavController) {
     }
 }
 
-@Preview(showBackground = true)
-@Composable
-fun DefaultPreview() {
-    StaminappAppTheme {
-//        HomeScreen()
-    }
-}
+

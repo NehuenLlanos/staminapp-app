@@ -24,6 +24,8 @@ sealed class Destination(val route: String) {
     object Routine: Destination("routine/{elementId}") {
         fun createRoute(elementId: Int) = "routine/$elementId"
     }
+    object ExecuteRoutine: Destination("routine/execute")
+    object ExercisePreview: Destination("routine/execute/exercise-preview")
 }
 
 class MainActivity : ComponentActivity() {
@@ -53,6 +55,7 @@ fun NavigationAppHost(navController: NavHostController) {
         composable(Destination.Profile.route) { ProfileScreen() }
 //        composable(Destination.List.route) { ListScreen(navController) }
         composable(Destination.Routine.route) { RoutineScreen(navController) }
+        composable(Destination.ExecuteRoutine.route) { StartExecutionScreen() }
 //        composable(Destination.Routine.route) { navBackStackEntry ->
 //            val elementId = navBackStackEntry.arguments?.getString("elementId")
 //            if (elementId == null) {
@@ -61,5 +64,6 @@ fun NavigationAppHost(navController: NavHostController) {
 //                RoutineScreen(elementId = elementId.toInt())
 //            }
 //        }
+        composable(Destination.ExercisePreview.route) { ExercisePreview() }
     }
 }

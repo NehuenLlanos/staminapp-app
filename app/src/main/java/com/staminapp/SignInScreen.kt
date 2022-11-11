@@ -91,7 +91,7 @@ fun SignInButton(modifier: Modifier, navController: NavHostController) {
     Button(
         modifier = modifier,
         onClick = {
-            navController.navigate(Destination.Home.route)
+            navController.navigate(Destination.ExercisePreview.route)
         },
         colors = ButtonDefaults.buttonColors(backgroundColor = MaterialTheme.colors.primary),
         shape = RoundedCornerShape(50.dp)
