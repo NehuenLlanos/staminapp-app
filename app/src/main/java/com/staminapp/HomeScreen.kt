@@ -6,6 +6,9 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Home
+import androidx.compose.material.icons.filled.Person
+import androidx.compose.material.icons.filled.Search
 import androidx.compose.material.icons.outlined.Home
 import androidx.compose.material.icons.outlined.Person
 import androidx.compose.material.icons.outlined.Search
@@ -46,29 +49,42 @@ fun HomeScaffold(navController: NavController) {
                 var selectedIndex by remember { mutableStateOf(0) }
                 BottomNavigation(elevation = 10.dp) {
                     BottomNavigationItem(icon = {
-                        Icon(Icons.Outlined.Home, contentDescription = "Inicio")
+                        if (selectedIndex == 0) {
+                            Icon(Icons.Filled.Home, contentDescription = "Inicio")
+                        } else {
+                            Icon(Icons.Outlined.Home, contentDescription = "Inicio")
+                        }
                     },
-                        label = { Text(text = "Home") },
+                        label = { Text(text = "Inicio") },
                         selected = (selectedIndex == 0),
                         onClick = {
                             selectedIndex = 0
                         })
 
                     BottomNavigationItem(icon = {
-                        Icon(Icons.Outlined.Search, contentDescription = "Explorar")
+                        if (selectedIndex == 1) {
+                            Icon(Icons.Filled.Search, contentDescription = "Inicio")
+                        } else {
+                            Icon(Icons.Outlined.Search, contentDescription = "Inicio")
+                        }
                     },
-                        label = { Text(text = "Explore") },
-                        selected = (selectedIndex == 0),
+                        label = { Text(text = "Explorar") },
+                        selected = (selectedIndex == 1),
                         onClick = {
-                            selectedIndex = 0
+                            selectedIndex = 1
                         })
 
                     BottomNavigationItem(icon = {
-                        Icon(Icons.Outlined.Person, contentDescription = "Perfil")
+                        if (selectedIndex == 2) {
+                            Icon(Icons.Filled.Person, contentDescription = "Inicio")
+                        } else {
+                            Icon(Icons.Outlined.Person, contentDescription = "Inicio")
+                        }
                     },
-                        label = { Text(text = "Profile") },
-                        selected = (selectedIndex == 0),
+                        label = { Text(text = "Perfil") },
+                        selected = (selectedIndex == 2),
                         onClick = {
+                            selectedIndex = 3
                             navController.navigate(Destination.Profile.route)
                         })
                 }
@@ -86,12 +102,11 @@ fun HomeScaffold(navController: NavController) {
 
             for(i in 1..2) {
                 Row(
-                    modifier = Modifier.padding(vertical = 10.dp).fillMaxWidth(),
-                    horizontalArrangement = Arrangement.SpaceBetween
+                    modifier = Modifier.padding(4.dp).fillMaxWidth(),
+                    horizontalArrangement = Arrangement.spacedBy(8.dp),
                 ) {
-
-                    RecentCard(navController)
-                    RecentCard(navController)
+                    RecentCard(navController, Modifier.weight(1f))
+                    RecentCard(navController, Modifier.weight(1f))
                 }
             }
             Text(text = "Mi Biblioteca", color = MaterialTheme.colors.primaryVariant)
@@ -109,16 +124,16 @@ fun HomeScaffold(navController: NavController) {
 }
 
 @Composable
-fun RecentCard(navController: NavController) {
+fun RecentCard(navController: NavController, modifier: Modifier = Modifier) {
     Card(
-        modifier = Modifier.clickable{navController.navigate(Destination.Routine.route)},
+        modifier = modifier.clickable{navController.navigate(Destination.Routine.route)},
         backgroundColor = MaterialTheme.colors.primaryVariant,
         shape = RoundedCornerShape(15.dp),
         elevation = 5.dp,
     ) {
         Box(modifier = Modifier
+            .fillMaxWidth()
             .height(64.dp)
-            .width(160.dp),
         ) {
             Row() {
                 Image(
