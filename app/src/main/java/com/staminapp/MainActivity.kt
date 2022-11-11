@@ -52,7 +52,7 @@ fun NavigationAppHost(navController: NavHostController) {
         composable(Destination.Home.route) { HomeScreen(navController) }
         composable(Destination.Profile.route) { ProfileScreen() }
 //        composable(Destination.List.route) { ListScreen(navController) }
-        composable(Destination.Routine.route) { RoutineScreen() }
+        composable(Destination.Routine.route) { RoutineScreen(navController) }
 //        composable(Destination.Routine.route) { navBackStackEntry ->
 //            val elementId = navBackStackEntry.arguments?.getString("elementId")
 //            if (elementId == null) {
