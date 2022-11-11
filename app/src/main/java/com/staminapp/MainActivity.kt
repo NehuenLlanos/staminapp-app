@@ -26,6 +26,7 @@ sealed class Destination(val route: String) {
     }
     object ExecuteRoutine: Destination("routine/execute")
     object ExercisePreview: Destination("routine/execute/exercise-preview")
+    object ExerciseScreenTime: Destination("rotuine/execute/exercise")
 }
 
 class MainActivity : ComponentActivity() {
@@ -65,5 +66,6 @@ fun NavigationAppHost(navController: NavHostController) {
 //            }
 //        }
         composable(Destination.ExercisePreview.route) { ExercisePreview() }
+        composable(Destination.ExerciseScreenTime.route) { ExerciseScreenTime() }
     }
 }

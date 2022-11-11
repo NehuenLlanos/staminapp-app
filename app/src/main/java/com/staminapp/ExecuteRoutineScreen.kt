@@ -1,10 +1,13 @@
 package com.staminapp
 
 import androidx.annotation.FloatRange
+import androidx.compose.animation.core.animateFloatAsState
+import androidx.compose.animation.core.animateIntAsState
+import androidx.compose.animation.core.tween
+import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
-import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
@@ -19,57 +22,53 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.KeyboardArrowLeft
 import androidx.compose.material.icons.filled.KeyboardArrowRight
+import androidx.compose.material.icons.filled.ThumbUp
+import androidx.compose.runtime.*
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.PaintingStyle.Companion.Stroke
+import androidx.compose.ui.graphics.StrokeCap
+import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.Dp
+import androidx.compose.ui.unit.TextUnit
 import com.staminapp.ui.theme.StaminappAppTheme
+import java.util.concurrent.TimeUnit
 
+/* TopBar que aparece en todas las vistas de Ejecución de Rutina */
 @Composable
-fun StartExecutionScreen() {
+fun TopBarRoutineExecution(modifier: Modifier) {
     Column(
-        modifier = Modifier.fillMaxSize(),
-        horizontalAlignment = Alignment.CenterHorizontally
+        modifier = modifier,
+        verticalArrangement = Arrangement.spacedBy(16.dp)
     ) {
-        Column(
-            modifier = Modifier
-                .fillMaxHeight(0.8f)
-                .fillMaxWidth()
-                .padding(32.dp),
-            horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.spacedBy(20.dp, Alignment.CenterVertically)
-        ) {
+        Row(
+            horizontalArrangement = Arrangement.spacedBy(16.dp)
+        ){
             Image(
                 modifier = Modifier
-                    .width(120.dp)
-                    .height(120.dp),
+                    .width(40.dp)
+                    .height(40.dp),
                 painter = painterResource(id = R.drawable.tincho2),
                 contentDescription = "Logo",
                 contentScale = ContentScale.Crop
             )
-            CustomChip(selected = false, text = "Principiante", modifier = Modifier)
             Text(text = "a todo ritmo me encanta coldplay pa la puta madre".uppercase(),
                 color = MaterialTheme.colors.primaryVariant,
-                fontSize = 25.sp,
+                fontSize = 20.sp,
                 fontWeight = FontWeight.Bold,
                 textAlign = TextAlign.Center,
                 overflow = TextOverflow.Ellipsis,
-                maxLines = 2
+                maxLines = 1
             )
         }
-        Button(
-            modifier = Modifier,
-            colors = ButtonDefaults.buttonColors(backgroundColor = Color(0XFFFBD5D1)),
-            onClick = { /*TODO*/ }) {
-            Text(text = "Cancelar",
-                color = MaterialTheme.colors.error,
-                style = MaterialTheme.typography.body2,
-            )
-        }
+        LinearProgressIndicator(progress = 0.3f, modifier = Modifier.fillMaxWidth())
     }
 }
 
+/* Vista Previa de un Ejercicio */
 @Composable
 fun ExercisePreview() {
     Column(modifier = Modifier
@@ -130,7 +129,9 @@ fun ExercisePreview() {
             )
         }
         Column(
-            modifier = Modifier.padding(horizontal = 64.dp).fillMaxSize(),
+            modifier = Modifier
+                .padding(horizontal = 64.dp)
+                .fillMaxSize(),
             verticalArrangement = Arrangement.spacedBy(8.dp, Alignment.CenterVertically),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
@@ -175,29 +176,97 @@ fun ExercisePreview() {
                 )
             }
         }
+    }
+}
 
+/* Circular Progress Bar */
+@Composable
+fun CircularProgressBar(
+    percentage: Float,
+    number: Int,
+    fontSize: TextUnit = 28.sp,
+    radius: Dp = 50.dp,
+    color: Color = MaterialTheme.colors.primary,
+    stokeWidth: Dp = 8.dp,
+    animDuration: Int = 10000,
+    animDelay: Int = 0
+) {
+    val sb = java.lang.StringBuilder()
+    var animationPlayed by remember {
+        mutableStateOf(false)
+    }
+    val curPercentage = animateFloatAsState(
+        targetValue = if (animationPlayed) percentage else 0f,
+        animationSpec = tween (
+            durationMillis = animDuration,
+            delayMillis = animDelay
+        )
+    )
+    val curTime = animateIntAsState(
+        targetValue = if (animationPlayed) animDuration else 0,
+        animationSpec = tween (
+            durationMillis = animDuration,
+            delayMillis = animDelay
+        )
+    )
+    LaunchedEffect(key1 = true) {
+        animationPlayed = true
+    }
+    Box(
+        contentAlignment = Alignment.Center,
+        modifier = Modifier.size(radius * 2f)
+    ) {
+        Canvas(modifier = Modifier.size(radius * 2f)) {
+            drawArc(
+                color = color,
+                -90f,
+                360 * curPercentage.value,
+                useCenter = false,
+                style = Stroke(stokeWidth.toPx(), cap = StrokeCap.Round)
+            )
+        }
+//        Text(
+//            text = curTime.value.toString(),
+//            color = MaterialTheme.colors.primary,
+//            fontSize = fontSize,
+//            fontWeight = FontWeight.Bold
+//        )
+        Text(
+            text = sb.append(TimeUnit.MILLISECONDS.toMinutes(curTime.value.toLong()).toString())
+                .append(":")
+                .append(TimeUnit.MILLISECONDS.toSeconds(curTime.value.toLong()).toString()).toString(),
+            color = MaterialTheme.colors.primary,
+            fontSize = fontSize,
+            fontWeight = FontWeight.Bold
+        )
     }
 
 }
 
+//fun MiliToMinutesAndSeconds(miliseconds: Int) {
+//    val milliseconds: Long = 1000000
+//
+//    // long minutes = (milliseconds / 1000) / 60;
+//    val minutes = TimeUnit.MILLISECONDS.toMinutes(milliseconds)
+//
+//    // long seconds = (milliseconds / 1000);
+//    val seconds = TimeUnit.MILLISECONDS.toSeconds(milliseconds)
+//}
+
+/* Ejercicio con Tiempo */
 @Composable
-fun TopBarRoutineExecution(modifier: Modifier) {
-    Column(
-        modifier = modifier,
-        verticalArrangement = Arrangement.spacedBy(16.dp)
+fun ExerciseScreenTime() {
+    Column(modifier = Modifier
+        .fillMaxHeight()
+        .fillMaxWidth()
+        .padding(horizontal = 16.dp, vertical = 16.dp),
+        horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        Row(
-            horizontalArrangement = Arrangement.spacedBy(16.dp)
-        ){
-            Image(
-                modifier = Modifier
-                    .width(40.dp)
-                    .height(40.dp),
-                painter = painterResource(id = R.drawable.tincho2),
-                contentDescription = "Logo",
-                contentScale = ContentScale.Crop
-            )
-            Text(text = "a todo ritmo me encanta coldplay pa la puta madre".uppercase(),
+        TopBarRoutineExecution(Modifier.padding(bottom = 16.dp))
+        Column(
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+            Text(text = "Ciclo",
                 color = MaterialTheme.colors.primaryVariant,
                 fontSize = 20.sp,
                 fontWeight = FontWeight.Bold,
@@ -205,7 +274,68 @@ fun TopBarRoutineExecution(modifier: Modifier) {
                 overflow = TextOverflow.Ellipsis,
                 maxLines = 1
             )
+            Text(text = "Ejercicio",
+                color = MaterialTheme.colors.primaryVariant,
+                fontSize = 30.sp,
+                fontWeight = FontWeight.Bold,
+                textAlign = TextAlign.Center,
+                overflow = TextOverflow.Ellipsis,
+                maxLines = 1
+            )
+
+            Column(
+                modifier = Modifier
+                    .height(215.dp)
+                    .fillMaxWidth()
+                    .padding(vertical = 8.dp, horizontal = 8.dp)
+                    .clip(shape = RoundedCornerShape(16.dp))
+                    .background(MaterialTheme.colors.primaryVariant),
+                horizontalAlignment = Alignment.CenterHorizontally,
+                verticalArrangement = Arrangement.Center,
+
+                ) {
+                CircularProgressBar(percentage = 1f, number = 100)
+            }
         }
-        LinearProgressIndicator(progress = 0.3f, modifier = Modifier.fillMaxWidth())
+        Column(
+            modifier = Modifier
+                .padding(horizontal = 64.dp)
+                .fillMaxSize(),
+            verticalArrangement = Arrangement.spacedBy(8.dp, Alignment.CenterVertically),
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+            Button(
+                modifier = Modifier.fillMaxWidth(),
+                colors = ButtonDefaults.buttonColors(backgroundColor = MaterialTheme.colors.primary),
+                shape = RoundedCornerShape(16.dp),
+                onClick = { /*TODO*/ }) {
+                Icon(Icons.Filled.ThumbUp, contentDescription = "Inicio")
+            }
+            Button(
+                modifier = Modifier.fillMaxWidth(),
+                colors = ButtonDefaults.buttonColors(backgroundColor = MaterialTheme.colors.primary),
+                shape = RoundedCornerShape(16.dp),
+                onClick = { /*TODO*/ }) {
+                Text(text = "Finalizar Ejercicio",
+                    color = MaterialTheme.colors.primaryVariant,
+                    style = MaterialTheme.typography.body2,
+                )
+            }
+            Button(
+                modifier = Modifier.fillMaxWidth(),
+                colors = ButtonDefaults.buttonColors(backgroundColor = Color(0XFFFBD5D1)),
+                shape = RoundedCornerShape(16.dp),
+                onClick = { /*TODO*/ }) {
+                Text(text = "Finalizar Rutina",
+                    color = MaterialTheme.colors.error,
+                    style = MaterialTheme.typography.body2,
+                )
+            }
+        }
     }
 }
+
+/* Ejercicio con Repeticiones */
+
+
+/* Ejercicio con Tiempo y Repeticiones */

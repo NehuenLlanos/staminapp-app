@@ -22,10 +22,12 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
+import androidx.navigation.compose.rememberNavController
 import com.staminapp.ui.theme.StaminappAppTheme
 
 @Composable
@@ -109,7 +111,9 @@ fun HomeScaffold(navController: NavController) {
 
             for(i in 1..2) {
                 Row(
-                    modifier = Modifier.padding(4.dp).fillMaxWidth(),
+                    modifier = Modifier
+                        .padding(4.dp)
+                        .fillMaxWidth(),
                     horizontalArrangement = Arrangement.spacedBy(8.dp),
                 ) {
                     RecentCard(navController, Modifier.weight(1f))
@@ -123,7 +127,9 @@ fun HomeScaffold(navController: NavController) {
             )
             for(i in 1..10) {
                 Row(
-                    modifier = Modifier.padding(vertical = 4.dp).fillMaxWidth(),
+                    modifier = Modifier
+                        .padding(vertical = 4.dp)
+                        .fillMaxWidth(),
                     horizontalArrangement = Arrangement.spacedBy(8.dp)
                 ) {
                     RoutineCard(navController, Modifier.weight(1f))
@@ -175,7 +181,9 @@ fun RoutineCard(navController: NavController, modifier: Modifier = Modifier) {
         shape = RoundedCornerShape(15.dp),
         elevation = 5.dp
     ) {
-        Box(modifier = Modifier.fillMaxWidth().height(160.dp)) {
+        Box(modifier = Modifier
+            .fillMaxWidth()
+            .height(160.dp)) {
             Image(
                 painter = painterResource(id = R.drawable.tincho2),
                 contentDescription = "Routine",
@@ -210,4 +218,10 @@ fun RoutineCard(navController: NavController, modifier: Modifier = Modifier) {
     }
 }
 
-
+@Preview
+@Composable
+fun DefaultPreview() {
+    StaminappAppTheme {
+        HomeScreen(rememberNavController())
+    }
+}
