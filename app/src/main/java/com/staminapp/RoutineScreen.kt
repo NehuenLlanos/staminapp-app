@@ -89,10 +89,8 @@ fun RoutineScreen(navController: NavController) {
                         val sendIntent: Intent = Intent().apply {
                             val bitmap = bitmapImage?.asAndroidBitmap()
                             val out: OutputStream
-                            val file = File(context.externalCacheDir, "shared_routine.jpg")
-                            while (!file.createNewFile()) {
-                                file.delete()
-                            }
+                            val file = File(context.externalCacheDir, System.currentTimeMillis().toString() + ".jpg")
+
                             try {
                                 val baos = ByteArrayOutputStream()
                                 bitmap?.compress(Bitmap.CompressFormat.JPEG, 100, baos)
@@ -104,17 +102,15 @@ fun RoutineScreen(navController: NavController) {
                                 e.printStackTrace()
                             }
 
-                            val path = file.path
+                            val uri = Uri.fromFile(file)
 
-                            val uri = Uri.parse("file://$path")
-
+                            putExtra(Intent.EXTRA_STREAM, uri)
                             putExtra(
                                 Intent.EXTRA_TEXT,
                                 "¡Mirá esta rutina en StaminApp! https://www.staminapp.com/routine/1"
                             )
-                            putExtra(Intent.EXTRA_STREAM, uri)
                             flags = Intent.FLAG_GRANT_READ_URI_PERMISSION
-                            type = "image/*"
+                            type = "*/*"
                         }
                         val shareIntent = Intent.createChooser(sendIntent, "Compartí esta rutina")
                         context.startActivity(shareIntent)
