@@ -47,6 +47,7 @@ fun RoutineScreen(navController: NavController) {
     val context = LocalContext.current
 
     var isDescriptionOpen by remember { mutableStateOf(true) }
+    var isFavourite by remember { mutableStateOf(false) }
 
     Scaffold (
         topBar = {
@@ -60,6 +61,15 @@ fun RoutineScreen(navController: NavController) {
                     }
                 },
                 actions = {
+                    IconButton(onClick = {
+                        // TODO
+                    }) {
+                        when {
+                            isFavourite -> Icon(Icons.Filled.Favorite, contentDescription = "Desmarcar como favorito", tint = White)
+                            else -> Icon(Icons.Filled.FavoriteBorder, contentDescription = "Marcar como favorito", tint = White)
+                        }
+
+                    }
                     IconButton(onClick = {
                         context.startActivity(shareIntent)
                     }) {
@@ -104,9 +114,15 @@ fun RoutineScreen(navController: NavController) {
                     Column(
                         horizontalAlignment = Alignment.End
                     ) {
-                        CustomChip(selected = false, text = "Principiante")
-                        Text("A todo Ritmo".uppercase(),
+                        CustomChip(
+                            selected = false,
+                            text = "Principiante",
+                            modifier = Modifier.padding(bottom = 4.dp)
+                        )
+                        Text(
+                            "A todo Ritmo".uppercase(),
                             style = MaterialTheme.typography.h2,
+                            lineHeight = 40.sp,
                             maxLines = 3,
                             overflow = TextOverflow.Ellipsis,
                             color = MaterialTheme.colors.primaryVariant
@@ -117,7 +133,7 @@ fun RoutineScreen(navController: NavController) {
                 Row(
                     modifier = Modifier.fillMaxWidth(),
                     horizontalArrangement = Arrangement.SpaceBetween,
-                    verticalAlignment = Alignment.Bottom
+                    verticalAlignment = Alignment.CenterVertically
                 ) {
                     Text("Calificación",
                         style = MaterialTheme.typography.subtitle1,
@@ -126,12 +142,11 @@ fun RoutineScreen(navController: NavController) {
                     RatingBar(
                         rating = 1,
                         starsColor = MaterialTheme.colors.primary,
-                        modifier = Modifier.padding(bottom = 2.dp)
                     )
                 }
                 Row(
                     horizontalArrangement = Arrangement.SpaceBetween,
-                    verticalAlignment = Alignment.Bottom,
+                    verticalAlignment = Alignment.CenterVertically,
                     modifier = Modifier
                         .fillMaxWidth()
                         .clickable {
@@ -200,7 +215,7 @@ fun Cycle(
     ) {
         Row(
             horizontalArrangement = Arrangement.SpaceBetween,
-            verticalAlignment = Alignment.Bottom,
+            verticalAlignment = Alignment.CenterVertically,
             modifier = Modifier
                 .fillMaxWidth()
                 .clickable {
@@ -208,7 +223,7 @@ fun Cycle(
                 }
         ) {
             Row(
-                verticalAlignment = Alignment.Bottom,
+                verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.spacedBy(8.dp)
             ) {
                 Text(title.uppercase(),
