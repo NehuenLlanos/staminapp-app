@@ -118,6 +118,7 @@ fun RoutineScreen(navController: NavController) {
 
                     }
                     IconButton(onClick = {
+                        captureController.capture()
                         context.startActivity(shareIntent)
                     }) {
                         Icon(Icons.Filled.Share, contentDescription = "Compartir", tint = White)
