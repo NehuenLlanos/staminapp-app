@@ -17,10 +17,7 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Home
-import androidx.compose.material.icons.filled.KeyboardArrowLeft
-import androidx.compose.material.icons.filled.KeyboardArrowRight
-import androidx.compose.material.icons.filled.ThumbUp
+import androidx.compose.material.icons.filled.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
@@ -32,6 +29,7 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.TextUnit
+import androidx.navigation.compose.rememberNavController
 import com.staminapp.ui.theme.StaminappAppTheme
 import java.util.concurrent.TimeUnit
 
@@ -180,30 +178,34 @@ fun ExercisePreview() {
 /* Circular Progress Bar */
 @Composable
 fun CircularProgressBar(
-    percentage: Float,
-    fontSize: TextUnit = 28.sp,
-    radius: Dp = 80.dp,
+    percentage: Float = 1f,
+    fontSize: TextUnit = 24.sp,
+    radius: Dp = 50.dp,
     color: Color = MaterialTheme.colors.primary,
-    stokeWidth: Dp = 8.dp,
-    animDuration: Int = 10000,
+    stokeWidth: Dp = 16.dp,
+    animDurationSec: Int = 10000,
+//    animDuration: Int = 10000,
     animDelay: Int = 1000
 ) {
     val sb = java.lang.StringBuilder()
     var animationPlayed by remember {
         mutableStateOf(false)
     }
+    val animationDuration by remember {
+        mutableStateOf(animDurationSec*1000)
+    }
     val curPercentage = animateFloatAsState(
         targetValue = if (animationPlayed) 0f else 1f,
         animationSpec = tween (
-            durationMillis = animDuration,
+            durationMillis = animationDuration,
             delayMillis = 0,
             easing = LinearEasing
         )
     )
     val curTime = animateIntAsState(
-        targetValue = if (animationPlayed) 10000 else 0,
+        targetValue = if (animationPlayed) animDurationSec else 0,
         animationSpec = tween (
-            durationMillis = animDuration,
+            durationMillis = animationDuration,
             delayMillis = animDelay,
             easing = LinearEasing
         )
@@ -225,9 +227,9 @@ fun CircularProgressBar(
             )
         }
         Text(
-            text = sb.append(TimeUnit.MILLISECONDS.toMinutes((animDuration - curTime.value).toLong()).toString())
+            text = sb.append(TimeUnit.SECONDS.toMinutes((animDurationSec - curTime.value).toLong()).toString())
                 .append(":")
-                .append(TimeUnit.MILLISECONDS.toSeconds((animDuration - curTime.value).toLong()).toString()).toString(),
+                .append(TimeUnit.SECONDS.toSeconds(((animDurationSec - curTime.value) % 60).toLong()).toString()).toString(),
             color = MaterialTheme.colors.primary,
             fontSize = fontSize,
             fontWeight = FontWeight.Bold
@@ -275,7 +277,7 @@ fun ExerciseScreenTime() {
                 horizontalAlignment = Alignment.CenterHorizontally,
                 verticalArrangement = Arrangement.Center,
                 ) {
-                CircularProgressBar(percentage = 1f, animDuration = 10000)
+                CircularProgressBar(percentage = 1f, animDurationSec = 70)
             }
         }
         Column(
@@ -290,7 +292,7 @@ fun ExerciseScreenTime() {
                 colors = ButtonDefaults.buttonColors(backgroundColor = MaterialTheme.colors.primary),
                 shape = RoundedCornerShape(16.dp),
                 onClick = { /*TODO*/ }) {
-                Icon(Icons.Filled.ThumbUp, contentDescription = "Inicio")
+                Icon(Icons.Filled.Pause, contentDescription = "Inicio")
             }
             Button(
                 modifier = Modifier.fillMaxWidth(),
@@ -320,3 +322,11 @@ fun ExerciseScreenTime() {
 
 
 /* Ejercicio con Tiempo y Repeticiones */
+
+@Preview
+@Composable
+fun DefaultPreview() {
+    StaminappAppTheme {
+        ExerciseScreenTime()
+    }
+}

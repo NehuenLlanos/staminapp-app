@@ -218,10 +218,4 @@ fun RoutineCard(navController: NavController, modifier: Modifier = Modifier) {
     }
 }
 
-@Preview
-@Composable
-fun DefaultPreview() {
-    StaminappAppTheme {
-        HomeScreen(rememberNavController())
-    }
-}
+
