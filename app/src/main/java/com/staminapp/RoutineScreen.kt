@@ -1,6 +1,9 @@
 package com.staminapp
 
 import android.content.Intent
+import android.graphics.Bitmap
+import android.graphics.BitmapFactory
+import android.net.Uri
 import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
@@ -9,7 +12,6 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
-import androidx.compose.material.icons.outlined.Star
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -17,37 +19,75 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Color.*
 import androidx.compose.ui.graphics.Color.Companion.White
+import androidx.compose.ui.graphics.ImageBitmap
+import androidx.compose.ui.graphics.asAndroidBitmap
+import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.text.font.FontFamily
-import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.core.content.ContextCompat.startActivity
 import androidx.navigation.NavController
-import androidx.navigation.compose.rememberNavController
 import com.staminapp.ui.theme.Gray
 import com.staminapp.ui.theme.StaminappAppTheme
-import kotlin.math.ceil
-import kotlin.math.floor
-import androidx.compose.material.Icon as Icon
-import androidx.compose.foundation.lazy.items
+import dev.shreyaspatil.capturable.Capturable
+import dev.shreyaspatil.capturable.controller.rememberCaptureController
+import java.io.File
+import java.io.FileOutputStream
+import java.io.OutputStream
+
 
 @Composable
 fun RoutineScreen(navController: NavController) {
+    val captureController = rememberCaptureController()
+    var bitmapImage: ImageBitmap? by remember { mutableStateOf(null)}
+
+    val context = LocalContext.current
     val sendIntent: Intent = Intent().apply {
-        action = Intent.ACTION_SEND
-        putExtra(Intent.EXTRA_TEXT, "¡Mirá esta rutina en StaminApp! https://www.staminapp.com/routine/1")
-        type = "text/plain"
+        val bitmap = bitmapImage?.asAndroidBitmap()
+        var path = context.externalCacheDir?.path + "/shared_routine.jpg"
+
+        val out: OutputStream
+        val file = File(path)
+        try {
+            out = FileOutputStream(file)
+            bitmap?.compress(Bitmap.CompressFormat.JPEG, 100, out)
+            out.flush()
+            out.close()
+        } catch (e: Exception) {
+            e.printStackTrace()
+        }
+
+        path = file.path
+
+        val uri = Uri.parse("file://$path")
+
+        putExtra(
+            Intent.EXTRA_TEXT,
+            "¡Mirá esta rutina en StaminApp! https://www.staminapp.com/routine/1"
+        )
+        putExtra(Intent.EXTRA_STREAM, uri)
+        type = "image/*"
     }
     val shareIntent = Intent.createChooser(sendIntent, "Compartí esta rutina")
-    val context = LocalContext.current
 
     var isDescriptionOpen by remember { mutableStateOf(true) }
     var isFavourite by remember { mutableStateOf(false) }
+
+    Capturable(
+        controller = captureController,
+        onCaptured = { bitmap, _ ->
+            if (bitmap != null) {
+               bitmapImage = bitmap
+            }
+        }
+    ) {
+        CapturableImage(url = "https://www.staminapp.com/1", title = "A todo ritmo probando")
+    }
 
     Scaffold (
         topBar = {
@@ -200,6 +240,54 @@ fun RoutineScreen(navController: NavController) {
 }
 
 @Composable
+fun CapturableImage(
+    url: String,
+    title: String,
+) {
+    val qrCode: Bitmap = getQrCodeBitmap(url);
+    
+    Box(
+        modifier = Modifier
+            .width(375.dp)
+            .height(200.dp)
+            .background(MaterialTheme.colors.primaryVariant)
+            .padding(16.dp)
+    ) {
+        Column(
+            modifier = Modifier.fillMaxSize(),
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .weight(1f),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Image(
+                    bitmap = qrCode.asImageBitmap(),
+                    contentDescription = "QR Code",
+                )
+                Text(
+                    title.uppercase(),
+                    modifier = Modifier.padding(start = 4.dp),
+                    style = MaterialTheme.typography.h3,
+                    color = White,
+                    lineHeight = 30.sp,
+                    maxLines = 2,
+                    overflow = TextOverflow.Ellipsis
+                )
+            }
+            Image(
+                painter = painterResource(R.drawable.logoalt),
+                contentDescription = "StaminApp",
+                modifier = Modifier
+                    .width(144.dp)
+            )
+        }
+    }
+}
+
+@Composable
 fun Cycle(
     modifier: Modifier = Modifier,
     title: String,
@@ -327,6 +415,7 @@ fun CustomChip(
 @Composable
 fun ComposablePreview() {
     StaminappAppTheme {
-        RoutineScreen(rememberNavController())
+//        RoutineScreen(rememberNavController())
+        CapturableImage("https://staminapp.com/1", "A todo ritmo wowo")
     }
 }
