@@ -48,39 +48,6 @@ fun RoutineScreen(navController: NavController) {
     var bitmapImage: ImageBitmap? by remember { mutableStateOf(null)}
 
     val context = LocalContext.current
-    val sendIntent: Intent = Intent().apply {
-        val bitmap = bitmapImage?.asAndroidBitmap()
-//        var path = context.cacheDir.path + "/shared_routine.jpg"
-//        println(path)
-        val out: OutputStream
-        val file = File(context.externalCacheDir, "shared_routine.jpg")
-        while (!file.createNewFile()) {
-            file.delete()
-        }
-        try {
-            val baos = ByteArrayOutputStream()
-            bitmap?.compress(Bitmap.CompressFormat.JPEG, 100, baos)
-            out = FileOutputStream(file)
-            out.write(baos.toByteArray())
-            out.flush()
-            out.close()
-        } catch (e: Exception) {
-            e.printStackTrace()
-        }
-
-        val path = file.path
-
-        val uri = Uri.parse("file://$path")
-
-        putExtra(
-            Intent.EXTRA_TEXT,
-            "¡Mirá esta rutina en StaminApp! https://www.staminapp.com/routine/1"
-        )
-        putExtra(Intent.EXTRA_STREAM, uri)
-        flags = Intent.FLAG_GRANT_READ_URI_PERMISSION
-        type = "image/*"
-    }
-    val shareIntent = Intent.createChooser(sendIntent, "Compartí esta rutina")
 
     var isDescriptionOpen by remember { mutableStateOf(true) }
     var isFavourite by remember { mutableStateOf(false) }
@@ -119,6 +86,37 @@ fun RoutineScreen(navController: NavController) {
                     }
                     IconButton(onClick = {
                         captureController.capture()
+                        val sendIntent: Intent = Intent().apply {
+                            val bitmap = bitmapImage?.asAndroidBitmap()
+                            val out: OutputStream
+                            val file = File(context.externalCacheDir, "shared_routine.jpg")
+                            while (!file.createNewFile()) {
+                                file.delete()
+                            }
+                            try {
+                                val baos = ByteArrayOutputStream()
+                                bitmap?.compress(Bitmap.CompressFormat.JPEG, 100, baos)
+                                out = FileOutputStream(file)
+                                out.write(baos.toByteArray())
+                                out.flush()
+                                out.close()
+                            } catch (e: Exception) {
+                                e.printStackTrace()
+                            }
+
+                            val path = file.path
+
+                            val uri = Uri.parse("file://$path")
+
+                            putExtra(
+                                Intent.EXTRA_TEXT,
+                                "¡Mirá esta rutina en StaminApp! https://www.staminapp.com/routine/1"
+                            )
+                            putExtra(Intent.EXTRA_STREAM, uri)
+                            flags = Intent.FLAG_GRANT_READ_URI_PERMISSION
+                            type = "image/*"
+                        }
+                        val shareIntent = Intent.createChooser(sendIntent, "Compartí esta rutina")
                         context.startActivity(shareIntent)
                     }) {
                         Icon(Icons.Filled.Share, contentDescription = "Compartir", tint = White)
