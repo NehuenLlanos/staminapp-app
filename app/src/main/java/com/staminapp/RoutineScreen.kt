@@ -53,6 +53,9 @@ fun RoutineScreen(navController: NavController) {
 //        println(path)
         val out: OutputStream
         val file = File(context.externalCacheDir, "shared_routine.jpg")
+        while (!file.createNewFile()) {
+            file.delete()
+        }
         try {
             out = FileOutputStream(file)
             bitmap?.compress(Bitmap.CompressFormat.JPEG, 100, out)
