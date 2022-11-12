@@ -175,6 +175,27 @@ fun ExercisePreview() {
     }
 }
 
+/* Cicle and Exercise names running at the moment */
+@Composable
+fun ExerciseHeader() {
+    Text(text = "Ciclo",
+        color = MaterialTheme.colors.primaryVariant,
+        fontSize = 20.sp,
+        fontWeight = FontWeight.Bold,
+        textAlign = TextAlign.Center,
+        overflow = TextOverflow.Ellipsis,
+        maxLines = 1
+    )
+    Text(text = "Ejercicio",
+        color = MaterialTheme.colors.primaryVariant,
+        fontSize = 30.sp,
+        fontWeight = FontWeight.Bold,
+        textAlign = TextAlign.Center,
+        overflow = TextOverflow.Ellipsis,
+        maxLines = 1
+    )
+}
+
 /* Circular Progress Bar */
 @Composable
 fun CircularProgressBar(
@@ -184,7 +205,6 @@ fun CircularProgressBar(
     color: Color = MaterialTheme.colors.primary,
     stokeWidth: Dp = 16.dp,
     animDurationSec: Int = 10000,
-//    animDuration: Int = 10000,
     animDelay: Int = 0
 ) {
     val sb = java.lang.StringBuilder()
@@ -251,22 +271,7 @@ fun ExerciseScreenTime() {
         Column(
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            Text(text = "Ciclo",
-                color = MaterialTheme.colors.primaryVariant,
-                fontSize = 20.sp,
-                fontWeight = FontWeight.Bold,
-                textAlign = TextAlign.Center,
-                overflow = TextOverflow.Ellipsis,
-                maxLines = 1
-            )
-            Text(text = "Ejercicio",
-                color = MaterialTheme.colors.primaryVariant,
-                fontSize = 30.sp,
-                fontWeight = FontWeight.Bold,
-                textAlign = TextAlign.Center,
-                overflow = TextOverflow.Ellipsis,
-                maxLines = 1
-            )
+            ExerciseHeader()
             Column(
                 modifier = Modifier
                     .height(264.dp)
@@ -300,7 +305,7 @@ fun ExerciseScreenTime() {
                 colors = ButtonDefaults.buttonColors(backgroundColor = MaterialTheme.colors.primary),
                 shape = RoundedCornerShape(16.dp),
                 onClick = { /*TODO*/ }) {
-                Text(text = "Finalizar Ejercicio",
+                Text(text = "Finalizar Ejercicio".uppercase(),
                     color = MaterialTheme.colors.primaryVariant,
                     style = MaterialTheme.typography.body2,
                 )
@@ -310,7 +315,7 @@ fun ExerciseScreenTime() {
                 colors = ButtonDefaults.buttonColors(backgroundColor = Color(0XFFFBD5D1)),
                 shape = RoundedCornerShape(16.dp),
                 onClick = { /*TODO*/ }) {
-                Text(text = "Finalizar Rutina",
+                Text(text = "Finalizar Rutina".uppercase(),
                     color = MaterialTheme.colors.error,
                     style = MaterialTheme.typography.body2,
                 )
@@ -320,9 +325,160 @@ fun ExerciseScreenTime() {
 }
 
 /* Ejercicio con Repeticiones */
-
+@Composable
+fun ExerciseScreenReps() {
+    Column(modifier = Modifier
+        .fillMaxHeight()
+        .fillMaxWidth()
+        .padding(horizontal = 16.dp, vertical = 16.dp),
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
+        TopBarRoutineExecution(Modifier.padding(bottom = 16.dp))
+        Column(
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+            ExerciseHeader()
+            Column(
+                modifier = Modifier
+                    .height(264.dp)
+                    .width(264.dp)
+                    .fillMaxWidth()
+                    .padding(vertical = 8.dp, horizontal = 8.dp)
+                    .clip(shape = RoundedCornerShape(16.dp))
+                    .background(MaterialTheme.colors.primaryVariant),
+                horizontalAlignment = Alignment.CenterHorizontally,
+                verticalArrangement = Arrangement.Center,
+            ) {
+                Text(text = "Reps",
+                    color = MaterialTheme.colors.primary,
+                    fontSize = 56.sp,
+                    fontWeight = FontWeight.Bold,
+                    textAlign = TextAlign.Center,
+                    overflow = TextOverflow.Ellipsis,
+                    maxLines = 1
+                )
+                Text(text = "Repeticiones".uppercase(),
+                    color = MaterialTheme.colors.primary,
+                    fontSize = 15.sp,
+                    fontWeight = FontWeight.Bold,
+                    textAlign = TextAlign.Center,
+                    overflow = TextOverflow.Ellipsis,
+                    maxLines = 1
+                )
+            }
+        }
+        Column(
+            modifier = Modifier
+                .padding(horizontal = 64.dp)
+                .fillMaxSize(),
+            verticalArrangement = Arrangement.spacedBy(8.dp, Alignment.CenterVertically),
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+            Button(
+                modifier = Modifier.fillMaxWidth(),
+                colors = ButtonDefaults.buttonColors(backgroundColor = MaterialTheme.colors.primary),
+                shape = RoundedCornerShape(16.dp),
+                onClick = { /*TODO*/ }) {
+                Text(text = "Listo",
+                    color = MaterialTheme.colors.primaryVariant,
+                    style = MaterialTheme.typography.body2,
+                )
+            }
+            Button(
+                modifier = Modifier.fillMaxWidth(),
+                colors = ButtonDefaults.buttonColors(backgroundColor = Color(0XFFFBD5D1)),
+                shape = RoundedCornerShape(16.dp),
+                onClick = { /*TODO*/ }) {
+                Text(text = "Finalizar Rutina".uppercase(),
+                    color = MaterialTheme.colors.error,
+                    style = MaterialTheme.typography.body2,
+                )
+            }
+        }
+    }
+}
 
 /* Ejercicio con Tiempo y Repeticiones */
+@Composable
+fun ExerciseScreenRepsAndTime() {
+    Column(modifier = Modifier
+        .fillMaxHeight()
+        .fillMaxWidth()
+        .padding(horizontal = 16.dp, vertical = 16.dp),
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
+        TopBarRoutineExecution(Modifier.padding(bottom = 16.dp))
+        Column(
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+            ExerciseHeader()
+            Column(
+                modifier = Modifier
+                    .height(264.dp)
+                    .width(264.dp)
+                    .fillMaxWidth()
+                    .padding(vertical = 8.dp, horizontal = 8.dp)
+                    .clip(shape = RoundedCornerShape(16.dp))
+                    .background(MaterialTheme.colors.primaryVariant),
+                horizontalAlignment = Alignment.CenterHorizontally,
+                verticalArrangement = Arrangement.spacedBy(8.dp, Alignment.CenterVertically),
+            ) {
+                CircularProgressBar(percentage = 1f, animDurationSec = 70, stokeWidth = 12.dp, radius = 50.dp, fontSize = 20.sp)
+                Text(text = "Reps",
+                    color = MaterialTheme.colors.primary,
+                    fontSize = 30.sp,
+                    fontWeight = FontWeight.Bold,
+                    textAlign = TextAlign.Center,
+                    overflow = TextOverflow.Ellipsis,
+                    maxLines = 1
+                )
+                Text(text = "Repeticiones".uppercase(),
+                    color = MaterialTheme.colors.primary,
+                    fontSize = 10.sp,
+                    fontWeight = FontWeight.Bold,
+                    textAlign = TextAlign.Center,
+                    overflow = TextOverflow.Ellipsis,
+                    maxLines = 1
+                )
+            }
+        }
+        Column(
+            modifier = Modifier
+                .padding(horizontal = 64.dp)
+                .fillMaxSize(),
+            verticalArrangement = Arrangement.spacedBy(8.dp, Alignment.CenterVertically),
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+            Button(
+                modifier = Modifier.fillMaxWidth(),
+                colors = ButtonDefaults.buttonColors(backgroundColor = MaterialTheme.colors.primary),
+                shape = RoundedCornerShape(16.dp),
+                onClick = { /*TODO*/ }) {
+                Icon(Icons.Filled.Pause, contentDescription = "Inicio")
+            }
+            Button(
+                modifier = Modifier.fillMaxWidth(),
+                colors = ButtonDefaults.buttonColors(backgroundColor = MaterialTheme.colors.primary),
+                shape = RoundedCornerShape(16.dp),
+                onClick = { /*TODO*/ }) {
+                Text(text = "Finalizar Ejercicio".uppercase(),
+                    color = MaterialTheme.colors.primaryVariant,
+                    style = MaterialTheme.typography.body2,
+                )
+            }
+            Button(
+                modifier = Modifier.fillMaxWidth(),
+                colors = ButtonDefaults.buttonColors(backgroundColor = Color(0XFFFBD5D1)),
+                shape = RoundedCornerShape(16.dp),
+                onClick = { /*TODO*/ }) {
+                Text(text = "Finalizar Rutina".uppercase(),
+                    color = MaterialTheme.colors.error,
+                    style = MaterialTheme.typography.body2,
+                )
+            }
+        }
+    }
+}
 
 @Preview
 @Composable
