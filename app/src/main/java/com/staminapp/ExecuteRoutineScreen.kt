@@ -480,6 +480,102 @@ fun ExerciseScreenRepsAndTime() {
     }
 }
 
+@Composable
+fun ExerciseScreenFinished() {
+    Column(modifier = Modifier
+        .fillMaxHeight()
+        .fillMaxWidth()
+        .padding(horizontal = 16.dp, vertical = 16.dp),
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
+        TopBarRoutineExecution(Modifier.padding(bottom = 16.dp))
+        Column(
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.spacedBy(16.dp, Alignment.CenterVertically)
+        ) {
+            Text(text = "¡Terminó!".uppercase(),
+                color = MaterialTheme.colors.primaryVariant,
+                fontSize = 40.sp,
+                fontWeight = FontWeight.Bold,
+                textAlign = TextAlign.Center,
+                overflow = TextOverflow.Ellipsis,
+                maxLines = 1
+            )
+            Column(
+                modifier = Modifier
+                    .height(120.dp)
+                    .width(264.dp)
+                    .fillMaxWidth()
+                    .padding(vertical = 4.dp, horizontal = 4.dp)
+                    .clip(shape = RoundedCornerShape(16.dp))
+                    .background(MaterialTheme.colors.primaryVariant),
+                horizontalAlignment = Alignment.CenterHorizontally,
+                verticalArrangement = Arrangement.spacedBy(4.dp, Alignment.CenterVertically),
+            ) {
+                Text(text = "01:23:43",
+                    color = MaterialTheme.colors.primary,
+                    fontSize = 32.sp,
+                    fontWeight = FontWeight.Bold,
+                    textAlign = TextAlign.Center,
+                    overflow = TextOverflow.Ellipsis,
+                    maxLines = 1
+                )
+                Text(text = "Tiempo Utilizado".uppercase(),
+                    color = MaterialTheme.colors.primary,
+                    fontSize = 15.sp,
+                    fontWeight = FontWeight.Bold,
+                    textAlign = TextAlign.Center,
+                    overflow = TextOverflow.Ellipsis,
+                    maxLines = 1
+                )
+            }
+            Column(
+                modifier = Modifier
+                    .height(120.dp)
+                    .width(264.dp)
+                    .fillMaxWidth()
+                    .padding(vertical = 4.dp, horizontal = 4.dp)
+                    .clip(shape = RoundedCornerShape(16.dp))
+                    .background(MaterialTheme.colors.primaryVariant),
+                horizontalAlignment = Alignment.CenterHorizontally,
+                verticalArrangement = Arrangement.spacedBy(8.dp, Alignment.CenterVertically),
+            ) {
+                Text(text = "Calificá la rutina",
+                    color = MaterialTheme.colors.primary,
+                    fontSize = 24.sp,
+                    fontWeight = FontWeight.Bold,
+                    textAlign = TextAlign.Center,
+                    overflow = TextOverflow.Ellipsis,
+                    maxLines = 1
+                )
+                RatingBar(
+                    rating = 2,
+                    starsColor = MaterialTheme.colors.primary,
+                    modifier = Modifier.padding(bottom = 2.dp)
+                )
+            }
+        }
+        Column(
+            modifier = Modifier
+                .padding(horizontal = 64.dp)
+                .fillMaxSize(),
+            verticalArrangement = Arrangement.spacedBy(8.dp, Alignment.CenterVertically),
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+            Button(
+                modifier = Modifier.fillMaxWidth(),
+                colors = ButtonDefaults.buttonColors(backgroundColor = MaterialTheme.colors.primary),
+                shape = RoundedCornerShape(16.dp),
+                onClick = { /*TODO*/ }) {
+                Text(text = "Finalizar".uppercase(),
+                    color = MaterialTheme.colors.primaryVariant,
+                    style = MaterialTheme.typography.body2,
+                )
+            }
+        }
+    }
+}
+
 @Preview
 @Composable
 fun DefaultPreview() {
