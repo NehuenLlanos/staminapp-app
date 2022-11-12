@@ -49,8 +49,8 @@ fun RoutineScreen(navController: NavController) {
     val context = LocalContext.current
     val sendIntent: Intent = Intent().apply {
         val bitmap = bitmapImage?.asAndroidBitmap()
-        var path = context.externalCacheDir?.path + "/shared_routine.jpg"
-
+        var path = context.cacheDir.path + "/shared_routine.jpg"
+        println(path)
         val out: OutputStream
         val file = File(path)
         try {
