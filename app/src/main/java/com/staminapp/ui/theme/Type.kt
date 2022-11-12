@@ -29,7 +29,7 @@ val CeraPro = FontFamily(
 val Typography = Typography(
     body1 = TextStyle(
         fontFamily = CeraPro,
-        fontWeight = FontWeight.W500,
+        fontWeight = FontWeight.W300,
         fontSize = 16.sp
     ),
     body2 = TextStyle(
@@ -61,12 +61,18 @@ val Typography = Typography(
         fontStyle = FontStyle.Normal,
         fontSize = 24.sp
     ),
-    button = TextStyle(
+    subtitle2 = TextStyle(
         fontFamily = CeraPro,
-        fontWeight = FontWeight.W700,
-        fontStyle = FontStyle.Normal,
-        fontSize = 14.sp,
+        fontWeight = FontWeight.W600,
+        fontStyle = FontStyle.Italic,
+        fontSize = 20.sp
     ),
+//    button = TextStyle(
+//        fontFamily = CeraPro,
+//        fontWeight = FontWeight.W700,
+//        fontStyle = FontStyle.Normal,
+//        fontSize = 14.sp,
+//    ),
     caption = TextStyle(
         fontFamily = CeraPro,
         fontWeight = FontWeight.W100,
