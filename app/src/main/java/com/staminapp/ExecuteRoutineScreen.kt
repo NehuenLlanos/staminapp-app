@@ -219,7 +219,7 @@ fun CircularProgressBar(
             drawArc(
                 color = color,
                 -90f,
-                360 *  curPercentage.valu,
+                360 *  curPercentage.value,
                 useCenter = false,
                 style = Stroke(stokeWidth.toPx(), cap = StrokeCap.Round)
             )
