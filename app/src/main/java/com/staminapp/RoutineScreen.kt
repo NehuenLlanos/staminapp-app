@@ -71,7 +71,7 @@ fun RoutineScreen(navController: NavController) {
         floatingActionButton = {
             ExtendedFloatingActionButton (
                 onClick = {
-
+                    navController.navigate(Destination.ExecuteRoutine.route)
                 },
                 icon = {
                     Icon(Icons.Filled.FitnessCenter, contentDescription = null)

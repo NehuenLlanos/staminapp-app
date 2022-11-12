@@ -42,7 +42,7 @@ fun SignInScreen(navController: NavHostController) {
                 .background(MaterialTheme.colors.background),
             horizontalAlignment = Alignment.CenterHorizontally,
             ) {
-            LogoImage(Modifier)
+            LogoImage()
             UsernameTextField(Modifier.padding(top = 70.dp))
             PasswordTextField(Modifier.padding(top = 20.dp))
             SignInButton(Modifier.padding(top = 30.dp), navController)
@@ -53,7 +53,7 @@ fun SignInScreen(navController: NavHostController) {
 @Composable
 fun LogoImage() {
     Image(
-        painter = painterResource(id = R.drawable.logo),
+        painter = painterResource(id = R.drawable.logofc),
         contentDescription = "Hola",
     )
 }
@@ -101,7 +101,7 @@ fun SignInButton(modifier: Modifier, navController: NavHostController) {
     Button(
         modifier = modifier,
         onClick = {
-            navController.navigate(Destination.ExerciseScreenFinished.route)
+            navController.navigate(Destination.Home.route)
         },
         colors = ButtonDefaults.buttonColors(backgroundColor = MaterialTheme.colors.primary),
         shape = RoundedCornerShape(50.dp)
