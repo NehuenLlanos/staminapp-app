@@ -36,6 +36,7 @@ import com.staminapp.ui.theme.Gray
 import com.staminapp.ui.theme.StaminappAppTheme
 import dev.shreyaspatil.capturable.Capturable
 import dev.shreyaspatil.capturable.controller.rememberCaptureController
+import java.io.ByteArrayOutputStream
 import java.io.File
 import java.io.FileOutputStream
 import java.io.OutputStream
@@ -57,8 +58,10 @@ fun RoutineScreen(navController: NavController) {
             file.delete()
         }
         try {
+            val baos = ByteArrayOutputStream()
+            bitmap?.compress(Bitmap.CompressFormat.JPEG, 100, baos)
             out = FileOutputStream(file)
-            bitmap?.compress(Bitmap.CompressFormat.JPEG, 100, out)
+            out.write(baos.toByteArray())
             out.flush()
             out.close()
         } catch (e: Exception) {
