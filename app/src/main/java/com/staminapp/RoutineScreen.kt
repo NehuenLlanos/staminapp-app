@@ -71,6 +71,7 @@ fun RoutineScreen(navController: NavController) {
             "¡Mirá esta rutina en StaminApp! https://www.staminapp.com/routine/1"
         )
         putExtra(Intent.EXTRA_STREAM, uri)
+        flags = Intent.FLAG_GRANT_READ_URI_PERMISSION
         type = "image/*"
     }
     val shareIntent = Intent.createChooser(sendIntent, "Compartí esta rutina")
