@@ -1,9 +1,7 @@
 package com.staminapp
 
 import androidx.annotation.FloatRange
-import androidx.compose.animation.core.animateFloatAsState
-import androidx.compose.animation.core.animateIntAsState
-import androidx.compose.animation.core.tween
+import androidx.compose.animation.core.*
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -183,30 +181,31 @@ fun ExercisePreview() {
 @Composable
 fun CircularProgressBar(
     percentage: Float,
-    number: Int,
     fontSize: TextUnit = 28.sp,
-    radius: Dp = 50.dp,
+    radius: Dp = 80.dp,
     color: Color = MaterialTheme.colors.primary,
     stokeWidth: Dp = 8.dp,
     animDuration: Int = 10000,
-    animDelay: Int = 0
+    animDelay: Int = 1000
 ) {
     val sb = java.lang.StringBuilder()
     var animationPlayed by remember {
         mutableStateOf(false)
     }
     val curPercentage = animateFloatAsState(
-        targetValue = if (animationPlayed) percentage else 0f,
+        targetValue = if (animationPlayed) 0f else 1f,
         animationSpec = tween (
             durationMillis = animDuration,
-            delayMillis = animDelay
+            delayMillis = 0,
+            easing = LinearEasing
         )
     )
     val curTime = animateIntAsState(
-        targetValue = if (animationPlayed) animDuration else 0,
+        targetValue = if (animationPlayed) 10000 else 0,
         animationSpec = tween (
             durationMillis = animDuration,
-            delayMillis = animDelay
+            delayMillis = animDelay,
+            easing = LinearEasing
         )
     )
     LaunchedEffect(key1 = true) {
@@ -220,21 +219,15 @@ fun CircularProgressBar(
             drawArc(
                 color = color,
                 -90f,
-                360 * curPercentage.value,
+                360 *  curPercentage.valu,
                 useCenter = false,
                 style = Stroke(stokeWidth.toPx(), cap = StrokeCap.Round)
             )
         }
-//        Text(
-//            text = curTime.value.toString(),
-//            color = MaterialTheme.colors.primary,
-//            fontSize = fontSize,
-//            fontWeight = FontWeight.Bold
-//        )
         Text(
-            text = sb.append(TimeUnit.MILLISECONDS.toMinutes(curTime.value.toLong()).toString())
+            text = sb.append(TimeUnit.MILLISECONDS.toMinutes((animDuration - curTime.value).toLong()).toString())
                 .append(":")
-                .append(TimeUnit.MILLISECONDS.toSeconds(curTime.value.toLong()).toString()).toString(),
+                .append(TimeUnit.MILLISECONDS.toSeconds((animDuration - curTime.value).toLong()).toString()).toString(),
             color = MaterialTheme.colors.primary,
             fontSize = fontSize,
             fontWeight = FontWeight.Bold
@@ -242,16 +235,6 @@ fun CircularProgressBar(
     }
 
 }
-
-//fun MiliToMinutesAndSeconds(miliseconds: Int) {
-//    val milliseconds: Long = 1000000
-//
-//    // long minutes = (milliseconds / 1000) / 60;
-//    val minutes = TimeUnit.MILLISECONDS.toMinutes(milliseconds)
-//
-//    // long seconds = (milliseconds / 1000);
-//    val seconds = TimeUnit.MILLISECONDS.toSeconds(milliseconds)
-//}
 
 /* Ejercicio con Tiempo */
 @Composable
@@ -282,7 +265,6 @@ fun ExerciseScreenTime() {
                 overflow = TextOverflow.Ellipsis,
                 maxLines = 1
             )
-
             Column(
                 modifier = Modifier
                     .height(215.dp)
@@ -292,9 +274,8 @@ fun ExerciseScreenTime() {
                     .background(MaterialTheme.colors.primaryVariant),
                 horizontalAlignment = Alignment.CenterHorizontally,
                 verticalArrangement = Arrangement.Center,
-
                 ) {
-                CircularProgressBar(percentage = 1f, number = 100)
+                CircularProgressBar(percentage = 1f, animDuration = 10000)
             }
         }
         Column(
