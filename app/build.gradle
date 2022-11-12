@@ -32,6 +32,11 @@ android {
     }
     kotlinOptions {
         jvmTarget = '1.8'
+        /* This material API is experimental and is likely to change or to be removed in the future. */
+        allWarningsAsErrors = false
+        freeCompilerArgs += [
+                '-opt-in=androidx.compose.material3.ExperimentalMaterial3Api'
+        ]
     }
     buildFeatures {
         compose true
@@ -54,6 +59,8 @@ dependencies {
     implementation "androidx.compose.ui:ui:$compose_ui_version"
     implementation "androidx.compose.ui:ui-tooling-preview:$compose_ui_version"
     implementation 'androidx.compose.material:material:1.1.1'
+
+    implementation "androidx.compose.material:material-icons-extended:$compose_ui_version"
 
     /* Navigation */
     implementation "androidx.navigation:navigation-compose:2.5.3"
