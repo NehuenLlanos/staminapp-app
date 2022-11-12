@@ -185,7 +185,7 @@ fun CircularProgressBar(
     stokeWidth: Dp = 16.dp,
     animDurationSec: Int = 10000,
 //    animDuration: Int = 10000,
-    animDelay: Int = 1000
+    animDelay: Int = 0
 ) {
     val sb = java.lang.StringBuilder()
     var animationPlayed by remember {
@@ -269,7 +269,8 @@ fun ExerciseScreenTime() {
             )
             Column(
                 modifier = Modifier
-                    .height(215.dp)
+                    .height(264.dp)
+                    .width(264.dp)
                     .fillMaxWidth()
                     .padding(vertical = 8.dp, horizontal = 8.dp)
                     .clip(shape = RoundedCornerShape(16.dp))
@@ -277,7 +278,7 @@ fun ExerciseScreenTime() {
                 horizontalAlignment = Alignment.CenterHorizontally,
                 verticalArrangement = Arrangement.Center,
                 ) {
-                CircularProgressBar(percentage = 1f, animDurationSec = 70)
+                CircularProgressBar(percentage = 1f, animDurationSec = 70, radius = 80.dp, fontSize = 40.sp)
             }
         }
         Column(
