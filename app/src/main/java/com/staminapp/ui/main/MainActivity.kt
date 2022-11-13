@@ -1,20 +1,30 @@
 package com.staminapp
 
 import android.os.Bundle
-import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
-import androidx.compose.foundation.ScrollState
+import androidx.annotation.StringRes
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
 import androidx.compose.material.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import com.staminapp.ui.main.MainViewModel
 import com.staminapp.ui.theme.StaminappAppTheme
+import com.staminapp.util.getViewModelFactory
+import androidx.lifecycle.viewmodel.compose.viewModel
+import com.staminapp.R
+import com.staminapp.ui.main.canGetCurrentUser
 
 
 sealed class Destination(val route: String) {
@@ -50,6 +60,78 @@ class MainActivity : ComponentActivity() {
         }
     }
 }
+
+@Composable
+fun ActionButton(
+    @StringRes resId: Int,
+    enabled: Boolean = true,
+    onClick: () -> Unit
+) {
+    Button(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(top = 16.dp, start = 16.dp, end = 16.dp),
+        enabled = enabled,
+        onClick = onClick,
+    ) {
+        Text(
+            text = stringResource(resId),
+            modifier = Modifier.padding(8.dp))
+    }
+}
+@Composable
+fun MainScreen(
+    viewModel: MainViewModel = viewModel(factory = getViewModelFactory())
+) {
+    val uiState = viewModel.uiState
+
+    Column(
+        modifier = Modifier.fillMaxWidth()
+    ) {
+        if (!uiState.isAuthenticated) {
+            ActionButton(
+                resId = "Logueate",
+                onClick = {
+                    viewModel.login("johndoe", "1234567890")
+                })
+        } else {
+            ActionButton(
+                resId = "Deslogueate PETE",
+                onClick = {
+                    viewModel.logout()
+                })
+        }
+
+        ActionButton(
+            resId = "Obtener el user de ahora",
+            enabled = uiState.canGetCurrentUser,
+            onClick = {
+                viewModel.getCurrentUser()
+            })
+        Column(
+            modifier = Modifier.fillMaxSize()
+        ) {
+            val currentUserData = uiState.currentUser?.let {
+                "Current User: ${it.firstName} ${it.lastName} (${it.email})"
+            }
+            Text(
+                text = currentUserData?: "",
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(top = 16.dp, start = 16.dp, end = 16.dp),
+                fontSize = 18.sp
+            )
+            Text(
+                text = uiState.message?: "",
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(top = 16.dp, start = 16.dp, end = 16.dp),
+                fontSize = 18.sp
+            )
+        }
+    }
+}
+
 @Composable
 fun NavigationAppHost(navController: NavHostController) {
     val ctx = LocalContext.current
