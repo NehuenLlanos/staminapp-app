@@ -41,11 +41,12 @@ import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.navigation.NavController
 
 
-@OptIn(ExperimentalFoundationApi::class)
+
 @Composable
-fun ProfileScreen() {
+fun ProfileScreen(navController: NavController) {
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -65,7 +66,7 @@ fun ProfileScreen() {
         Column(
             Modifier
                 .fillMaxWidth()
-                .padding(top = 12.dp, bottom = 64.dp),
+                .padding(top = 12.dp, bottom = 40.dp),
             verticalArrangement = Arrangement.spacedBy(8.dp, Alignment.CenterVertically)
         ) {
             GenderTextField(Modifier.fillMaxWidth())

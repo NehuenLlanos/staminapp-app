@@ -4,6 +4,7 @@ import android.os.Bundle
 import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.compose.foundation.ScrollState
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material.*
 import androidx.compose.runtime.Composable
@@ -56,7 +57,7 @@ fun NavigationAppHost(navController: NavHostController) {
     NavHost(navController = navController, startDestination = "sign-in") {
         composable(Destination.SignIn.route) { SignInScreen(navController) }
         composable(Destination.Home.route) { HomeScreen(navController) }
-        composable(Destination.Profile.route) { ProfileScreen() }
+        composable(Destination.Profile.route) { ProfileScreen(navController) }
 //        composable(Destination.List.route) { ListScreen(navController) }
         composable(Destination.Routine.route) { RoutineScreen(navController) }
         composable(Destination.ExecuteRoutine.route) { StartExecutionScreen() }
