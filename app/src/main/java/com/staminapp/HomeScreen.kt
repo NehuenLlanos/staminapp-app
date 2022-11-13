@@ -29,6 +29,7 @@ import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import com.staminapp.ui.theme.StaminappAppTheme
+import kotlinx.coroutines.selects.select
 
 @Composable
 fun HomeScreen(navController: NavController) {
@@ -37,6 +38,7 @@ fun HomeScreen(navController: NavController) {
 
 @Composable
 fun HomeScaffold(navController: NavController) {
+    var selectedIndex by remember { mutableStateOf(0) }
     Scaffold(
         topBar = {
             TopAppBar {
@@ -51,7 +53,6 @@ fun HomeScaffold(navController: NavController) {
         },
         bottomBar = {
             BottomAppBar {
-                var selectedIndex by remember { mutableStateOf(0) }
                 BottomNavigation(elevation = 10.dp) {
                     BottomNavigationItem(icon = {
                         if (selectedIndex == 0) {
@@ -90,51 +91,62 @@ fun HomeScaffold(navController: NavController) {
                         selected = (selectedIndex == 2),
                         onClick = {
                             selectedIndex = 3
-                            navController.navigate(Destination.Profile.route)
+//                            navController.navigate(Destination.Profile.route)
                         })
                 }
             }
         }
     ) {
         val scrollState = rememberScrollState()
-        Column(
-            modifier = Modifier
-                .verticalScroll(scrollState)
-                .padding(horizontal = 16.dp)
-                .fillMaxWidth()
-        ) {
-            Text(text = "BUENOS DÍAS, USUARIO",
-                color = MaterialTheme.colors.primaryVariant,
-                fontSize = 40.sp,
-                fontWeight = FontWeight.Bold
-            )
+        if (selectedIndex == 0) {
+            HomeScreenContent(navController, scrollState)
+        } else if (selectedIndex == 1) {
+            Text(text = "Explorar la concha de tu madre", color = MaterialTheme.colors.primaryVariant)
+        } else if (selectedIndex == 3) {
+            ProfileScreen(navController)
+        }
+    }
+}
 
-            for(i in 1..2) {
-                Row(
-                    modifier = Modifier
-                        .padding(4.dp)
-                        .fillMaxWidth(),
-                    horizontalArrangement = Arrangement.spacedBy(8.dp),
-                ) {
-                    RecentCard(navController, Modifier.weight(1f))
-                    RecentCard(navController, Modifier.weight(1f))
-                }
+@Composable
+fun HomeScreenContent(navController: NavController, scrollState: ScrollState) {
+    Column(
+        modifier = Modifier
+            .verticalScroll(scrollState)
+            .padding(horizontal = 16.dp)
+            .fillMaxWidth()
+    ) {
+        Text(text = "BUENOS DÍAS, USUARIO",
+            color = MaterialTheme.colors.primaryVariant,
+            fontSize = 40.sp,
+            fontWeight = FontWeight.Bold
+        )
+
+        for(i in 1..2) {
+            Row(
+                modifier = Modifier
+                    .padding(4.dp)
+                    .fillMaxWidth(),
+                horizontalArrangement = Arrangement.spacedBy(8.dp),
+            ) {
+                RecentCard(navController, Modifier.weight(1f))
+                RecentCard(navController, Modifier.weight(1f))
             }
-            Text(text = "Mi Biblioteca",
-                color = MaterialTheme.colors.primaryVariant,
-                fontSize = 25.sp,
-                fontWeight = FontWeight.Bold
-            )
-            for(i in 1..10) {
-                Row(
-                    modifier = Modifier
-                        .padding(vertical = 4.dp)
-                        .fillMaxWidth(),
-                    horizontalArrangement = Arrangement.spacedBy(8.dp)
-                ) {
-                    RoutineCard(navController, Modifier.weight(1f))
-                    RoutineCard(navController, Modifier.weight(1f))
-                }
+        }
+        Text(text = "Mi Biblioteca",
+            color = MaterialTheme.colors.primaryVariant,
+            fontSize = 25.sp,
+            fontWeight = FontWeight.Bold
+        )
+        for(i in 1..10) {
+            Row(
+                modifier = Modifier
+                    .padding(vertical = 4.dp)
+                    .fillMaxWidth(),
+                horizontalArrangement = Arrangement.spacedBy(8.dp)
+            ) {
+                RoutineCard(navController, Modifier.weight(1f))
+                RoutineCard(navController, Modifier.weight(1f))
             }
         }
     }
