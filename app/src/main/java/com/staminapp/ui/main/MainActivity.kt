@@ -11,6 +11,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.material.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
@@ -53,8 +54,9 @@ class MainActivity : ComponentActivity() {
                     modifier = Modifier.fillMaxSize(),
                     color = MaterialTheme.colors.background
                 ) {
-                    val navController = rememberNavController()
-                    NavigationAppHost(navController = navController)
+//                    val navController = rememberNavController()
+//                    NavigationAppHost(navController = navController)
+                    MainScreen()
                 }
             }
         }
@@ -63,7 +65,7 @@ class MainActivity : ComponentActivity() {
 
 @Composable
 fun ActionButton(
-    @StringRes resId: Int,
+    str: String,
     enabled: Boolean = true,
     onClick: () -> Unit
 ) {
@@ -75,7 +77,7 @@ fun ActionButton(
         onClick = onClick,
     ) {
         Text(
-            text = stringResource(resId),
+            text = str,
             modifier = Modifier.padding(8.dp))
     }
 }
@@ -90,20 +92,20 @@ fun MainScreen(
     ) {
         if (!uiState.isAuthenticated) {
             ActionButton(
-                resId = "Logueate",
+                str = "Logueate",
                 onClick = {
-                    viewModel.login("johndoe", "1234567890")
+                    viewModel.login("alejo", "123")
                 })
         } else {
             ActionButton(
-                resId = "Deslogueate PETE",
+                str = "Deslogueate PETE",
                 onClick = {
                     viewModel.logout()
                 })
         }
 
         ActionButton(
-            resId = "Obtener el user de ahora",
+            str = "Obtener el user de ahora",
             enabled = uiState.canGetCurrentUser,
             onClick = {
                 viewModel.getCurrentUser()
@@ -115,18 +117,20 @@ fun MainScreen(
                 "Current User: ${it.firstName} ${it.lastName} (${it.email})"
             }
             Text(
-                text = currentUserData?: "",
+                text = currentUserData ?: "",
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(top = 16.dp, start = 16.dp, end = 16.dp),
-                fontSize = 18.sp
+                fontSize = 18.sp,
+                color = Color.Black
             )
             Text(
                 text = uiState.message?: "",
                 modifier = Modifier
                     .fillMaxSize()
                     .padding(top = 16.dp, start = 16.dp, end = 16.dp),
-                fontSize = 18.sp
+                fontSize = 18.sp,
+                color = Color.Black
             )
         }
     }
