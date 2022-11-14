@@ -2,7 +2,7 @@ package com.staminapp.data.network.model
 
 import com.google.gson.annotations.SerializedName
 
-data class NetworkRoutineModel(
+data class NetworkRoutine(
     @SerializedName("id")
     var id : Int? = null,
 
