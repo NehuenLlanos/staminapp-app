@@ -54,94 +54,94 @@ class MainActivity : ComponentActivity() {
                     modifier = Modifier.fillMaxSize(),
                     color = MaterialTheme.colors.background
                 ) {
-//                    val navController = rememberNavController()
-//                    NavigationAppHost(navController = navController)
-                    MainScreen()
+                    val navController = rememberNavController()
+                    NavigationAppHost(navController = navController)
+//                    SignInScreen(navController = navController)
                 }
             }
         }
     }
 }
 
-@Composable
-fun ActionButton(
-    str: String,
-    enabled: Boolean = true,
-    onClick: () -> Unit
-) {
-    Button(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(top = 16.dp, start = 16.dp, end = 16.dp),
-        enabled = enabled,
-        onClick = onClick,
-    ) {
-        Text(
-            text = str,
-            modifier = Modifier.padding(8.dp))
-    }
-}
-@Composable
-fun MainScreen(
-    viewModel: MainViewModel = viewModel(factory = getViewModelFactory())
-) {
-    val uiState = viewModel.uiState
-
-    Column(
-        modifier = Modifier.fillMaxWidth()
-    ) {
-        if (!uiState.isAuthenticated) {
-            ActionButton(
-                str = "Logueate",
-                onClick = {
-                    viewModel.login("alejo", "123")
-                })
-        } else {
-            ActionButton(
-                str = "Deslogueate PETE",
-                onClick = {
-                    viewModel.logout()
-                })
-        }
-
-        ActionButton(
-            str = "Obtener el user de ahora",
-            enabled = uiState.canGetCurrentUser,
-            onClick = {
-                viewModel.getCurrentUser()
-            })
-        Column(
-            modifier = Modifier.fillMaxSize()
-        ) {
-            val currentUserData = uiState.currentUser?.let {
-                "Current User: ${it.firstName} ${it.lastName} (${it.email})"
-            }
-            Text(
-                text = currentUserData ?: "",
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(top = 16.dp, start = 16.dp, end = 16.dp),
-                fontSize = 18.sp,
-                color = Color.Black
-            )
-            Text(
-                text = uiState.message?: "",
-                modifier = Modifier
-                    .fillMaxSize()
-                    .padding(top = 16.dp, start = 16.dp, end = 16.dp),
-                fontSize = 18.sp,
-                color = Color.Black
-            )
-        }
-    }
-}
+//@Composable
+//fun ActionButton(
+//    str: String,
+//    enabled: Boolean = true,
+//    onClick: () -> Unit
+//) {
+//    Button(
+//        modifier = Modifier
+//            .fillMaxWidth()
+//            .padding(top = 16.dp, start = 16.dp, end = 16.dp),
+//        enabled = enabled,
+//        onClick = onClick,
+//    ) {
+//        Text(
+//            text = str,
+//            modifier = Modifier.padding(8.dp))
+//    }
+//}
+//@Composable
+//fun MainScreen(
+//    viewModel: MainViewModel = viewModel(factory = getViewModelFactory())
+//) {
+//    val uiState = viewModel.uiState
+//
+//    Column(
+//        modifier = Modifier.fillMaxWidth()
+//    ) {
+//        if (!uiState.isAuthenticated) {
+//            ActionButton(
+//                str = "Logueate",
+//                onClick = {
+//                    viewModel.login("nehuen", "1234")
+//                })
+//        } else {
+//            ActionButton(
+//                str = "Deslogueate PETE",
+//                onClick = {
+//                    viewModel.logout()
+//                })
+//        }
+//
+//        ActionButton(
+//            str = "Obtener el user de ahora",
+//            enabled = uiState.canGetCurrentUser,
+//            onClick = {
+//                viewModel.getCurrentUser()
+//            })
+//        Column(
+//            modifier = Modifier.fillMaxSize()
+//        ) {
+//            val currentUserData = uiState.currentUser?.let {
+//                "Current User: ${it.firstName} ${it.lastName} (${it.email})"
+//            }
+//            Text(
+//                text = currentUserData ?: "",
+//                modifier = Modifier
+//                    .fillMaxWidth()
+//                    .padding(top = 16.dp, start = 16.dp, end = 16.dp),
+//                fontSize = 18.sp,
+//                color = Color.Black
+//            )
+//            Text(
+//                text = uiState.message?: "",
+//                modifier = Modifier
+//                    .fillMaxSize()
+//                    .padding(top = 16.dp, start = 16.dp, end = 16.dp),
+//                fontSize = 18.sp,
+//                color = Color.Black
+//            )
+//        }
+//    }
+//}
 
 @Composable
 fun NavigationAppHost(navController: NavHostController) {
     val ctx = LocalContext.current
 
     NavHost(navController = navController, startDestination = "sign-in") {
-        composable(Destination.SignIn.route) { SignInScreen(navController) }
+        composable(Destination.SignIn.route) { SignInScreen(viewModel = viewModel(factory = getViewModelFactory()) ,navController) }
         composable(Destination.Home.route) { HomeScreen(navController) }
         composable(Destination.Profile.route) { ProfileScreen(navController) }
 //        composable(Destination.List.route) { ListScreen(navController) }
