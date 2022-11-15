@@ -5,10 +5,8 @@ import androidx.lifecycle.AbstractSavedStateViewModelFactory
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.savedstate.SavedStateRegistryOwner
-import com.staminapp.data.repository.RoutinesRepository
 import com.staminapp.data.repository.UserRepository
 import com.staminapp.ui.main.MainViewModel
-import com.staminapp.ui.routines.RoutinesViewModel
 
 class ViewModelFactory constructor(
     private val sessionManager: SessionManager,

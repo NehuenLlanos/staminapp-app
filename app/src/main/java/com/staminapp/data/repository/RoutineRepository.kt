@@ -3,14 +3,12 @@ package com.staminapp.data.repository
 import com.staminapp.data.model.Cycle
 import com.staminapp.data.model.Exercise
 import com.staminapp.data.model.Routine
-import com.staminapp.data.model.User
-import com.staminapp.data.network.RoutinesRemoteDataSource
-import com.staminapp.data.network.model.NetworkRoutine
+import com.staminapp.data.network.RoutineRemoteDataSource
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 
-class RoutinesRepository (
-    private val remoteDataSource: RoutinesRemoteDataSource
+class RoutineRepository (
+    private val remoteDataSource: RoutineRemoteDataSource
 ) {
     private val currentRoutinesMutex = Mutex()
     private var currentRoutinesList: List<Routine> = emptyList()

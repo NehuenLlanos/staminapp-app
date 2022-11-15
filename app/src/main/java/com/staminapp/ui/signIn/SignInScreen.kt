@@ -19,10 +19,12 @@ import com.staminapp.ui.main.MainViewModel
 import com.staminapp.util.getViewModelFactory
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
+import com.staminapp.ui.signIn.SignInViewModel
+import com.staminapp.util.getSignInViewModelFactory
 
 @Composable
 fun SignInScreen(
-    viewModel: MainViewModel = viewModel(factory = getViewModelFactory()),
+    viewModel: SignInViewModel = viewModel(factory = getSignInViewModelFactory()),
     navController: NavHostController
 ) {
     val uiState = viewModel.uiState
@@ -77,7 +79,7 @@ fun LogoImage() {
 }
 
 @Composable
-fun UsernameTextField(modifier: Modifier, viewModel: MainViewModel, username: String) {
+fun UsernameTextField(modifier: Modifier, viewModel: SignInViewModel, username: String) {
 
     TextField(
         modifier = modifier,
@@ -92,7 +94,7 @@ fun UsernameTextField(modifier: Modifier, viewModel: MainViewModel, username: St
 }
 
 @Composable
-fun PasswordTextField(modifier: Modifier, viewModel: MainViewModel, password: String) {
+fun PasswordTextField(modifier: Modifier, viewModel: SignInViewModel, password: String) {
     TextField(
         modifier = modifier,
         value = password,
@@ -110,7 +112,7 @@ fun PasswordTextField(modifier: Modifier, viewModel: MainViewModel, password: St
 @Composable
 fun SignInButton(
     modifier: Modifier,
-    viewModel: MainViewModel,
+    viewModel: SignInViewModel,
     username: String,
     password: String,
     navController: NavHostController

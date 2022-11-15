@@ -1,33 +1,35 @@
-package com.staminapp.ui.home
+package com.staminapp.ui.profile
 
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.staminapp.data.repository.RoutineRepository
 import com.staminapp.data.repository.UserRepository
+import com.staminapp.ui.explore.ExploreUiState
 import com.staminapp.util.SessionManager
 import kotlinx.coroutines.launch
 
-class HomeViewModel (
+class ProfileViewModel (
     private val sessionManager: SessionManager,
     private val userRepository: UserRepository,
 ) : ViewModel() {
 
-    var uiState by mutableStateOf(HomeUiState())
+    var uiState by mutableStateOf(ProfileUiState())
         private set
 
-    fun getUserRoutines() = viewModelScope.launch {
+    fun getCurrentUser() = viewModelScope.launch {
         uiState = uiState.copy(
             isFetching = true,
             message = null
         )
         runCatching {
-            userRepository.getUserRoutines()
+            userRepository.getCurrentUser(uiState.currentUser == null)
         }.onSuccess { response ->
             uiState = uiState.copy(
                 isFetching = false,
-                routines = response
+                currentUser = response
             )
         }.onFailure { e ->
             // Handle the error and notify the UI when appropriate.

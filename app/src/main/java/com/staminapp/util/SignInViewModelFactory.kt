@@ -5,12 +5,12 @@ import androidx.lifecycle.AbstractSavedStateViewModelFactory
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.savedstate.SavedStateRegistryOwner
-import com.staminapp.data.repository.RoutineRepository
-import com.staminapp.ui.routines.RoutinesViewModel
+import com.staminapp.data.repository.UserRepository
+import com.staminapp.ui.signIn.SignInViewModel
 
-class RoutinesViewModelFactory constructor(
+class SignInViewModelFactory constructor(
     private val sessionManager: SessionManager,
-    private val routineRepository: RoutineRepository,
+    private val userRepository: UserRepository,
     owner: SavedStateRegistryOwner,
     defaultArgs: Bundle? = null
 ) : AbstractSavedStateViewModelFactory(owner, defaultArgs) {
@@ -21,8 +21,8 @@ class RoutinesViewModelFactory constructor(
         handle: SavedStateHandle
     ) = with(modelClass) {
         when {
-            isAssignableFrom(RoutinesViewModel::class.java) ->
-                RoutinesViewModel(sessionManager, routineRepository)
+            isAssignableFrom(SignInViewModel::class.java) ->
+                SignInViewModel(sessionManager, userRepository)
             else ->
                 throw IllegalArgumentException("Unknown ViewModel class: ${modelClass.name}")
         }

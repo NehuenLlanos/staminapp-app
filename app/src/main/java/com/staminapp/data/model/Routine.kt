@@ -11,6 +11,6 @@ data class Routine(
     var detail : String,
     var score : Int,
     var difficulty : String,
-    var user : User,
+    var user : User? = null,
     var image : String? = null
 )

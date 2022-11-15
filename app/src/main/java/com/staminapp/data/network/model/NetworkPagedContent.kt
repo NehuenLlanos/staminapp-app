@@ -6,9 +6,9 @@ data class NetworkPagedContent<T> (
     @SerializedName("totalCount")
     var totalCount: Int,
     @SerializedName("orderBy")
-    var orderBy: String? = null,
+    var orderBy: String,
     @SerializedName("direction")
-    var direction: String? = null,
+    var direction: String,
     @SerializedName("content")
     var content : List<T> = arrayListOf(),
     @SerializedName("size")

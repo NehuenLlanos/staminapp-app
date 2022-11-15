@@ -8,7 +8,6 @@ import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
-import retrofit2.create
 import java.util.*
 
 object RetrofitClient {
@@ -47,11 +46,11 @@ object RetrofitClient {
             .build()
     }
 
-    fun getApiUserService(context: Context) : ApiUserService {
-        return getInstance(context).create(ApiUserService::class.java)
+    fun getApiUserService(context: Context) : UserApiService {
+        return getInstance(context).create(UserApiService::class.java)
     }
 
-    fun getRoutinesApiService(context: Context) : RoutinesApiService {
-        return getInstance(context).create(RoutinesApiService::class.java)
+    fun getRoutinesApiService(context: Context) : RoutineApiService {
+        return getInstance(context).create(RoutineApiService::class.java)
     }
 }

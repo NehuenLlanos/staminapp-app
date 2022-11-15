@@ -28,7 +28,7 @@ data class NetworkRoutine(
     var difficulty : String,
 
     @SerializedName("user")
-    var user : NetworkUser,
+    var user : NetworkUser? = null,
 
     @SerializedName("category")
     var category : NetworkCategory? = null,
@@ -43,7 +43,7 @@ data class NetworkRoutine(
             detail = detail?: "",
             score = score?: 0,
             difficulty = difficulty?: "rookie",
-            user = user!!.asModel(),
+            user = user?.asModel(),
             image = metadata?.picture,
         )
     }

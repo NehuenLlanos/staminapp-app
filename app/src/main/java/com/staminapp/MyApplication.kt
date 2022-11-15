@@ -1,11 +1,10 @@
 package com.staminapp
 
 import android.app.Application
-import com.staminapp.data.model.User
-import com.staminapp.data.network.RoutinesRemoteDataSource
+import com.staminapp.data.network.RoutineRemoteDataSource
 import com.staminapp.data.network.UserRemoteDataSource
 import com.staminapp.data.network.api.RetrofitClient
-import com.staminapp.data.repository.RoutinesRepository
+import com.staminapp.data.repository.RoutineRepository
 import com.staminapp.data.repository.UserRepository
 import com.staminapp.util.SessionManager
 
@@ -20,9 +19,10 @@ class MyApplication : Application() {
     val userRepository : UserRepository
         get() = UserRepository(userRemoteDataSource)
 
-    private val routinesRemoteDataSource : RoutinesRemoteDataSource
-        get() = RoutinesRemoteDataSource(sessionManager, RetrofitClient.getRoutinesApiService(this))
+    private val routineRemoteDataSource : RoutineRemoteDataSource
+        get() = RoutineRemoteDataSource(sessionManager, RetrofitClient.getRoutinesApiService(this))
 
-    val routineRepository : RoutinesRepository
-        get() = RoutinesRepository(routinesRemoteDataSource)
+    val routineRepository : RoutineRepository
+        get() = RoutineRepository(routineRemoteDataSource)
+
 }

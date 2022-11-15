@@ -141,7 +141,7 @@ fun NavigationAppHost(navController: NavHostController) {
     val ctx = LocalContext.current
 
     NavHost(navController = navController, startDestination = "sign-in") {
-        composable(Destination.SignIn.route) { SignInScreen(viewModel = viewModel(factory = getViewModelFactory()) ,navController) }
+        composable(Destination.SignIn.route) { SignInScreen(navController = navController) }
         composable(Destination.Home.route) { HomeScreen(navController) }
         composable(Destination.Profile.route) { ProfileScreen(navController) }
 //        composable(Destination.List.route) { ListScreen(navController) }

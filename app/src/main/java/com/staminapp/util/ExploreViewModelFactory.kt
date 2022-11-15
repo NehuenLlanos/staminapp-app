@@ -6,9 +6,11 @@ import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.savedstate.SavedStateRegistryOwner
 import com.staminapp.data.repository.RoutineRepository
-import com.staminapp.ui.routines.RoutinesViewModel
+import com.staminapp.data.repository.UserRepository
+import com.staminapp.ui.explore.ExploreViewModel
+import com.staminapp.ui.home.HomeViewModel
 
-class RoutinesViewModelFactory constructor(
+class ExploreViewModelFactory constructor(
     private val sessionManager: SessionManager,
     private val routineRepository: RoutineRepository,
     owner: SavedStateRegistryOwner,
@@ -21,8 +23,8 @@ class RoutinesViewModelFactory constructor(
         handle: SavedStateHandle
     ) = with(modelClass) {
         when {
-            isAssignableFrom(RoutinesViewModel::class.java) ->
-                RoutinesViewModel(sessionManager, routineRepository)
+            isAssignableFrom(ExploreViewModel::class.java) ->
+                ExploreViewModel(sessionManager, routineRepository)
             else ->
                 throw IllegalArgumentException("Unknown ViewModel class: ${modelClass.name}")
         }

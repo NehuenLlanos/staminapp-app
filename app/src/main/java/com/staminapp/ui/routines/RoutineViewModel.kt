@@ -5,13 +5,13 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.staminapp.data.repository.RoutinesRepository
+import com.staminapp.data.repository.RoutineRepository
 import com.staminapp.util.SessionManager
 import kotlinx.coroutines.launch
 
 class RoutineViewModel (
     private val sessionManager: SessionManager,
-    private val routinesRepository: RoutinesRepository,
+    private val routineRepository: RoutineRepository,
 ) : ViewModel() {
 
     var uiState by mutableStateOf(RoutineUiState())
@@ -23,7 +23,7 @@ class RoutineViewModel (
             message = null
         )
         runCatching {
-            routinesRepository.getRoutine(id = id)
+            routineRepository.getRoutine(id = id)
         }.onSuccess { response ->
             uiState = uiState.copy(
                 isFetching = false,
@@ -43,7 +43,7 @@ class RoutineViewModel (
             message = null
         )
         runCatching {
-            routinesRepository.getCyclesForRoutine(id = id)
+            routineRepository.getCyclesForRoutine(id = id)
         }.onSuccess { response ->
             uiState = uiState.copy(
                 isFetching = false,
@@ -63,7 +63,7 @@ class RoutineViewModel (
             message = null
         )
         runCatching {
-            routinesRepository.getExerciseForCycle(id = id)
+            routineRepository.getExerciseForCycle(id = id)
         }.onSuccess { response ->
             uiState.exercises?.put(id, response)
             uiState = uiState.copy(

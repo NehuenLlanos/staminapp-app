@@ -31,13 +31,14 @@ import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import com.staminapp.ui.routines.RoutinesViewModel
 import com.staminapp.ui.theme.StaminappAppTheme
-import com.staminapp.util.getViewModelFactory
 import kotlinx.coroutines.selects.select
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.staminapp.data.model.Routine
+import com.staminapp.ui.explore.ExploreViewModel
+import com.staminapp.ui.home.HomeViewModel
+import com.staminapp.ui.profile.ProfileViewModel
 import com.staminapp.ui.routines.RoutineViewModel
-import com.staminapp.util.getRoutineViewModelFactory
-import com.staminapp.util.getRoutinesViewModelFactory
+import com.staminapp.util.*
 
 
 @Composable
@@ -124,47 +125,86 @@ fun HomeScreenContent(
     navController: NavController,
     scrollState: ScrollState,
 //    viewModel: RoutinesViewModel = viewModel(factory = getRoutinesViewModelFactory())
-    viewModel: RoutineViewModel = viewModel(factory = getRoutineViewModelFactory())
+//    viewModel: RoutineViewModel = viewModel(factory = getRoutineViewModelFactory())
+//    viewModel: HomeViewModel = viewModel(factory = getHomeViewModelFactory())
+//    viewModel: ExploreViewModel = viewModel(factory = getExploreViewModelFactory())
+    viewModel: ProfileViewModel = viewModel(factory = getProfileViewModelFactory())
 ) {
 //    val uiState = viewModel.uiState
 //    viewModel.getAllRoutines()
 
+//    val uiState = viewModel.uiState
+//    viewModel.getRoutine(1)
+//    viewModel.getCyclesForRoutine(1)
+//    uiState.cycles?.forEach {
+//        viewModel.getExercisesForCycle(it.id)
+//    }
+
+//    val uiState = viewModel.uiState
+//    if (!uiState.isFetching && uiState.routines == null) {
+//        viewModel.getUserRoutines()
+//    }
+
+//    val uiState = viewModel.uiState
+//    if (!uiState.isFetching && uiState.routines == null) {
+//        viewModel.getAllRoutines()
+//    }
+
     val uiState = viewModel.uiState
-    viewModel.getRoutine(1)
-    viewModel.getCyclesForRoutine(1)
-    uiState.cycles?.forEach {
-        viewModel.getExercisesForCycle(it.id)
+    if (!uiState.isFetching && uiState.currentUser == null) {
+        viewModel.getCurrentUser()
     }
+
     Column(
         modifier = modifier
             .verticalScroll(scrollState)
             .padding(horizontal = 16.dp)
             .fillMaxWidth()
     ) {
-        if (uiState.routine != null) {
-            Text(text = uiState.routine.name,
+
+        if(uiState.currentUser != null) {
+            Text(text = uiState.currentUser?.username,
                 color = MaterialTheme.colors.primaryVariant,
-                fontSize = 40.sp,
+                fontSize = 60.sp,
                 fontWeight = FontWeight.Bold
             )
         }
 
-        if (uiState.cycles != null) {
-            uiState.cycles?.forEach {
-                Text(text = it.name,
-                    color = MaterialTheme.colors.primaryVariant,
-                    fontSize = 60.sp,
-                    fontWeight = FontWeight.Bold
-                )
-                uiState.exercises?.get(it.id)?.forEach {
-                    Text(text = it.name,
-                        color = MaterialTheme.colors.primaryVariant,
-                        fontSize = 20.sp,
-                        fontWeight = FontWeight.Bold
-                    )
-                }
-            }
-        }
+//        if(uiState.routines != null) {
+//            uiState.routines?.forEach {
+//                Text(text = it.name,
+//                    color = MaterialTheme.colors.primaryVariant,
+//                    fontSize = 60.sp,
+//                    fontWeight = FontWeight.Bold
+//                )
+//            }
+//        }
+
+
+//        if (uiState.routine != null) {
+//            Text(text = uiState.routine.name,
+//                color = MaterialTheme.colors.primaryVariant,
+//                fontSize = 40.sp,
+//                fontWeight = FontWeight.Bold
+//            )
+//        }
+//
+//        if (uiState.cycles != null) {
+//            uiState.cycles?.forEach {
+//                Text(text = it.name,
+//                    color = MaterialTheme.colors.primaryVariant,
+//                    fontSize = 60.sp,
+//                    fontWeight = FontWeight.Bold
+//                )
+//                uiState.exercises?.get(it.id)?.forEach {
+//                    Text(text = it.name,
+//                        color = MaterialTheme.colors.primaryVariant,
+//                        fontSize = 20.sp,
+//                        fontWeight = FontWeight.Bold
+//                    )
+//                }
+//            }
+//        }
 
 
 
