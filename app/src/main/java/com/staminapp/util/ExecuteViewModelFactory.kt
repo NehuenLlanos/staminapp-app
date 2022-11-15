@@ -13,6 +13,7 @@ import com.staminapp.ui.explore.ExploreViewModel
 class ExecuteViewModelFactory constructor(
     private val sessionManager: SessionManager,
     private val reviewRepository: ReviewRepository,
+    private val routineRepository: RoutineRepository,
     owner: SavedStateRegistryOwner,
     defaultArgs: Bundle? = null
 ) : AbstractSavedStateViewModelFactory(owner, defaultArgs) {
@@ -24,7 +25,7 @@ class ExecuteViewModelFactory constructor(
     ) = with(modelClass) {
         when {
             isAssignableFrom(ExecuteViewModel::class.java) ->
-                ExecuteViewModel(sessionManager, reviewRepository)
+                ExecuteViewModel(sessionManager, reviewRepository, routineRepository)
             else ->
                 throw IllegalArgumentException("Unknown ViewModel class: ${modelClass.name}")
         }

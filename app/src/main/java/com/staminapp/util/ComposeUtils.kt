@@ -63,5 +63,6 @@ fun getExecuteViewModelFactory(defaultArgs: Bundle? = null): ExecuteViewModelFac
     val application = (LocalContext.current.applicationContext as MyApplication)
     val sessionManager = application.sessionManager
     val reviewRepository = application.reviewRepository
-    return ExecuteViewModelFactory(sessionManager, reviewRepository, LocalSavedStateRegistryOwner.current, defaultArgs)
+    val routineRepository = application.routineRepository
+    return ExecuteViewModelFactory(sessionManager, reviewRepository, routineRepository, LocalSavedStateRegistryOwner.current, defaultArgs)
 }

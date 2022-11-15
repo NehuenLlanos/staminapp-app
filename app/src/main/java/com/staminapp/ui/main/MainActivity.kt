@@ -3,29 +3,21 @@ package com.staminapp
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
-import androidx.annotation.StringRes
-import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.padding
 import androidx.compose.material.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
-import com.staminapp.ui.main.MainViewModel
+import com.staminapp.ui.execute.*
+import com.staminapp.ui.home.HomeScreen
+import com.staminapp.ui.profile.ProfileScreen
+import com.staminapp.ui.routines.RoutineScreen
+import com.staminapp.ui.signIn.SignInScreen
 import com.staminapp.ui.theme.StaminappAppTheme
-import com.staminapp.util.getViewModelFactory
-import androidx.lifecycle.viewmodel.compose.viewModel
-import com.staminapp.R
-import com.staminapp.ui.main.canGetCurrentUser
 
 
 sealed class Destination(val route: String) {

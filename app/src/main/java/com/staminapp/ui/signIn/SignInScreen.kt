@@ -1,4 +1,4 @@
-package com.staminapp
+package com.staminapp.ui.signIn
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -15,11 +15,9 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.unit.dp
-import com.staminapp.ui.main.MainViewModel
-import com.staminapp.util.getViewModelFactory
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
-import com.staminapp.ui.signIn.SignInViewModel
+import com.staminapp.R
 import com.staminapp.util.getSignInViewModelFactory
 
 @Composable

@@ -1,4 +1,4 @@
-package com.staminapp
+package com.staminapp.ui.home
 
 import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
@@ -13,23 +13,17 @@ import androidx.compose.material.icons.outlined.Home
 import androidx.compose.material.icons.outlined.Person
 import androidx.compose.material.icons.outlined.Search
 import androidx.compose.runtime.*
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Brush
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.staminapp.Destination
+import com.staminapp.R
 import com.staminapp.data.model.Routine
 import com.staminapp.ui.execute.ExecuteViewModel
-import com.staminapp.ui.home.HomeViewModel
-import com.staminapp.ui.profile.ProfileViewModel
-import com.staminapp.ui.routines.RoutineViewModel
 import com.staminapp.util.*
 
 
@@ -359,48 +353,6 @@ fun RecentCard(navController: NavController, modifier: Modifier = Modifier, rout
     }
 }
 
-@Composable
-fun RoutineCard(navController: NavController, modifier: Modifier = Modifier) {
-    Card(
-        modifier = modifier.clickable{navController.navigate(Destination.Routine.route)},
-        shape = RoundedCornerShape(15.dp),
-        elevation = 5.dp
-    ) {
-        Box(modifier = Modifier
-            .fillMaxWidth()
-            .height(160.dp)) {
-            Image(
-                painter = painterResource(id = R.drawable.tincho2),
-                contentDescription = "Routine",
-                contentScale = ContentScale.Crop
-            )
-            Box(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .background(
-                        Brush.verticalGradient(
-                            colors = listOf(
-                                Color.Transparent,
-                                Color.Black
-                            ),
-                            startY = 300f
-                        )
-                    )
-            )
-            Box(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .padding(12.dp),
-                contentAlignment = Alignment.BottomStart
-            ) {
-                Text(text = "Routine Name",
-                    color = MaterialTheme.colors.background,
-                    overflow = TextOverflow.Ellipsis,
-                    maxLines = 2
-                )
-            }
-        }
-    }
-}
+
 
 
