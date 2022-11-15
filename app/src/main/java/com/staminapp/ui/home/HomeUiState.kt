@@ -9,4 +9,5 @@ data class HomeUiState (
     val message: String? = null,
 
     val routines : List<Routine>? = null,
+    val favouriteRoutines : List<Routine>? = null
 )

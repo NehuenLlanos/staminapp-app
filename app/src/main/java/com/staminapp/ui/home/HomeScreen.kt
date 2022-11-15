@@ -1,6 +1,5 @@
 package com.staminapp
 
-import android.annotation.SuppressLint
 import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
 
@@ -22,19 +21,12 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
-import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.tooling.preview.PreviewParameter
-import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
-import androidx.navigation.compose.rememberNavController
-import com.staminapp.ui.routines.RoutinesViewModel
-import com.staminapp.ui.theme.StaminappAppTheme
-import kotlinx.coroutines.selects.select
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.staminapp.data.model.Routine
-import com.staminapp.ui.explore.ExploreViewModel
+import com.staminapp.ui.execute.ExecuteViewModel
 import com.staminapp.ui.home.HomeViewModel
 import com.staminapp.ui.profile.ProfileViewModel
 import com.staminapp.ui.routines.RoutineViewModel
@@ -128,7 +120,10 @@ fun HomeScreenContent(
 //    viewModel: RoutineViewModel = viewModel(factory = getRoutineViewModelFactory())
 //    viewModel: HomeViewModel = viewModel(factory = getHomeViewModelFactory())
 //    viewModel: ExploreViewModel = viewModel(factory = getExploreViewModelFactory())
-    viewModel: ProfileViewModel = viewModel(factory = getProfileViewModelFactory())
+//    viewModel: ProfileViewModel = viewModel(factory = getProfileViewModelFactory())
+//    viewModel: RoutineViewModel = viewModel(factory = getRoutineViewModelFactory())
+//    viewModel: HomeViewModel = viewModel(factory = getHomeViewModelFactory())
+    viewModel: ExecuteViewModel = viewModel(factory = getExecuteViewModelFactory())
 ) {
 //    val uiState = viewModel.uiState
 //    viewModel.getAllRoutines()
@@ -150,10 +145,25 @@ fun HomeScreenContent(
 //        viewModel.getAllRoutines()
 //    }
 
+//    val uiState = viewModel.uiState
+//    if (!uiState.isFetching && uiState.currentUser == null) {
+//        viewModel.getCurrentUser()
+//    }
+
+//    val uiState = viewModel.uiState
+//    if (!uiState.isFetching && uiState.routine == null) {
+//        viewModel.getRoutine(1)
+//    }
+
+//    val uiState = viewModel.uiState
+//    if (!uiState.isFetching && uiState.favouriteRoutines == null) {
+//        viewModel.getFavourites()
+//    }
+
     val uiState = viewModel.uiState
-    if (!uiState.isFetching && uiState.currentUser == null) {
-        viewModel.getCurrentUser()
-    }
+//    if (!uiState.isFetching && uiState.routine == null) {
+//        viewModel.getRoutine(1)
+//    }
 
     Column(
         modifier = modifier
@@ -161,14 +171,60 @@ fun HomeScreenContent(
             .padding(horizontal = 16.dp)
             .fillMaxWidth()
     ) {
-
-        if(uiState.currentUser != null) {
-            Text(text = uiState.currentUser?.username,
-                color = MaterialTheme.colors.primaryVariant,
-                fontSize = 60.sp,
-                fontWeight = FontWeight.Bold
-            )
+//        if(uiState.routine != null) {
+//            Text(text = uiState.routine.score.toString(),
+//                color = MaterialTheme.colors.primaryVariant,
+//                fontSize = 60.sp,
+//                fontWeight = FontWeight.Bold
+//            )
+//        }
+        Button(
+            onClick = {
+                viewModel.rate(1, 1)
+            },
+            colors = ButtonDefaults.buttonColors(backgroundColor = MaterialTheme.colors.primary),
+            shape = RoundedCornerShape(50.dp)
+        ) {
+            Text(text = "Ratear",color = MaterialTheme.colors.background)
         }
+//        if(uiState.favouriteRoutines != null) {
+//            uiState.favouriteRoutines?.forEach {
+//                Text(text = it.name,
+//                    color = MaterialTheme.colors.primaryVariant,
+//                    fontSize = 60.sp,
+//                    fontWeight = FontWeight.Bold
+//                )
+//            }
+//        }
+
+
+
+//        Button(
+//            onClick = {
+//                      viewModel.putFavourite(1)
+//            },
+//            colors = ButtonDefaults.buttonColors(backgroundColor = MaterialTheme.colors.primary),
+//            shape = RoundedCornerShape(50.dp)
+//        ) {
+//            Text(text = "ME GUSTA EL SALAME DE BERNI",color = MaterialTheme.colors.background)
+//        }
+//        Button(
+//            onClick = {
+//                viewModel.deleteFavourite(1)
+//            },
+//            colors = ButtonDefaults.buttonColors(backgroundColor = MaterialTheme.colors.primary),
+//            shape = RoundedCornerShape(50.dp)
+//        ) {
+//            Text(text = "NO ME GUSTA EL SALAME DE BERNI",color = MaterialTheme.colors.background)
+//        }
+
+//        if(uiState.currentUser != null) {
+//            Text(text = uiState.currentUser?.username,
+//                color = MaterialTheme.colors.primaryVariant,
+//                fontSize = 60.sp,
+//                fontWeight = FontWeight.Bold
+//            )
+//        }
 
 //        if(uiState.routines != null) {
 //            uiState.routines?.forEach {

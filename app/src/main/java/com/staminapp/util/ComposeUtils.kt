@@ -15,19 +15,13 @@ fun getViewModelFactory(defaultArgs: Bundle? = null): ViewModelFactory {
 }
 
 @Composable
-fun getRoutinesViewModelFactory(defaultArgs: Bundle? = null): RoutinesViewModelFactory {
-    val application = (LocalContext.current.applicationContext as MyApplication)
-    val sessionManager = application.sessionManager
-    val routinesRepository = application.routineRepository
-    return RoutinesViewModelFactory(sessionManager, routinesRepository, LocalSavedStateRegistryOwner.current, defaultArgs)
-}
-
-@Composable
 fun getRoutineViewModelFactory(defaultArgs: Bundle? = null): RoutineViewModelFactory {
     val application = (LocalContext.current.applicationContext as MyApplication)
     val sessionManager = application.sessionManager
     val routinesRepository = application.routineRepository
-    return RoutineViewModelFactory(sessionManager, routinesRepository, LocalSavedStateRegistryOwner.current, defaultArgs)
+    val favouriteRepository = application.favouriteRepository
+    val reviewRepository = application.reviewRepository
+    return RoutineViewModelFactory(sessionManager, routinesRepository, favouriteRepository, reviewRepository, LocalSavedStateRegistryOwner.current, defaultArgs)
 }
 
 @Composable
@@ -35,7 +29,8 @@ fun getHomeViewModelFactory(defaultArgs: Bundle? = null): HomeViewModelFactory {
     val application = (LocalContext.current.applicationContext as MyApplication)
     val sessionManager = application.sessionManager
     val userRepository = application.userRepository
-    return HomeViewModelFactory(sessionManager, userRepository, LocalSavedStateRegistryOwner.current, defaultArgs)
+    val favouriteRepository = application.favouriteRepository
+    return HomeViewModelFactory(sessionManager, userRepository, favouriteRepository, LocalSavedStateRegistryOwner.current, defaultArgs)
 }
 
 
@@ -61,4 +56,12 @@ fun getProfileViewModelFactory(defaultArgs: Bundle? = null): ProfileViewModelFac
     val sessionManager = application.sessionManager
     val userRepository = application.userRepository
     return ProfileViewModelFactory(sessionManager, userRepository, LocalSavedStateRegistryOwner.current, defaultArgs)
+}
+
+@Composable
+fun getExecuteViewModelFactory(defaultArgs: Bundle? = null): ExecuteViewModelFactory {
+    val application = (LocalContext.current.applicationContext as MyApplication)
+    val sessionManager = application.sessionManager
+    val reviewRepository = application.reviewRepository
+    return ExecuteViewModelFactory(sessionManager, reviewRepository, LocalSavedStateRegistryOwner.current, defaultArgs)
 }
