@@ -136,9 +136,8 @@ fun HomeScreenContent(
             fontWeight = FontWeight.Bold
         )
         Button(
-            modifier = modifier,
             onClick = {
-                viewModel.getRoutine(15)
+                viewModel.getRoutine(1)
             },
             colors = ButtonDefaults.buttonColors(backgroundColor = MaterialTheme.colors.primary),
             shape = RoundedCornerShape(50.dp)
@@ -146,8 +145,15 @@ fun HomeScreenContent(
             Text(text = "Ingresar",color = MaterialTheme.colors.background)
         }
         if(uiState.currentRoutine != null) {
-            Text(text = uiState.currentRoutine.name,color = MaterialTheme.colors.primary)
-//            RecentCard(navController, Modifier.weight(1f), uiState.currentRoutine!!)
+            Row(
+                modifier = Modifier
+                    .padding(4.dp)
+                    .fillMaxWidth(),
+                horizontalArrangement = Arrangement.spacedBy(8.dp),
+            ) {
+                RecentCard(navController, Modifier.weight(1f), uiState.currentRoutine)
+                RecentCard(navController, Modifier.weight(1f), uiState.currentRoutine)
+            }
         }
 
 //        for(i in viewModel.uiState.routines) {
@@ -193,7 +199,7 @@ fun RecentCard(navController: NavController, modifier: Modifier = Modifier, rout
             .fillMaxWidth()
             .height(64.dp)
         ) {
-            Row() {
+            Row {
                 Image(
                     modifier = Modifier
                         .fillMaxHeight()
@@ -206,9 +212,10 @@ fun RecentCard(navController: NavController, modifier: Modifier = Modifier, rout
                     modifier = Modifier.padding(10.dp),
                     text = routine.name,
                     color = MaterialTheme.colors.background,
+                    maxLines = 2,
                     overflow = TextOverflow.Ellipsis,
-                    maxLines = 2
-                    )
+
+                )
             }
         }
 
