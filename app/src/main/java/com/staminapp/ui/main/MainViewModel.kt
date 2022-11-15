@@ -23,18 +23,12 @@ class MainViewModel(
     private val userRepository: UserRepository,
 ) : ViewModel() {
 
-//    private val _userName = MutableLiveData(TextFieldValue(""))
-//    val userName: LiveData<TextFieldValue> = _userName
-//    fun onNameChange(input: String) {
-//        this._userName.value.text = input
-//    }
-
     private val _name = MutableStateFlow("")
     val name = _name.asStateFlow()
 
     private val _password = MutableStateFlow("")
     val password = _password.asStateFlow()
-//
+
     private val _failLogin = MutableStateFlow(false)
     val failLogin = _failLogin.asStateFlow()
 
@@ -46,10 +40,8 @@ class MainViewModel(
         _password.value = password
     }
     fun setFail(fail: Boolean) {
-//        uiState.loginFail = fail
         _failLogin.value = fail
     }
-
 
     var uiState by mutableStateOf(
         MainUiState(isAuthenticated = sessionManager.loadAuthToken() != null, username = TextFieldValue(""))

@@ -50,9 +50,10 @@ data class NetworkUser(
             id = id,
             username = username?: "",
             firstName = firstName?: "",
-            lastName = lastName?: "",
             email = email?: "",
-            lastActivity = lastActivity
+            gender = gender?: "other",
+            birthdate = birthdate,
+            image = metadata?.profilePicture,
         )
     }
 }

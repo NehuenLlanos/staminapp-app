@@ -1,6 +1,5 @@
 package com.staminapp
 
-
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
@@ -19,9 +18,7 @@ import androidx.compose.ui.unit.dp
 import com.staminapp.ui.main.MainViewModel
 import com.staminapp.util.getViewModelFactory
 import androidx.lifecycle.viewmodel.compose.viewModel
-import androidx.navigation.NavController
 import androidx.navigation.NavHostController
-import com.staminapp.ui.main.MainUiState
 
 @Composable
 fun SignInScreen(

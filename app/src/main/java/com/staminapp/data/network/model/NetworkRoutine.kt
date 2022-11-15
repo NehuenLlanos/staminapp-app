@@ -1,31 +1,34 @@
 package com.staminapp.data.network.model
 
 import com.google.gson.annotations.SerializedName
+import com.staminapp.data.model.Routine
+import com.staminapp.data.model.User
+import java.util.*
 
 data class NetworkRoutine(
     @SerializedName("id")
-    var id : Int? = null,
+    var id : Int,
 
     @SerializedName("name")
-    var name : String? = null,
+    var name : String,
 
     @SerializedName("detail")
-    var detail : String? = null,
+    var detail : String,
 
     @SerializedName("date")
-    var date : Int? = null,
+    var date : Long,
 
     @SerializedName("score")
-    var score : Int? = null,
+    var score : Int,
 
     @SerializedName("isPublic")
-    var isPublic : Boolean? = null,
+    var isPublic : Boolean,
 
     @SerializedName("difficulty")
-    var difficulty : String? = null,
+    var difficulty : String,
 
     @SerializedName("user")
-    var user : NetworkUser? = null,
+    var user : NetworkUser,
 
     @SerializedName("category")
     var category : NetworkCategory? = null,
@@ -33,5 +36,15 @@ data class NetworkRoutine(
     @SerializedName("metadata")
     var metadata : NetworkRoutineMetadata? = null
 ) {
-
+    fun asModel(): Routine {
+        return Routine(
+            id = id?: 0,
+            name = name?: "",
+            detail = detail?: "",
+            score = score?: 0,
+            difficulty = difficulty?: "rookie",
+            user = user!!.asModel(),
+            image = metadata?.picture,
+        )
+    }
 }

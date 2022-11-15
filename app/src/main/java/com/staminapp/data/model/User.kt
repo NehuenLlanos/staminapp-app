@@ -6,7 +6,8 @@ data class User (
     var id: Int?,
     var username: String,
     var firstName: String,
-    var lastName: String,
     var email: String,
-    var lastActivity: Date? = null,
+    var gender: String,
+    var birthdate: Date? = null,
+    var image: String? = null,
 )

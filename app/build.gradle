@@ -35,11 +35,11 @@ android {
                 En mi caso es 192.168.0.70
             */
             buildConfigField "String", "API_BASE_URL",
-                "\"http://10.2.66.148:8090/api/\""
+                "\"http://192.168.0.70:8090/api/\""
         }
         debug {
             buildConfigField "String", "API_BASE_URL",
-                    "\"http://10.2.66.148:8090/api/\""
+                    "\"http://192.168.0.70:8090/api/\""
         }
     }
     compileOptions {
