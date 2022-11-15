@@ -1,4 +1,4 @@
-package com.staminapp
+package com.staminapp.ui.execute
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.*
@@ -17,6 +17,8 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.staminapp.R
+import com.staminapp.ui.main.CustomChip
 
 /* Vista Previa para la Ejecución de una rutina */
 @Composable

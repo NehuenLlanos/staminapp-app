@@ -5,7 +5,7 @@ plugins {
 
 android {
     namespace 'com.staminapp'
-    compileSdk 32
+    compileSdk 33
 
     defaultConfig {
         applicationId "com.staminapp"
@@ -24,6 +24,22 @@ android {
         release {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+            /* EMULADOR
+                 No usar localhost o la IP 127.0.0.1 porque la interfaz de loopback del emulador. La
+                 forma de salir del emulador para acceder al localhost de host del mismoes usando
+                 la IP 10.0.2.2
+            */
+            /* DISPOSITIVO FÍSICO
+                Tenes que hacer el ipconfig y buscar la dirección IP de la compu y que los
+                dos dispositivos (celular y compu) esten conectados a la misma red.
+                En mi caso es 192.168.0.70
+            */
+            buildConfigField "String", "API_BASE_URL",
+                "\"http://10.2.64.47:8090/api/\""
+        }
+        debug {
+            buildConfigField "String", "API_BASE_URL",
+                    "\"http://10.2.64.47:8090/api/\""
         }
     }
     compileOptions {
@@ -53,22 +69,32 @@ android {
 
 dependencies {
 
-    implementation 'androidx.core:core-ktx:1.7.0'
-    implementation 'androidx.lifecycle:lifecycle-runtime-ktx:2.3.1'
-    implementation 'androidx.activity:activity-compose:1.3.1'
+    implementation 'androidx.core:core-ktx:1.9.0'
+    implementation "androidx.lifecycle:lifecycle-runtime-ktx:$lifecycle_version"
+
+    /* View Model */
+    implementation "androidx.lifecycle:lifecycle-viewmodel-compose:$lifecycle_version"
+    implementation 'androidx.compose.runtime:runtime-livedata:1.4.0-alpha02'
+
+    implementation 'androidx.activity:activity-compose:1.6.1'
     implementation "androidx.compose.ui:ui:$compose_ui_version"
     implementation "androidx.compose.ui:ui-tooling-preview:$compose_ui_version"
-    implementation 'androidx.compose.material:material:1.1.1'
+    implementation 'androidx.compose.material:material:1.3.1'
 
     implementation "androidx.compose.material:material-icons-extended:$compose_ui_version"
 
     /* Navigation */
     implementation "androidx.navigation:navigation-compose:2.5.3"
 
+    /* API dependencies */
+    implementation 'com.google.code.gson:gson:2.10'
+    implementation "com.squareup.retrofit2:converter-gson:$retrofit_version"
+    implementation "com.squareup.retrofit2:retrofit:$retrofit_version"
+    implementation 'com.squareup.okhttp3:logging-interceptor:4.10.0'
 
     testImplementation 'junit:junit:4.13.2'
-    androidTestImplementation 'androidx.test.ext:junit:1.1.3'
-    androidTestImplementation 'androidx.test.espresso:espresso-core:3.4.0'
+    androidTestImplementation 'androidx.test.ext:junit:1.1.4'
+    androidTestImplementation 'androidx.test.espresso:espresso-core:3.5.0'
     androidTestImplementation "androidx.compose.ui:ui-test-junit4:$compose_ui_version"
     debugImplementation "androidx.compose.ui:ui-tooling:$compose_ui_version"
     debugImplementation "androidx.compose.ui:ui-test-manifest:$compose_ui_version"

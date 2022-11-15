@@ -1,40 +1,34 @@
-package com.staminapp
+package com.staminapp.ui.routines
 
 import android.content.Intent
 import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
-import androidx.compose.material.icons.outlined.Star
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.Color.*
 import androidx.compose.ui.graphics.Color.Companion.White
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.text.font.FontFamily
-import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import com.staminapp.ui.theme.Gray
 import com.staminapp.ui.theme.StaminappAppTheme
-import kotlin.math.ceil
-import kotlin.math.floor
 import androidx.compose.material.Icon as Icon
-import androidx.compose.foundation.lazy.items
+import com.staminapp.Destination
+import com.staminapp.R
+import com.staminapp.ui.main.CustomChip
+import com.staminapp.ui.main.RatingBar
 
 @Composable
 fun RoutineScreen(navController: NavController) {
@@ -81,9 +75,11 @@ fun RoutineScreen(navController: NavController) {
                 contentColor = MaterialTheme.colors.primary
             )
         }
-    ) {
+    ) { paddingValues ->
+
         LazyColumn(
             modifier = Modifier
+                .padding(paddingValues)
                 .fillMaxWidth()
                 .padding(16.dp)
         ) {
@@ -264,49 +260,7 @@ fun Cycle(
     }
 }
 
-@Composable
-fun RatingBar(
-    modifier: Modifier = Modifier,
-    rating: Int = 0,
-    stars: Int = 5,
-    starsColor: Color = Color.Yellow,
-) {
-    Row(modifier = modifier) {
-        repeat(rating) {
-            Icon(Icons.Filled.Star, contentDescription = null, tint = starsColor)
-        }
-        repeat(stars - rating) {
-            Icon(Icons.Filled.Star, contentDescription = null, tint = Gray)
-        }
-    }
-}
 
-@Composable
-fun CustomChip(
-    selected: Boolean,
-    text: String,
-    modifier: Modifier = Modifier
-) {
-    Surface(
-        color = when {
-            selected -> MaterialTheme.colors.primaryVariant
-            else -> Gray
-        },
-        contentColor = when {
-            selected -> White
-            else -> MaterialTheme.colors.primaryVariant
-        },
-        shape = CircleShape,
-        modifier = modifier,
-    ) {
-        Text(
-            text = text.uppercase(),
-            textAlign = TextAlign.Center,
-            style = MaterialTheme.typography.body2,
-            modifier = Modifier.padding(12.dp, 8.dp)
-        )
-    }
-}
 
 @Preview
 @Composable
