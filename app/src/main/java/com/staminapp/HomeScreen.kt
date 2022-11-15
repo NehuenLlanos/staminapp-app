@@ -145,38 +145,39 @@ fun HomeScreenContent(
         ) {
             Text(text = "Ingresar",color = MaterialTheme.colors.background)
         }
-//        if(uiState.currentRoutine != null) {
+        if(uiState.currentRoutine != null) {
+            Text(text = uiState.currentRoutine.name,color = MaterialTheme.colors.primary)
 //            RecentCard(navController, Modifier.weight(1f), uiState.currentRoutine!!)
+        }
+
+//        for(i in viewModel.uiState.routines) {
+//            Row(
+//                modifier = Modifier
+//                    .padding(4.dp)
+//                    .fillMaxWidth(),
+//                horizontalArrangement = Arrangement.spacedBy(8.dp),
+//            ) {
+//
+//                RecentCard(navController, Modifier.weight(1f), i)
+//                RecentCard(navController, Modifier.weight(1f), i)
+//            }
 //        }
-
-        for(i in viewModel.uiState.routines) {
-            Row(
-                modifier = Modifier
-                    .padding(4.dp)
-                    .fillMaxWidth(),
-                horizontalArrangement = Arrangement.spacedBy(8.dp),
-            ) {
-
-                RecentCard(navController, Modifier.weight(1f), i)
-                RecentCard(navController, Modifier.weight(1f), i)
-            }
-        }
-        Text(text = "Mi Biblioteca",
-            color = MaterialTheme.colors.primaryVariant,
-            fontSize = 25.sp,
-            fontWeight = FontWeight.Bold
-        )
-        for(i in 1..10) {
-            Row(
-                modifier = Modifier
-                    .padding(vertical = 4.dp)
-                    .fillMaxWidth(),
-                horizontalArrangement = Arrangement.spacedBy(8.dp)
-            ) {
-                RoutineCard(navController, Modifier.weight(1f))
-                RoutineCard(navController, Modifier.weight(1f))
-            }
-        }
+//        Text(text = "Mi Biblioteca",
+//            color = MaterialTheme.colors.primaryVariant,
+//            fontSize = 25.sp,
+//            fontWeight = FontWeight.Bold
+//        )
+//        for(i in 1..10) {
+//            Row(
+//                modifier = Modifier
+//                    .padding(vertical = 4.dp)
+//                    .fillMaxWidth(),
+//                horizontalArrangement = Arrangement.spacedBy(8.dp)
+//            ) {
+//                RoutineCard(navController, Modifier.weight(1f))
+//                RoutineCard(navController, Modifier.weight(1f))
+//            }
+//        }
     }
 }
 

@@ -22,10 +22,6 @@ class RoutinesViewModel(
     private val routinesRepository: RoutinesRepository,
 ) : ViewModel() {
 
-    init {
-        getRoutine(15)
-    }
-
     private val _fail = MutableStateFlow(false)
     val fail = _fail.asStateFlow()
 
