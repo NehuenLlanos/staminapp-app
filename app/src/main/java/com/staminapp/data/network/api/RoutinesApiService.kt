@@ -17,6 +17,13 @@ interface RoutinesApiService {
     @GET("routines/{routineId}")
     suspend fun getRoutine(@Path("routineId") id: Int) : Response<NetworkRoutine>
 
+    @GET("routines/{routineId}/cycles")
+    suspend fun getCyclesForRoutine(@Path("routineId") id: Int, @Query("size") size: Int?= MAX_SIZE) : Response<NetworkPagedContent<NetworkCycle>>
+
+    @GET("cycles/{cycleId}/exercises")
+    suspend fun getExercisesForCycle(@Path("cycleId") id: Int, @Query("size") size: Int?= MAX_SIZE) : Response<NetworkPagedContent<NetworkCycleExercise>>
+
+
     companion object {
         const val MAX_SIZE = Int.MAX_VALUE
     }

@@ -1,6 +1,8 @@
 package com.staminapp.data.network.model
 
 import com.google.gson.annotations.SerializedName
+import com.staminapp.data.model.Cycle
+import com.staminapp.data.model.Routine
 
 data class NetworkCycle(
     @SerializedName("id")
@@ -23,4 +25,13 @@ data class NetworkCycle(
 
     @SerializedName("metadata")
     var metadata : String? = null
-)
+) {
+    fun asModel(): Cycle {
+        return Cycle(
+            id = id?: 0,
+            name = name?: "",
+            order = order?: 1,
+            repetitions = repetitions?: 1,
+        )
+    }
+}

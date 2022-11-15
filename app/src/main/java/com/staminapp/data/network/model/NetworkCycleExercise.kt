@@ -1,6 +1,8 @@
 package com.staminapp.data.network.model
 
 import com.google.gson.annotations.SerializedName
+import com.staminapp.data.model.Cycle
+import com.staminapp.data.model.Exercise
 
 data class NetworkCycleExercise(
     @SerializedName("order")
@@ -14,4 +16,15 @@ data class NetworkCycleExercise(
 
     @SerializedName("exercise")
     var exercise: NetworkExercise? = null
-)
+) {
+    fun asModel(): Exercise {
+        return Exercise(
+            id = exercise?.id?: 0,
+            name = exercise?.name?: "",
+            detail = exercise?.detail?: "",
+            duration = duration?: 0,
+            repetitions = repetitions?: 1,
+            order = order?: 1,
+        )
+    }
+}

@@ -35,6 +35,8 @@ import com.staminapp.util.getViewModelFactory
 import kotlinx.coroutines.selects.select
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.staminapp.data.model.Routine
+import com.staminapp.ui.routines.RoutineViewModel
+import com.staminapp.util.getRoutineViewModelFactory
 import com.staminapp.util.getRoutinesViewModelFactory
 
 
@@ -121,53 +123,92 @@ fun HomeScreenContent(
     modifier: Modifier = Modifier,
     navController: NavController,
     scrollState: ScrollState,
-    viewModel: RoutinesViewModel = viewModel(factory = getRoutinesViewModelFactory())
+//    viewModel: RoutinesViewModel = viewModel(factory = getRoutinesViewModelFactory())
+    viewModel: RoutineViewModel = viewModel(factory = getRoutineViewModelFactory())
 ) {
+//    val uiState = viewModel.uiState
+//    viewModel.getAllRoutines()
+
     val uiState = viewModel.uiState
+    viewModel.getRoutine(1)
+    viewModel.getCyclesForRoutine(1)
+    uiState.cycles?.forEach {
+        viewModel.getExercisesForCycle(it.id)
+    }
     Column(
         modifier = modifier
             .verticalScroll(scrollState)
             .padding(horizontal = 16.dp)
             .fillMaxWidth()
     ) {
-        Text(text = "BUENOS DÍAS, USUARIO",
-            color = MaterialTheme.colors.primaryVariant,
-            fontSize = 40.sp,
-            fontWeight = FontWeight.Bold
-        )
-        Button(
-            onClick = {
-                viewModel.getRoutine(1)
-            },
-            colors = ButtonDefaults.buttonColors(backgroundColor = MaterialTheme.colors.primary),
-            shape = RoundedCornerShape(50.dp)
-        ) {
-            Text(text = "Ingresar",color = MaterialTheme.colors.background)
+        if (uiState.routine != null) {
+            Text(text = uiState.routine.name,
+                color = MaterialTheme.colors.primaryVariant,
+                fontSize = 40.sp,
+                fontWeight = FontWeight.Bold
+            )
         }
-        if(uiState.currentRoutine != null) {
-            Row(
-                modifier = Modifier
-                    .padding(4.dp)
-                    .fillMaxWidth(),
-                horizontalArrangement = Arrangement.spacedBy(8.dp),
-            ) {
-                RecentCard(navController, Modifier.weight(1f), uiState.currentRoutine)
-                RecentCard(navController, Modifier.weight(1f), uiState.currentRoutine)
+
+        if (uiState.cycles != null) {
+            uiState.cycles?.forEach {
+                Text(text = it.name,
+                    color = MaterialTheme.colors.primaryVariant,
+                    fontSize = 60.sp,
+                    fontWeight = FontWeight.Bold
+                )
+                uiState.exercises?.get(it.id)?.forEach {
+                    Text(text = it.name,
+                        color = MaterialTheme.colors.primaryVariant,
+                        fontSize = 20.sp,
+                        fontWeight = FontWeight.Bold
+                    )
+                }
             }
         }
 
-//        for(i in viewModel.uiState.routines) {
+
+
+
+//        Text(text = "BUENOS DÍAS, USUARIO",
+//            color = MaterialTheme.colors.primaryVariant,
+//            fontSize = 40.sp,
+//            fontWeight = FontWeight.Bold
+//        )
+//        Button(
+//            onClick = {
+////                viewModel.getRoutine(1)
+//                      viewModel.getAllRoutines()
+//            },
+//            colors = ButtonDefaults.buttonColors(backgroundColor = MaterialTheme.colors.primary),
+//            shape = RoundedCornerShape(50.dp)
+//        ) {
+//            Text(text = "Ingresar",color = MaterialTheme.colors.background)
+//        }
+//        if(!uiState.routines.isEmpty()) {
 //            Row(
 //                modifier = Modifier
 //                    .padding(4.dp)
 //                    .fillMaxWidth(),
 //                horizontalArrangement = Arrangement.spacedBy(8.dp),
 //            ) {
+//                RecentCard(navController, Modifier.weight(1f), uiState.currentRoutine)
+//                RecentCard(navController, Modifier.weight(1f), uiState.currentRoutine)
+//            }
+//            for(i in uiState.routines) {
+//                Row(
+//                    modifier = Modifier
+//                        .padding(4.dp)
+//                        .fillMaxWidth(),
+//                    horizontalArrangement = Arrangement.spacedBy(8.dp),
+//                ) {
 //
-//                RecentCard(navController, Modifier.weight(1f), i)
-//                RecentCard(navController, Modifier.weight(1f), i)
+//                    RecentCard(navController, Modifier.weight(1f), i)
+//                    RecentCard(navController, Modifier.weight(1f), i)
+//                }
 //            }
 //        }
+
+
 //        Text(text = "Mi Biblioteca",
 //            color = MaterialTheme.colors.primaryVariant,
 //            fontSize = 25.sp,
