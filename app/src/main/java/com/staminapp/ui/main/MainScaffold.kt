@@ -22,7 +22,7 @@ import com.staminapp.ui.explore.ExploreScreen
 fun MainScaffold(
     selectedIndex: Int,
     navController: NavController,
-    content: @Composable () -> Unit
+    content: @Composable (modifier: Modifier, navController: NavController) -> Unit
 ) {
     Scaffold(
         topBar = {
@@ -90,7 +90,6 @@ fun MainScaffold(
             }
         },
     ) {
-//        HomeScreenContent(Modifier.padding(it), navController)
-        ExploreScreen(Modifier.padding(it), navController = navController)
+        content(Modifier.padding(it), navController)
     }
 }

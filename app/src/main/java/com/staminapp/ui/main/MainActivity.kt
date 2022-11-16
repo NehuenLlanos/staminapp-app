@@ -14,6 +14,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.staminapp.ui.execute.*
+import com.staminapp.ui.explore.ExploreScreen
 import com.staminapp.ui.home.HomeScreen
 import com.staminapp.ui.profile.ProfileScreen
 import com.staminapp.ui.routines.RoutineScreen
@@ -64,15 +65,34 @@ fun NavigationAppHost(navController: NavHostController) {
     NavHost(navController = navController, startDestination = "sign-in") {
 
         composable(Destination.SignIn.route) {
-            SignInScreen(navController = navController)
+            SignInScreen(navController)
         }
 
         composable(Destination.Home.route) {
-            HomeScreen(navController)
+            MainScaffold(
+                selectedIndex = 0,
+                navController = navController
+            ) { modifier, navController ->
+                HomeScreen(modifier, navController)
+            }
+        }
+
+        composable(Destination.Explore.route) {
+            MainScaffold(
+                selectedIndex = 1,
+                navController = navController
+            ) { modifier, navController ->
+                ExploreScreen(modifier, navController)
+            }
         }
 
         composable(Destination.Profile.route) {
-            ProfileScreen(navController)
+            MainScaffold(
+                selectedIndex = 2,
+                navController = navController
+            ) { modifier, navController ->
+                ProfileScreen(modifier, navController)
+            }
         }
 
         composable(Destination.Routine.route) { navBackStackEntry ->

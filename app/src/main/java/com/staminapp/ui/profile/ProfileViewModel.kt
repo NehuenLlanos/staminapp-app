@@ -6,10 +6,10 @@ import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.navigation.NavController
-import com.staminapp.Destination
 import com.staminapp.data.repository.RoutineRepository
 import com.staminapp.data.repository.UserRepository
 import com.staminapp.ui.explore.ExploreUiState
+import com.staminapp.ui.main.Destination
 import com.staminapp.util.SessionManager
 import kotlinx.coroutines.launch
 

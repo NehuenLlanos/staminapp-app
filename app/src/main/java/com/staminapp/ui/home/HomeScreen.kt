@@ -35,12 +35,7 @@ import com.staminapp.util.*
 
 
 @Composable
-fun HomeScreen(navController: NavController) {
-    HomeScaffold(navController)
-}
-
-@Composable
-fun HomeScreenContent(
+fun HomeScreen(
     modifier: Modifier = Modifier,
     navController: NavController,
     viewModel: HomeViewModel = viewModel(factory = getHomeViewModelFactory())
