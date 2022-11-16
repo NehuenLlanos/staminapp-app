@@ -13,6 +13,7 @@ import androidx.compose.material.icons.filled.Star
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.asImageBitmap
@@ -78,8 +79,7 @@ fun CustomChip(
             selected -> Color.White
             else -> MaterialTheme.colors.primaryVariant
         },
-        shape = CircleShape,
-        modifier = modifier,
+        modifier = modifier.clip(CircleShape),
     ) {
         Text(
             text = text.uppercase(),

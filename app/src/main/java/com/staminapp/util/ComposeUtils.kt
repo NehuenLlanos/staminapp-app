@@ -70,7 +70,7 @@ fun decodeBase64Image(encodedString: String?): Bitmap {
     return BitmapFactory.decodeByteArray(imageBytes, 0, imageBytes.size)
 }
 
-fun translateDifficulty(string: String): String {
+fun translateDifficultyForApp(string: String): String {
     val dict = mapOf(
         Pair("rookie", "novato"),
         Pair("beginner", "principiante"),
@@ -79,5 +79,17 @@ fun translateDifficulty(string: String): String {
         Pair("expert", "experto"),
     )
 
-    return dict.getOrDefault(string, "")
+    return dict.getOrDefault(string.lowercase(), "")
+}
+
+fun translateDifficutlyForApi(string: String): String {
+    val dict = mapOf(
+        Pair("novato", "rookie"),
+        Pair("principiante", "beginner"),
+        Pair("intermedio", "intermediate"),
+        Pair("avanzado", "advanced"),
+        Pair("experto", "expert"),
+    )
+
+    return dict.getOrDefault(string.lowercase(), "")
 }
