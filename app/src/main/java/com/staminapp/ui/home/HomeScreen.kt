@@ -27,6 +27,8 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import com.staminapp.ui.main.Destination
 import com.staminapp.R
 import com.staminapp.data.model.Routine
+import com.staminapp.ui.execute.ExecuteViewModel
+import com.staminapp.ui.profile.ProfileScreen
 import com.staminapp.ui.explore.ExploreScreen
 import com.staminapp.ui.main.RoutineCard
 import com.staminapp.util.*
@@ -36,7 +38,6 @@ import com.staminapp.util.*
 fun HomeScreen(navController: NavController) {
     HomeScaffold(navController)
 }
-
 
 @Composable
 fun HomeScreenContent(

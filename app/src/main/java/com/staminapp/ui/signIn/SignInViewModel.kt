@@ -57,7 +57,9 @@ class SignInViewModel (
                 isFetching = false,
                 isAuthenticated = true,
             )
+            navController.popBackStack()
             navController.navigate(Destination.Home.route)
+
         }.onFailure { e ->
             // Handle the error and notify the UI when appropriate.
             uiState = uiState.copy(

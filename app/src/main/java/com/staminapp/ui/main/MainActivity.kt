@@ -62,6 +62,7 @@ fun NavigationAppHost(navController: NavHostController) {
     val ctx = LocalContext.current
 
     NavHost(navController = navController, startDestination = "sign-in") {
+
         composable(Destination.SignIn.route) {
             SignInScreen(navController = navController)
         }
