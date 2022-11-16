@@ -31,7 +31,7 @@ import com.staminapp.ui.main.CustomChip
 import com.staminapp.ui.main.RatingBar
 import com.staminapp.util.decodeBase64Image
 import com.staminapp.util.getRoutineViewModelFactory
-import com.staminapp.util.translateDifficulty
+import com.staminapp.util.translateDifficultyForApp
 
 @Composable
 fun RoutineScreen(
@@ -148,7 +148,7 @@ fun RoutineScreen(
                         ) {
                             CustomChip(
                                 selected = false,
-                                text = translateDifficulty(uiState.routine.difficulty)
+                                text = translateDifficultyForApp(uiState.routine.difficulty)
                             )
                             Text(
                                 uiState.routine.name.uppercase(),

@@ -29,6 +29,7 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import com.staminapp.Destination
 import com.staminapp.R
 import com.staminapp.data.model.Routine
+import com.staminapp.ui.explore.ExploreScreen
 import com.staminapp.ui.main.RoutineCard
 import com.staminapp.util.*
 
@@ -101,7 +102,8 @@ fun HomeScaffold(navController: NavController) {
             }
         },
     ) {
-        HomeScreenContent(Modifier.padding(it), navController)
+//        HomeScreenContent(Modifier.padding(it), navController)
+        ExploreScreen(Modifier.padding(it), navController = navController)
 //        if (selectedIndex == 0) {
 //        HomeScreenContent(navController, scrollState)
 //        } else if (selectedIndex == 1) {
@@ -125,7 +127,9 @@ fun HomeScreenContent(
     }
 
     LazyVerticalGrid(
-        modifier = modifier.fillMaxWidth().padding(16.dp),
+        modifier = modifier
+            .fillMaxWidth()
+            .padding(16.dp),
         columns = GridCells.Adaptive(minSize = 160.dp),
         verticalArrangement = Arrangement.spacedBy(16.dp),
         horizontalArrangement = Arrangement.spacedBy(16.dp)
@@ -224,7 +228,6 @@ fun RecentCard(navController: NavController, modifier: Modifier = Modifier, rout
                 )
             }
         }
-
     }
 }
 

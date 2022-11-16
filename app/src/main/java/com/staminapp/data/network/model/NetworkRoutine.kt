@@ -43,6 +43,7 @@ data class NetworkRoutine(
             detail = detail?: "",
             score = score?: 0,
             difficulty = difficulty?: "rookie",
+            date = date,
             user = user?.asModel(),
             image = metadata?.picture,
         )
