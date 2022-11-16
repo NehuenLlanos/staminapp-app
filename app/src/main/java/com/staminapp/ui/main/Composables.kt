@@ -10,7 +10,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Star
-import androidx.compose.runtime.Composable
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Brush
@@ -33,13 +33,32 @@ fun RatingBar(
     rating: Int = 0,
     stars: Int = 5,
     starsColor: Color = Color.Yellow,
+    rate: (score: Int) -> Unit
 ) {
+    var mutableRating by remember { mutableStateOf(rating) }
+
     Row(modifier = modifier) {
-        repeat(rating) {
-            Icon(Icons.Filled.Star, contentDescription = null, tint = starsColor)
+        repeat(mutableRating) {
+            Icon(
+                Icons.Filled.Star,
+                contentDescription = null,
+                tint = starsColor,
+                modifier = Modifier.clickable {
+                    rate(it + 1)
+                    mutableRating = it + 1
+                }
+            )
         }
-        repeat(stars - rating) {
-            Icon(Icons.Filled.Star, contentDescription = null, tint = Gray)
+        repeat(stars - mutableRating) {
+            Icon(
+                Icons.Filled.Star,
+                contentDescription = null,
+                tint = Gray,
+                modifier = Modifier.clickable {
+                    rate(it + mutableRating + 1)
+                    mutableRating += it + 1
+                }
+            )
         }
     }
 }
@@ -82,7 +101,7 @@ fun RoutineCard(navController: NavController, routine: Routine, modifier: Modifi
     ) {
         Box(modifier = Modifier
             .fillMaxSize()
-            .aspectRatio(1f/1f)
+            .aspectRatio(1f / 1f)
         ) {
             Image(
                 bitmap = decodeBase64Image(routine.image).asImageBitmap(),

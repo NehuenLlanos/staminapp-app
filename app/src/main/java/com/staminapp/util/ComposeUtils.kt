@@ -69,3 +69,15 @@ fun decodeBase64Image(encodedString: String?): Bitmap {
     val imageBytes = Base64.decode(encodedString.split(',')[1], Base64.NO_PADDING)
     return BitmapFactory.decodeByteArray(imageBytes, 0, imageBytes.size)
 }
+
+fun translateDifficulty(string: String): String {
+    val dict = mapOf(
+        Pair("rookie", "novato"),
+        Pair("beginner", "principiante"),
+        Pair("intermediate", "intermedio"),
+        Pair("advanced", "avanzado"),
+        Pair("expert", "experto"),
+    )
+
+    return dict.getOrDefault(string, "")
+}
