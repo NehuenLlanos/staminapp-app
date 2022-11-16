@@ -4,11 +4,15 @@ import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
+import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.focus.FocusRequester
+import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
@@ -20,11 +24,13 @@ import androidx.navigation.NavHostController
 import com.staminapp.R
 import com.staminapp.util.getSignInViewModelFactory
 
+@OptIn(ExperimentalComposeUiApi::class)
 @Composable
 fun SignInScreen(
     viewModel: SignInViewModel = viewModel(factory = getSignInViewModelFactory()),
     navController: NavHostController
 ) {
+    val (focusRequester) = FocusRequester.createRefs()
     val uiState = viewModel.uiState
     val username by viewModel.name.collectAsState(initial = "")
     val password by viewModel.password.collectAsState(initial = "")
@@ -61,8 +67,8 @@ fun SignInScreen(
 
             }
             LogoImage()
-            UsernameTextField(Modifier.padding(top = 70.dp), viewModel, username)
-            PasswordTextField(Modifier.padding(top = 20.dp), viewModel, password)
+            UsernameTextField(Modifier.padding(top = 70.dp), viewModel, username, focusRequester)
+            PasswordTextField(Modifier.padding(top = 20.dp), viewModel, password, focusRequester)
             SignInButton(Modifier.padding(top = 30.dp), viewModel, username, password, navController)
 
         }
@@ -77,8 +83,7 @@ fun LogoImage() {
 }
 
 @Composable
-fun UsernameTextField(modifier: Modifier, viewModel: SignInViewModel, username: String) {
-
+fun UsernameTextField(modifier: Modifier, viewModel: SignInViewModel, username: String, focusRequester: FocusRequester) {
     TextField(
         modifier = modifier,
         value = username,
@@ -88,13 +93,17 @@ fun UsernameTextField(modifier: Modifier, viewModel: SignInViewModel, username: 
             MaterialTheme.colors.primaryVariant,
             fontWeight = FontWeight.Bold
         ),
+        keyboardActions = KeyboardActions(
+            onDone = { focusRequester.requestFocus() }
+        ),
+        singleLine = true,
     )
 }
 
 @Composable
-fun PasswordTextField(modifier: Modifier, viewModel: SignInViewModel, password: String) {
+fun PasswordTextField(modifier: Modifier, viewModel: SignInViewModel, password: String, focusRequester : FocusRequester) {
     TextField(
-        modifier = modifier,
+        modifier = modifier.focusRequester(focusRequester),
         value = password,
         onValueChange = viewModel::setPassword,
         label = { Text(text = "Contraseña") },
@@ -104,6 +113,7 @@ fun PasswordTextField(modifier: Modifier, viewModel: SignInViewModel, password: 
             MaterialTheme.colors.primaryVariant,
             fontWeight = FontWeight.Bold
         ),
+        singleLine = true,
     )
 }
 
