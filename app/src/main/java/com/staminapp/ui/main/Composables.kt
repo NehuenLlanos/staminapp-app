@@ -81,13 +81,14 @@ fun RoutineCard(navController: NavController, routine: Routine, modifier: Modifi
         elevation = 5.dp
     ) {
         Box(modifier = Modifier
-            .fillMaxWidth()
-            .height(160.dp)
+            .fillMaxSize()
+            .aspectRatio(1f/1f)
         ) {
             Image(
                 bitmap = decodeBase64Image(routine.image).asImageBitmap(),
                 contentDescription = "Imagen de Rutina",
-                contentScale = ContentScale.Crop
+                contentScale = ContentScale.Crop,
+                modifier = Modifier.fillMaxSize()
             )
             Box(
                 modifier = Modifier
