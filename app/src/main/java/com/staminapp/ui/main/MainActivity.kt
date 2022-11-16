@@ -135,7 +135,7 @@ fun NavigationAppHost(navController: NavHostController) {
     NavHost(navController = navController, startDestination = "sign-in") {
         composable(Destination.SignIn.route) { SignInScreen(navController = navController) }
         composable(Destination.Home.route) { HomeScreen(navController) }
-        composable(Destination.Profile.route) { ProfileScreen(navController) }
+        composable(Destination.Profile.route) { ProfileScreen(navController = navController) }
 //        composable(Destination.List.route) { ListScreen(navController) }
         composable(Destination.Routine.route) { RoutineScreen(navController) }
         composable(Destination.ExecuteRoutine.route) { StartExecutionScreen() }
