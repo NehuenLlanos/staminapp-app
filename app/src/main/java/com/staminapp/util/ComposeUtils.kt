@@ -1,6 +1,9 @@
 package com.staminapp.util
 
+import android.graphics.Bitmap
+import android.graphics.BitmapFactory
 import android.os.Bundle
+import android.util.Base64
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalSavedStateRegistryOwner
@@ -57,4 +60,12 @@ fun getExecuteViewModelFactory(defaultArgs: Bundle? = null): ExecuteViewModelFac
     val reviewRepository = application.reviewRepository
     val routineRepository = application.routineRepository
     return ExecuteViewModelFactory(sessionManager, reviewRepository, routineRepository, LocalSavedStateRegistryOwner.current, defaultArgs)
+}
+
+fun decodeBase64Image(encodedString: String?): Bitmap {
+    if (encodedString == null) {
+        return Bitmap.createBitmap(100, 100, Bitmap.Config.ARGB_8888)
+    }
+    val imageBytes = Base64.decode(encodedString.split(',')[1], Base64.NO_PADDING)
+    return BitmapFactory.decodeByteArray(imageBytes, 0, imageBytes.size)
 }

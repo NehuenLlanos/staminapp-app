@@ -1,6 +1,7 @@
 package com.staminapp
 
 import android.os.Bundle
+import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.layout.fillMaxSize
@@ -26,7 +27,7 @@ sealed class Destination(val route: String) {
     object Profile: Destination("profile")
 //    object List: Destination("list")
     object Routine: Destination("routine/{elementId}") {
-        fun createRoute(elementId: Int) = "routine/$elementId"
+        fun createRoute(routineId: Int) = "routine/$routineId"
     }
     object ExecuteRoutine: Destination("routine/execute")
     object ExercisePreview: Destination("routine/execute/exercise-preview")
@@ -137,16 +138,15 @@ fun NavigationAppHost(navController: NavHostController) {
         composable(Destination.Home.route) { HomeScreen(navController) }
         composable(Destination.Profile.route) { ProfileScreen(navController = navController) }
 //        composable(Destination.List.route) { ListScreen(navController) }
-        composable(Destination.Routine.route) { RoutineScreen(navController) }
         composable(Destination.ExecuteRoutine.route) { StartExecutionScreen() }
-//        composable(Destination.Routine.route) { navBackStackEntry ->
-//            val elementId = navBackStackEntry.arguments?.getString("elementId")
-//            if (elementId == null) {
-//                Toast.makeText(ctx, "ElementId is required", Toast.LENGTH_SHORT).show()
-//            } else {
-//                RoutineScreen(elementId = elementId.toInt())
-//            }
-//        }
+        composable(Destination.Routine.route) { navBackStackEntry ->
+            val elementId = navBackStackEntry.arguments?.getString("elementId")
+            if (elementId == null) {
+                Toast.makeText(ctx, "ERROR FATAL. Volver a correr la aplicación", Toast.LENGTH_SHORT).show()
+            } else {
+                RoutineScreen(elementId.toInt(), navController)
+            }
+        }
         composable(Destination.ExercisePreview.route) { ExercisePreview() }
         composable(Destination.ExerciseScreenTime.route) { ExerciseScreenTime() }
         composable(Destination.ExerciseScreenReps.route) { ExerciseScreenReps() }

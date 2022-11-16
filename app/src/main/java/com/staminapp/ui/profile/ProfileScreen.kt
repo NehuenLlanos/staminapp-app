@@ -32,6 +32,7 @@ import androidx.navigation.NavController
 import com.staminapp.ui.execute.ExecuteViewModel
 import com.staminapp.util.getExecuteViewModelFactory
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.staminapp.util.decodeBase64Image
 import com.staminapp.util.getProfileViewModelFactory
 import java.sql.Date
 import java.time.LocalDateTime
@@ -79,31 +80,46 @@ fun ProfileScreen(
     }
 }
 
+
+
 @Composable
 fun UserImage(iuState: ProfileUiState){
-    val context = LocalContext.current
-    val myImage: Bitmap = BitmapFactory.decodeResource(Resources.getSystem(),android.R.mipmap.sym_def_app_icon)
-    val result= remember {
-        mutableStateOf<Bitmap>(myImage)
-    }
-    val loadImage = rememberLauncherForActivityResult(ActivityResultContracts.GetContent()){
-       //if(Build.VERSION.SDK_INT < 29){
-            result.value= MediaStore.Images.Media.getBitmap(context.contentResolver,it)
-        //}
-        //else{
-        //    val source = ImageDecoder.createSource(context.contentResolver,it)
-        //    result.value= ImageDecoder.decodeBitmap(source)
-        //}
-    }
-    Image(result.value.asImageBitmap(), contentDescription = "User Image", modifier = Modifier
+
+    Image(
+        modifier = Modifier
         .size(150.dp)
         .padding(10.dp)
         .clip(CircleShape)
         .fillMaxHeight()
-        .fillMaxWidth()
-        .rotate(90f)
-        .clickable { loadImage.launch("image/*") },
-        contentScale = ContentScale.Crop)
+        .fillMaxWidth(),
+        bitmap = decodeBase64Image(iuState.currentUser!!.image).asImageBitmap(),
+        contentDescription = "Imagen de Rutina",
+        contentScale = ContentScale.Crop
+    )
+
+//    val context = LocalContext.current
+//    val myImage: Bitmap = BitmapFactory.decodeResource(Resources.getSystem(),android.R.mipmap.sym_def_app_icon)
+//    val result= remember {
+//        mutableStateOf<Bitmap>(myImage)
+//    }
+//    val loadImage = rememberLauncherForActivityResult(ActivityResultContracts.GetContent()){
+//       //if(Build.VERSION.SDK_INT < 29){
+//            result.value= MediaStore.Images.Media.getBitmap(context.contentResolver,it)
+//        //}
+//        //else{
+//        //    val source = ImageDecoder.createSource(context.contentResolver,it)
+//        //    result.value= ImageDecoder.decodeBitmap(source)
+//        //}
+//    }
+//    Image(result.value.asImageBitmap(), contentDescription = "User Image", modifier = Modifier
+//        .size(150.dp)
+//        .padding(10.dp)
+//        .clip(CircleShape)
+//        .fillMaxHeight()
+//        .fillMaxWidth()
+//        .rotate(90f)
+//        .clickable { loadImage.launch("image/*") },
+//        contentScale = ContentScale.Crop)
         // con FillBounds se soluciona pero queda muy feo
 
 //    OutlinedButton(onClick = {loadImage.launch("image/*")}, modifier = Modifier.width(150.dp).padding(10.dp)) {

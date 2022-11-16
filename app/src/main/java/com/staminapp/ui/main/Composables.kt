@@ -15,6 +15,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextAlign
@@ -22,7 +23,9 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.staminapp.Destination
+import com.staminapp.data.model.Routine
 import com.staminapp.ui.theme.Gray
+import com.staminapp.util.decodeBase64Image
 
 @Composable
 fun RatingBar(
@@ -69,18 +72,21 @@ fun CustomChip(
 }
 
 @Composable
-fun RoutineCard(navController: NavController, modifier: Modifier = Modifier) {
+fun RoutineCard(navController: NavController, routine: Routine, modifier: Modifier = Modifier) {
     Card(
-        modifier = modifier.clickable{navController.navigate(Destination.Routine.route)},
+        modifier = modifier.clickable{
+            navController.navigate(Destination.Routine.createRoute(routine.id))
+        },
         shape = RoundedCornerShape(15.dp),
         elevation = 5.dp
     ) {
         Box(modifier = Modifier
             .fillMaxWidth()
-            .height(160.dp)) {
+            .height(160.dp)
+        ) {
             Image(
-                painter = painterResource(id = R.drawable.tincho2),
-                contentDescription = "Routine",
+                bitmap = decodeBase64Image(routine.image).asImageBitmap(),
+                contentDescription = "Imagen de Rutina",
                 contentScale = ContentScale.Crop
             )
             Box(
@@ -102,7 +108,8 @@ fun RoutineCard(navController: NavController, modifier: Modifier = Modifier) {
                     .padding(12.dp),
                 contentAlignment = Alignment.BottomStart
             ) {
-                Text(text = "Routine Name",
+                Text(
+                    routine.name,
                     color = MaterialTheme.colors.background,
                     overflow = TextOverflow.Ellipsis,
                     maxLines = 2
