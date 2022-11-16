@@ -547,11 +547,11 @@ fun ExerciseScreenFinished() {
                     overflow = TextOverflow.Ellipsis,
                     maxLines = 1
                 )
-                RatingBar(
-                    rating = 2,
-                    starsColor = MaterialTheme.colors.primary,
-                    modifier = Modifier.padding(bottom = 2.dp)
-                )
+//                RatingBar(
+//                    rating = 2,
+//                    starsColor = MaterialTheme.colors.primary,
+//                    modifier = Modifier.padding(bottom = 2.dp)
+//                )
             }
         }
         Column(
