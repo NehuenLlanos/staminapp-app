@@ -54,11 +54,8 @@ class ProfileViewModel (
                 currentUser = null,
             )
             // The following code erase history navigation
-            navController.navigate(Destination.SignIn.route) {
-                popUpTo(Destination.SignIn.route) {
-                    inclusive = true
-                }
-            }
+            navController.backQueue.clear()
+            navController.navigate(Destination.SignIn.route)
         }.onFailure { e ->
             // Handle the error and notify the UI when appropriate.
             uiState = uiState.copy(
