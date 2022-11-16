@@ -34,7 +34,10 @@ import androidx.navigation.NavController
 
 
 @Composable
-fun ProfileScreen(navController: NavController) {
+fun ProfileScreen(
+    modifier: Modifier,
+    navController: NavController
+) {
     Column(
         modifier = Modifier
             .fillMaxSize()
