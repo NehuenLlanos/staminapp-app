@@ -3,6 +3,10 @@ package com.staminapp.ui.home
 import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.grid.GridCells
+import androidx.compose.foundation.lazy.grid.GridItemSpan
+import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
+import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
@@ -27,6 +31,7 @@ import com.staminapp.R
 import com.staminapp.data.model.Routine
 import com.staminapp.ui.execute.ExecuteViewModel
 import com.staminapp.ui.profile.ProfileScreen
+import com.staminapp.ui.explore.ExploreScreen
 import com.staminapp.ui.main.RoutineCard
 import com.staminapp.util.*
 
@@ -99,11 +104,12 @@ fun HomeScaffold(navController: NavController) {
             }
         },
     ) {
-
-        val scrollState = rememberScrollState()
+//        val scrollState = rememberScrollState()
 //        HomeScreenContent(Modifier.padding(it), navController, scrollState)
-        ProfileScreen(Modifier.padding(it), navController)
+//        ProfileScreen(Modifier.padding(it), navController)
 //        HomeScreenContent(Modifier.padding(it), navController)
+//        HomeScreenContent(Modifier.padding(it), navController)
+        ExploreScreen(Modifier.padding(it), navController = navController)
 //        if (selectedIndex == 0) {
 //        HomeScreenContent(navController, scrollState)
 //        } else if (selectedIndex == 1) {
@@ -126,23 +132,32 @@ fun HomeScreenContent(
         viewModel.getFavourites()
     }
 
-    LazyColumn(
+    LazyVerticalGrid(
         modifier = modifier
-            .padding(horizontal = 16.dp)
             .fillMaxWidth()
+            .padding(16.dp),
+        columns = GridCells.Adaptive(minSize = 160.dp),
+        verticalArrangement = Arrangement.spacedBy(16.dp),
+        horizontalArrangement = Arrangement.spacedBy(16.dp)
     ) {
         if (uiState.routines == null && uiState.favouriteRoutines == null) {
             item {
 
             }
         } else {
-            item {
+            item(span = {
+                GridItemSpan(maxLineSpan)
+            }) {
                 Text(
                     "Buenos días".uppercase(),
                     color = MaterialTheme.colors.primaryVariant,
-                    style = MaterialTheme.typography.h1
+                    style = MaterialTheme.typography.h2
                 )
-                if(uiState.routines != null && uiState.routines.isNotEmpty()) {
+            }
+            if(uiState.routines != null && uiState.routines.isNotEmpty()) {
+                item(span = {
+                    GridItemSpan(maxLineSpan)
+                }) {
                     Row(
                         modifier = Modifier
                             .padding(4.dp)
@@ -163,9 +178,13 @@ fun HomeScreenContent(
                         }
                     }
                 }
+            }
+            item(span = {
+                GridItemSpan(maxLineSpan)
+            }) {
                 Text(text = "Mi Biblioteca",
                     color = MaterialTheme.colors.primaryVariant,
-                    style = MaterialTheme.typography.h2
+                    style = MaterialTheme.typography.h3
                 )
             }
             val list = mutableListOf<Routine>()
@@ -175,7 +194,6 @@ fun HomeScreenContent(
             if (uiState.favouriteRoutines != null) {
                 list.addAll(uiState.favouriteRoutines)
             }
-            println(list)
             items(list) {
                 RoutineCard(navController = navController, it)
             }
@@ -216,7 +234,6 @@ fun RecentCard(navController: NavController, modifier: Modifier = Modifier, rout
                 )
             }
         }
-
     }
 }
 

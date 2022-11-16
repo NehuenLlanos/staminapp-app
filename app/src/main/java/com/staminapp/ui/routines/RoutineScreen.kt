@@ -20,6 +20,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import com.staminapp.ui.theme.Gray
 import androidx.compose.material.Icon as Icon
@@ -30,6 +31,7 @@ import com.staminapp.ui.main.CustomChip
 import com.staminapp.ui.main.RatingBar
 import com.staminapp.util.decodeBase64Image
 import com.staminapp.util.getRoutineViewModelFactory
+import com.staminapp.util.translateDifficultyForApp
 
 @Composable
 fun RoutineScreen(
@@ -43,7 +45,10 @@ fun RoutineScreen(
         viewModel.getRoutine(routineId)
         viewModel.isFavourite()
         viewModel.getCyclesForRoutine(routineId)
-        uiState.cycles?.forEach {
+    }
+
+    if (uiState.exercises.isEmpty() && uiState.cycles != null) {
+        uiState.cycles.forEach {
             viewModel.getExercisesForCycle(it.id)
         }
     }
@@ -143,11 +148,12 @@ fun RoutineScreen(
                         ) {
                             CustomChip(
                                 selected = false,
-                                text = uiState.routine.difficulty
+                                text = translateDifficultyForApp(uiState.routine.difficulty)
                             )
                             Text(
                                 uiState.routine.name.uppercase(),
                                 style = MaterialTheme.typography.h2,
+                                lineHeight = 42.sp,
                                 maxLines = 3,
                                 overflow = TextOverflow.Ellipsis,
                                 color = MaterialTheme.colors.primaryVariant
@@ -158,7 +164,7 @@ fun RoutineScreen(
                     Row(
                         modifier = Modifier.fillMaxWidth(),
                         horizontalArrangement = Arrangement.SpaceBetween,
-                        verticalAlignment = Alignment.Bottom
+                        verticalAlignment = Alignment.CenterVertically
                     ) {
                         Text("Calificación",
                             style = MaterialTheme.typography.subtitle1,
@@ -167,12 +173,15 @@ fun RoutineScreen(
                         RatingBar(
                             rating = uiState.routine.score,
                             starsColor = MaterialTheme.colors.primary,
-                            modifier = Modifier.padding(bottom = 2.dp)
+                            modifier = Modifier.padding(bottom = 2.dp),
+                            rate = {
+                                viewModel.rate(routineId, it)
+                            }
                         )
                     }
                     Row(
                         horizontalArrangement = Arrangement.SpaceBetween,
-                        verticalAlignment = Alignment.Bottom,
+                        verticalAlignment = Alignment.CenterVertically,
                         modifier = Modifier
                             .fillMaxWidth()
                             .clickable {
@@ -215,7 +224,7 @@ fun RoutineScreen(
                     Cycle(
                         title = it.name,
                         repetitions = it.repetitions,
-                        exercises = uiState.exercises!!.getOrDefault(it.id, listOf()),
+                        exercises = uiState.exercises.getOrDefault(it.id, listOf()),
                         modifier = Modifier.padding(bottom = 8.dp)
                     )
                 }
@@ -241,7 +250,7 @@ fun Cycle(
     ) {
         Row(
             horizontalArrangement = Arrangement.SpaceBetween,
-            verticalAlignment = Alignment.Bottom,
+            verticalAlignment = Alignment.CenterVertically,
             modifier = Modifier
                 .fillMaxWidth()
                 .clickable {
@@ -249,7 +258,7 @@ fun Cycle(
                 }
         ) {
             Row(
-                verticalAlignment = Alignment.Bottom,
+                verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.spacedBy(8.dp)
             ) {
                 Text(title.uppercase(),
@@ -283,13 +292,13 @@ fun Cycle(
                 exercises.forEach { exercise ->
                     var info = ""
                     if (exercise.duration > 0 ) {
-                        info += "${exercise.duration} segundos"
+                        info += "${exercise.duration} segundo${if (exercise.duration == 1) "" else "s"}"
                     }
                     if (info != "") {
                         info += " | "
                     }
                     if (exercise.repetitions > 0 ) {
-                        info += "${exercise.repetitions} repeticiones"
+                        info += "${exercise.repetitions} repetici${if (exercise.repetitions == 1) "ón" else "ones"}"
                     }
 
                     Row(
