@@ -32,6 +32,7 @@ import com.staminapp.ui.execute.ExecuteViewModel
 import com.staminapp.ui.execute.Execution
 import com.staminapp.ui.profile.ProfileScreen
 import com.staminapp.ui.explore.ExploreScreen
+import com.staminapp.ui.main.LoadingIndicator
 import com.staminapp.ui.main.RoutineCard
 import com.staminapp.util.*
 
@@ -39,6 +40,7 @@ import com.staminapp.util.*
 @Composable
 fun HomeScreen(
     modifier: Modifier = Modifier,
+    showRecent: Boolean = true,
     navController: NavController,
     viewModel: HomeViewModel = viewModel(factory = getHomeViewModelFactory())
 ) {
@@ -58,7 +60,7 @@ fun HomeScreen(
     ) {
         if (uiState.routines == null && uiState.favouriteRoutines == null) {
             item {
-
+                LoadingIndicator()
             }
         } else {
             item(span = {
@@ -70,38 +72,40 @@ fun HomeScreen(
                     style = MaterialTheme.typography.h2
                 )
             }
-            if(uiState.routines != null && uiState.routines.isNotEmpty()) {
-                item(span = {
-                    GridItemSpan(maxLineSpan)
-                }) {
-                    Row(
-                        modifier = Modifier
-                            .padding(4.dp)
-                            .fillMaxWidth(),
-                        horizontalArrangement = Arrangement.spacedBy(8.dp),
-                    ) {
-                        RecentCard(
-                            navController,
-                            Modifier.weight(1f),
-                            uiState.routines.last()
-                        )
-                        if (uiState.routines.size >= 2) {
+            if (showRecent) {
+                if (uiState.routines != null && uiState.routines.isNotEmpty()) {
+                    item(span = {
+                        GridItemSpan(maxLineSpan)
+                    }) {
+                        Row(
+                            modifier = Modifier
+                                .padding(4.dp)
+                                .fillMaxWidth(),
+                            horizontalArrangement = Arrangement.spacedBy(8.dp),
+                        ) {
                             RecentCard(
                                 navController,
                                 Modifier.weight(1f),
-                                uiState.routines[uiState.routines.lastIndex - 1]
+                                uiState.routines.last()
                             )
+                            if (uiState.routines.size >= 2) {
+                                RecentCard(
+                                    navController,
+                                    Modifier.weight(1f),
+                                    uiState.routines[uiState.routines.lastIndex - 1]
+                                )
+                            }
                         }
                     }
                 }
-            }
-            item(span = {
-                GridItemSpan(maxLineSpan)
-            }) {
-                Text(text = stringResource(R.string.my_library),
-                    color = MaterialTheme.colors.primaryVariant,
-                    style = MaterialTheme.typography.h3
-                )
+                item(span = {
+                    GridItemSpan(maxLineSpan)
+                }) {
+                    Text(text = stringResource(R.string.my_library),
+                        color = MaterialTheme.colors.primaryVariant,
+                        style = MaterialTheme.typography.h3
+                    )
+                }
             }
             val list = mutableListOf<Routine>()
             if (uiState.routines != null) {

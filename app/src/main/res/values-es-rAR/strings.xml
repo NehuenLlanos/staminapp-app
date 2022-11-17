@@ -45,4 +45,12 @@
     <string name="repetitions">repeticiones</string>
     <string name="login_error_message">Chequeá que el email y la contraseña sean correctos y verificá que hayas confirmado tu email.</string>
     <string name="password">Contraseña</string>
+    <string name="app_configuration">Configuración de la app</string>
+    <string name="home_screen">Página de inicio</string>
+    <string name="show_recent_routines">Mostrar las rutinas recientes</string>
+    <string name="routine_view">Vista de rutina</string>
+    <string name="dropdowns_open">Los despleguables están abiertos por defecto</string>
+    <string name="execution_mode">Modo de ejecución de rutinas</string>
+    <string name="immersive_view">Vista inmersiva</string>
+    <string name="detailed_view">Vista detallada</string>
 </resources>

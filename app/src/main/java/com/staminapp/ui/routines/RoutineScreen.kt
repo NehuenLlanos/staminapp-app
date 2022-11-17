@@ -39,6 +39,7 @@ import com.staminapp.util.*
 fun RoutineScreen(
     routineId: Int,
     isAuthenticated: Boolean = true,
+    dropdownsOpen: Boolean = true,
     navController: NavController,
     viewModel: RoutineViewModel = viewModel(factory = getRoutineViewModelFactory())
 ) {
@@ -166,6 +167,7 @@ fun RoutineScreen(
                         ) {
                             RoutineInfo(
                                 routine = uiState.routine,
+                                dropdownsOpen = dropdownsOpen,
                                 viewModel = viewModel
                             )
                         }
@@ -184,6 +186,7 @@ fun RoutineScreen(
                                     title = it.name,
                                     repetitions = it.repetitions,
                                     exercises = uiState.exercises.getOrDefault(it.id, listOf()),
+                                    dropdownsOpen = dropdownsOpen,
                                     modifier = Modifier.padding(bottom = 8.dp)
                                 )
                             }
@@ -199,6 +202,7 @@ fun RoutineScreen(
                         item {
                             RoutineInfo(
                                 routine = uiState.routine,
+                                dropdownsOpen = dropdownsOpen,
                                 viewModel = viewModel
                             )
                             Spacer(modifier = Modifier
@@ -217,6 +221,7 @@ fun RoutineScreen(
                                 title = it.name,
                                 repetitions = it.repetitions,
                                 exercises = uiState.exercises.getOrDefault(it.id, listOf()),
+                                dropdownsOpen = dropdownsOpen,
                                 modifier = Modifier.padding(bottom = 8.dp)
                             )
                         }
@@ -225,15 +230,15 @@ fun RoutineScreen(
             }
         }
     }
-
 }
 
 @Composable
 fun RoutineInfo(
     routine: Routine,
+    dropdownsOpen: Boolean,
     viewModel: RoutineViewModel
 ) {
-    var isDescriptionOpen by remember { mutableStateOf(true) }
+    var isDescriptionOpen by remember { mutableStateOf(dropdownsOpen) }
     val windowInfo = rememberWindowInfo()
 
     var maxWidth = 0.4f
@@ -334,9 +339,10 @@ fun Cycle(
     modifier: Modifier = Modifier,
     title: String,
     repetitions: Int,
-    exercises: List<Exercise>
+    exercises: List<Exercise>,
+    dropdownsOpen: Boolean
 ) {
-    var isOpen by remember { mutableStateOf(true) }
+    var isOpen by remember { mutableStateOf(dropdownsOpen) }
 
     Column(
         modifier = modifier
