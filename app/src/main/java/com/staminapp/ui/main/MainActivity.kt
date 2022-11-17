@@ -23,6 +23,7 @@ import com.staminapp.R
 import com.staminapp.ui.execute.*
 import com.staminapp.ui.explore.ExploreScreen
 import com.staminapp.ui.home.HomeScreen
+import com.staminapp.ui.profile.AppConfigScreen
 import com.staminapp.ui.profile.ProfileScreen
 import com.staminapp.ui.routines.RoutineScreen
 import com.staminapp.ui.signIn.SignInScreen
@@ -38,6 +39,7 @@ sealed class Destination(val route: String) {
     object Home: Destination("home")
     object Explore: Destination("explore")
     object Profile: Destination("profile")
+    object AppConfig: Destination("app-config")
 
     object Routine: Destination("routine/{id}") {
         fun createRoute(routineId: Int) = "routine/$routineId"
@@ -77,9 +79,9 @@ class MainActivity : ComponentActivity() {
 fun NavigationAppHost(navController: NavHostController) {
     val ctx = LocalContext.current
 
-    var isAuthenticated = (ctx.applicationContext as MyApplication).sessionManager.loadAuthToken() != null
+    val sessionManager = (ctx.applicationContext as MyApplication).sessionManager
 
-    NavHost(navController = navController, startDestination = if (isAuthenticated) Destination.Home.route else Destination.SignIn.route) {
+    NavHost(navController = navController, startDestination = if (sessionManager.loadAuthToken() != null) Destination.Home.route else Destination.SignIn.route) {
 
         composable(
             route = Destination.SignIn.route,
@@ -98,7 +100,7 @@ fun NavigationAppHost(navController: NavHostController) {
                 selectedIndex = 0,
                 navController = navController
             ) { modifier, navController ->
-                HomeScreen(modifier, navController)
+                HomeScreen(modifier, sessionManager.getShowRecent(), navController)
             }
         }
 
@@ -118,6 +120,10 @@ fun NavigationAppHost(navController: NavHostController) {
             ) { modifier, navController ->
                 ProfileScreen(modifier, navController)
             }
+        }
+
+        composable(Destination.AppConfig.route) {
+            AppConfigScreen(sessionManager, navController)
         }
 
         composable(
@@ -151,8 +157,12 @@ fun NavigationAppHost(navController: NavHostController) {
             if (id == null || id == -1) {
                 Toast.makeText(ctx, stringResource(R.string.fatal_error_navigation), Toast.LENGTH_SHORT).show()
             } else {
-                isAuthenticated = (ctx.applicationContext as MyApplication).sessionManager.loadAuthToken() != null
-                RoutineScreen(id, isAuthenticated, navController)
+                RoutineScreen(
+                    id,
+                    sessionManager.loadAuthToken() != null,
+                    sessionManager.getDropdownsOpen(),
+                    navController
+                )
             }
         }
 
@@ -167,7 +177,7 @@ fun NavigationAppHost(navController: NavHostController) {
             if (id == null || id == -1) {
                 Toast.makeText(ctx, "ERROR FATAL. Volver a correr la aplicación", Toast.LENGTH_SHORT).show()
             } else {
-                StartExecutionScreen(id, navController)
+                StartExecutionScreen(id, sessionManager.getExecutionMode(), navController)
             }
         }
 
