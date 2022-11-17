@@ -35,6 +35,7 @@ sealed class Destination(val route: String) {
     object ExerciseScreenReps: Destination("routine/execute/exercise-reps")
     object ExerciseScreenRepsAndTime: Destination("routine/execute/exercise-reps-and-time")
     object ExerciseScreenFinished: Destination("routine/execute/exercise-finished")
+    object Execution: Destination("routine/execute2")
 }
 
 class MainActivity : ComponentActivity() {
@@ -138,7 +139,15 @@ fun NavigationAppHost(navController: NavHostController) {
         composable(Destination.Home.route) { HomeScreen(navController) }
         composable(Destination.Profile.route) { ProfileScreen(navController = navController) }
 //        composable(Destination.List.route) { ListScreen(navController) }
-        composable(Destination.ExecuteRoutine.route) { StartExecutionScreen() }
+        composable(Destination.ExecuteRoutine.route) { navBackStackEntry ->
+            val routineId = navBackStackEntry.arguments?.getString("routineId")
+            if (routineId == null) {
+                Toast.makeText(ctx, "ERROR FATAL. Volver a correr la aplicación", Toast.LENGTH_SHORT).show()
+            } else {
+                StartExecutionScreen(routineId.toInt(), navController)
+            }
+        }
+
         composable(Destination.Routine.route) { navBackStackEntry ->
             val elementId = navBackStackEntry.arguments?.getString("elementId")
             if (elementId == null) {
@@ -147,10 +156,16 @@ fun NavigationAppHost(navController: NavHostController) {
                 RoutineScreen(elementId.toInt(), navController)
             }
         }
-        composable(Destination.ExercisePreview.route) { ExercisePreview() }
-        composable(Destination.ExerciseScreenTime.route) { ExerciseScreenTime() }
-        composable(Destination.ExerciseScreenReps.route) { ExerciseScreenReps() }
-        composable(Destination.ExerciseScreenRepsAndTime.route) { ExerciseScreenRepsAndTime() }
+//        composable(Destination.ExercisePreview.route) { ExercisePreview() }
+        composable(Destination.Execution.route) { navBackStackEntry ->
+            val routineId = navBackStackEntry.arguments?.getString("routineId")
+            if (routineId == null) {
+                Toast.makeText(ctx, "ERROR FATAL. Volver a correr la aplicación", Toast.LENGTH_SHORT).show()
+            } else {
+                Execution(modifier = Modifier, routineId = routineId.toInt(), navController = navController)
+            }
+        }
+
         composable(Destination.ExerciseScreenFinished.route) { ExerciseScreenFinished() }
     }
 }

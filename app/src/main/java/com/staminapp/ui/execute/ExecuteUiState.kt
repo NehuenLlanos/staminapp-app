@@ -10,6 +10,6 @@ data class ExecuteUiState (
 
     val routine : Routine? = null,
     val cycles : List<Cycle>? = null,
-    val exercises : MutableMap<Int, List<Exercise>>? = mutableMapOf(),
+    val exercises : MutableMap<Int, List<Exercise>> = mutableMapOf(),
     val score : Int? = null,
 )

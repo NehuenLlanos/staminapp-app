@@ -26,6 +26,7 @@ import com.staminapp.Destination
 import com.staminapp.R
 import com.staminapp.data.model.Routine
 import com.staminapp.ui.execute.ExecuteViewModel
+import com.staminapp.ui.execute.Execution
 import com.staminapp.ui.profile.ProfileScreen
 import com.staminapp.ui.main.RoutineCard
 import com.staminapp.util.*
@@ -102,7 +103,8 @@ fun HomeScaffold(navController: NavController) {
 
         val scrollState = rememberScrollState()
 //        HomeScreenContent(Modifier.padding(it), navController, scrollState)
-        ProfileScreen(Modifier.padding(it), navController)
+        Execution(Modifier.padding(it), routineId = 1, navController = navController)
+//        ProfileScreen(Modifier.padding(it), navController)
 //        HomeScreenContent(Modifier.padding(it), navController)
 //        if (selectedIndex == 0) {
 //        HomeScreenContent(navController, scrollState)
