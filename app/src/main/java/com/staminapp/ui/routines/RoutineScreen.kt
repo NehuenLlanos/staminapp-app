@@ -17,6 +17,7 @@ import androidx.compose.ui.graphics.Color.Companion.White
 import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
@@ -25,6 +26,7 @@ import androidx.navigation.NavController
 import com.staminapp.ui.theme.Gray
 import androidx.compose.material.Icon as Icon
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.staminapp.R
 import com.staminapp.ui.main.Destination
 import com.staminapp.data.model.Exercise
 import com.staminapp.ui.main.CustomChip
@@ -57,10 +59,10 @@ fun RoutineScreen(
 
     val sendIntent: Intent = Intent().apply {
         action = Intent.ACTION_SEND
-        putExtra(Intent.EXTRA_TEXT, "¡Mirá esta rutina en StaminApp! https://www.staminapp.com/routine/1")
+        putExtra(Intent.EXTRA_TEXT, stringResource(R.string.share_text) + " https://www.staminapp.com/routine/" + routineId.toString())
         type = "text/plain"
     }
-    val shareIntent = Intent.createChooser(sendIntent, "Compartí esta rutina")
+    val shareIntent = Intent.createChooser(sendIntent, stringResource(R.string.share_title))
     val context = LocalContext.current
 
     var isDescriptionOpen by remember { mutableStateOf(true) }
@@ -69,13 +71,13 @@ fun RoutineScreen(
         topBar = {
             TopAppBar(
                 title = {
-                    Text("Rutina")
+                    Text(stringResource(R.string.routine))
                 },
                 navigationIcon = {
                     IconButton(onClick = {
                         navController.popBackStack()
                     }) {
-                        Icon(Icons.Filled.ArrowBack, contentDescription = "Atrás")
+                        Icon(Icons.Filled.ArrowBack, contentDescription = stringResource(R.string.back))
                     }
                 },
                 actions = {
@@ -87,15 +89,15 @@ fun RoutineScreen(
                         }
                     }) {
                         when {
-                            uiState.isFavourite!! -> Icon(Icons.Filled.Favorite, contentDescription = "Desmarcar como favorito", tint = White)
-                            else -> Icon(Icons.Filled.FavoriteBorder, contentDescription = "Marcar como favorito", tint = White)
+                            uiState.isFavourite!! -> Icon(Icons.Filled.Favorite, contentDescription = stringResource(R.string.unmark_as_favourite), tint = White)
+                            else -> Icon(Icons.Filled.FavoriteBorder, contentDescription = stringResource(R.string.mark_as_favourite), tint = White)
                         }
 
                     }
                     IconButton(onClick = {
                         context.startActivity(shareIntent)
                     }) {
-                        Icon(Icons.Filled.Share, contentDescription = "Compartir", tint = White)
+                        Icon(Icons.Filled.Share, contentDescription = stringResource(R.string.share), tint = White)
                     }
                 }
             )
@@ -110,7 +112,7 @@ fun RoutineScreen(
                     Icon(Icons.Filled.FitnessCenter, contentDescription = null)
                 },
                 text = {
-                    Text("Empezar".uppercase())
+                    Text(stringResource(R.string.start).uppercase())
                 },
                 backgroundColor = MaterialTheme.colors.primaryVariant,
                 contentColor = MaterialTheme.colors.primary
@@ -132,15 +134,15 @@ fun RoutineScreen(
                                 navController.navigate(Destination.SignIn.route)
                             }
                         ) {
-                            Text("Iniciar sesión")
+                            Text(stringResource(R.string.login))
                         }
                     }
                 },
                 title = {
-                    Text("Error")
+                    Text(stringResource(R.string.error))
                 },
                 text = {
-                    Text("Debés iniciar sesión antes de ver la rutina. Autenticate y volvé a intentarlo.")
+                    Text(stringResource(R.string.not_logged_in_message))
                 }
             )
         } else {
@@ -162,7 +164,7 @@ fun RoutineScreen(
                         ) {
                             Image(
                                 bitmap = decodeBase64Image(uiState.routine.image).asImageBitmap(),
-                                contentDescription = "Imagen de Rutina",
+                                contentDescription = stringResource(R.string.routine_image),
                                 contentScale = ContentScale.Crop,
                                 modifier = Modifier
                                     .fillMaxWidth(0.4f)
@@ -192,7 +194,7 @@ fun RoutineScreen(
                             horizontalArrangement = Arrangement.SpaceBetween,
                             verticalAlignment = Alignment.CenterVertically
                         ) {
-                            Text("Calificación",
+                            Text(stringResource(R.string.rating),
                                 style = MaterialTheme.typography.subtitle1,
                                 color = MaterialTheme.colors.primaryVariant
                             )
@@ -214,7 +216,7 @@ fun RoutineScreen(
                                     isDescriptionOpen = !isDescriptionOpen
                                 }
                         ) {
-                            Text("Descripción",
+                            Text(stringResource(R.string.description),
                                 style = MaterialTheme.typography.subtitle1,
                                 color = MaterialTheme.colors.primaryVariant
                             )
@@ -240,7 +242,7 @@ fun RoutineScreen(
                             .height(4.dp)
                             .fillMaxWidth()
                             .background(Gray))
-                        Text("Ciclos",
+                        Text(stringResource(R.string.cycles),
                             style = MaterialTheme.typography.subtitle1,
                             color = MaterialTheme.colors.primaryVariant,
                             modifier = Modifier.padding(bottom = 8.dp)
@@ -319,13 +321,13 @@ fun Cycle(
                 exercises.forEach { exercise ->
                     var info = ""
                     if (exercise.duration > 0 ) {
-                        info += "${exercise.duration} segundo${if (exercise.duration == 1) "" else "s"}"
+                        info += exercise.duration.toString() + stringResource(R.string.second) + if (exercise.duration == 1) "" else "s"
                     }
                     if (info != "") {
                         info += " | "
                     }
                     if (exercise.repetitions > 0 ) {
-                        info += "${exercise.repetitions} repetici${if (exercise.repetitions == 1) "ón" else "ones"}"
+                        info += "${exercise.repetitions} ${if (exercise.repetitions == 1) stringResource(R.string.repetition) else stringResource(R.string.repetitions)}"
                     }
 
                     Row(

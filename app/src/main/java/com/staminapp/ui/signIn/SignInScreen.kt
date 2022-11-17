@@ -15,6 +15,7 @@ import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
@@ -67,23 +68,23 @@ fun SignInScreen(
                     }
                 },
                 title = {
-                    Text("Error")
+                    Text(stringResource(R.string.error))
                 },
                 text = {
-                    Text("Chequeá que el email y la contraseña sean correctos y verificá que hayas confirmado tu email.")
+                    Text(stringResource(R.string.login_error_message))
                 }
             )
         }
         Image(
             painter = painterResource(R.drawable.logofc),
-            contentDescription = "StaminApp",
+            contentDescription = stringResource(R.string.app_name),
         )
         TextField(
             modifier = Modifier.padding(top = 70.dp),
             value = username,
             onValueChange = viewModel::setName,
             label = {
-                Text(text = "Email")
+                Text(text = stringResource(R.string.email))
             },
             textStyle = TextStyle(
                 MaterialTheme.colors.primaryVariant,
@@ -101,7 +102,7 @@ fun SignInScreen(
             value = password,
             onValueChange = viewModel::setPassword,
             label = {
-                Text(text = "Contraseña")
+                Text(text = stringResource(R.string.password))
             },
             visualTransformation = PasswordVisualTransformation(),
             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
@@ -118,7 +119,7 @@ fun SignInScreen(
             onClick = { viewModel.login(username, password, navController) },
             shape = RoundedCornerShape(50), // = 50% percent
         ) {
-            Text(text="Ingresar")
+            Text(text=stringResource(R.string.login))
         }
 
     }

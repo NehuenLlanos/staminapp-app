@@ -11,6 +11,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
@@ -18,6 +19,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.staminapp.R
 import com.staminapp.util.decodeBase64Image
 import com.staminapp.util.getProfileViewModelFactory
 
@@ -77,7 +79,7 @@ fun UserImage(uiState: ProfileUiState) {
             .fillMaxHeight()
             .fillMaxWidth(),
         bitmap = decodeBase64Image(uiState.currentUser!!.image).asImageBitmap(),
-        contentDescription = "Imagen de Usuario",
+        contentDescription = stringResource(R.string.user_image),
         contentScale = ContentScale.Crop
     )
 }
@@ -96,7 +98,7 @@ fun UserNameTitle(uiState: ProfileUiState){
             maxLines = 2
         )
         Text(
-            uiState.currentUser.birthdate!!.year.toString() + " " +"años",
+            uiState.currentUser.birthdate!!.year.toString() + " " + stringResource(R.string.years),
             color = MaterialTheme.colors.primaryVariant,
             style = MaterialTheme.typography.subtitle1,
             overflow = TextOverflow.Ellipsis,
@@ -107,7 +109,7 @@ fun UserNameTitle(uiState: ProfileUiState){
 
 @Composable
 fun PersonalInfoText(){
-    Text(text = "Información Personal",
+    Text(text = stringResource(R.string.personal_information),
         color = MaterialTheme.colors.primaryVariant,
         style = MaterialTheme.typography.h3,
         overflow = TextOverflow.Ellipsis,
@@ -125,17 +127,17 @@ fun GenderTextField(modifier: Modifier, uiState: ProfileUiState){
             modifier = Modifier.fillMaxWidth(),
             value =
                 if (uiState.currentUser!!.gender == "male") {
-                    "Masculino"
+                    stringResource(R.string.male)
                 } else if (uiState.currentUser.gender == "female") {
-                    "Femenino"
+                    stringResource(R.string.female)
                 } else {
-                    "Otro"
+                    stringResource(R.string.other)
                 }
             ,
             enabled = false,
             readOnly = true,
             onValueChange = { },
-            label = { Text(text = "Género", fontWeight = FontWeight.Bold) },
+            label = { Text(text = stringResource(R.string.gender), fontWeight = FontWeight.Bold) },
             textStyle = TextStyle(
                 MaterialTheme.colors.primaryVariant,
                 fontWeight = FontWeight.Bold
@@ -152,7 +154,7 @@ fun EMailTextField(modifier: Modifier, uiState: ProfileUiState){
         enabled = false,
         readOnly = true,
         onValueChange = {},
-        label = { Text(text = "Email", fontWeight = FontWeight.Bold) },
+        label = { Text(text = stringResource(R.string.email), fontWeight = FontWeight.Bold) },
         textStyle = TextStyle(
             MaterialTheme.colors.primaryVariant,
             fontWeight = FontWeight.Bold
@@ -164,13 +166,13 @@ fun EMailTextField(modifier: Modifier, uiState: ProfileUiState){
 fun BirthdateTextField(modifier: Modifier, uiState: ProfileUiState) {
     TextField(
         modifier = modifier,
-        value = uiState.currentUser!!.birthdate!!.date.toString() + "/" +
-                uiState.currentUser.birthdate!!.month.toString() + "/" +
-                uiState.currentUser.birthdate!!.year.toString(),
+        value = uiState.currentUser!!.birthdate!!.year.toString() + "-" +
+                uiState.currentUser.birthdate!!.month.toString() + "-" +
+                uiState.currentUser.birthdate!!.day.toString(),
         enabled = false,
         readOnly = true,
         onValueChange = {},
-        label = { Text(text = "Fecha de nacimiento", fontWeight = FontWeight.Bold) },
+        label = { Text(text = stringResource(R.string.birthdate), fontWeight = FontWeight.Bold) },
         textStyle = TextStyle(
             MaterialTheme.colors.primaryVariant,
             fontWeight = FontWeight.Bold
@@ -186,6 +188,6 @@ fun SignOutButton(viewModel: ProfileViewModel, navController: NavController) {
         shape = RoundedCornerShape(50),
         colors = ButtonDefaults.buttonColors(MaterialTheme.colors.error),
     ) {
-        Text(text="Cerrar sesión")
+        Text(text= stringResource(R.string.logout))
     }
 }

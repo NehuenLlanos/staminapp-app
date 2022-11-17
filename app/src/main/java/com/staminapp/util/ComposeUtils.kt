@@ -7,7 +7,9 @@ import android.util.Base64
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalSavedStateRegistryOwner
+import androidx.compose.ui.res.stringResource
 import com.staminapp.MyApplication
+import com.staminapp.R
 
 @Composable
 fun getRoutineViewModelFactory(defaultArgs: Bundle? = null): RoutineViewModelFactory {
@@ -70,26 +72,40 @@ fun decodeBase64Image(encodedString: String?): Bitmap {
     return BitmapFactory.decodeByteArray(imageBytes, 0, imageBytes.size)
 }
 
+@Composable
 fun translateDifficultyForApp(string: String): String {
     val dict = mapOf(
-        Pair("rookie", "novato"),
-        Pair("beginner", "principiante"),
-        Pair("intermediate", "intermedio"),
-        Pair("advanced", "avanzado"),
-        Pair("expert", "experto"),
+        Pair("rookie", stringResource(R.string.rookie)),
+        Pair("beginner", stringResource(R.string.beginner)),
+        Pair("intermediate", stringResource(R.string.intermediate)),
+        Pair("advanced", stringResource(R.string.advanced)),
+        Pair("expert", stringResource(R.string.expert)),
     )
 
     return dict.getOrDefault(string.lowercase(), "")
 }
 
+@Composable
 fun translateDifficutlyForApi(string: String): String {
     val dict = mapOf(
-        Pair("novato", "rookie"),
-        Pair("principiante", "beginner"),
-        Pair("intermedio", "intermediate"),
-        Pair("avanzado", "advanced"),
-        Pair("experto", "expert"),
+        Pair(stringResource(R.string.rookie), "rookie"),
+        Pair(stringResource(R.string.beginner), "beginner"),
+        Pair(stringResource(R.string.intermediate), "intermediate"),
+        Pair(stringResource(R.string.advanced), "advanced"),
+        Pair(stringResource(R.string.expert), "expert"),
     )
 
     return dict.getOrDefault(string.lowercase(), "")
+}
+
+fun getDifficultyApiStringFromIndex(index: Int): String {
+    val dict = mapOf(
+        Pair(0, "rookie"),
+        Pair(1, "beginner"),
+        Pair(2, "intermediate"),
+        Pair(3, "advanced"),
+        Pair(4, "expert"),
+    )
+
+    return dict.getOrDefault(index, "")
 }

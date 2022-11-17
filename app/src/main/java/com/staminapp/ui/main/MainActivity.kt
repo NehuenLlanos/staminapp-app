@@ -10,6 +10,7 @@ import androidx.compose.material.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.navigation.NavHostController
 import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
@@ -18,6 +19,7 @@ import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
 import androidx.navigation.navDeepLink
 import com.staminapp.MyApplication
+import com.staminapp.R
 import com.staminapp.ui.execute.*
 import com.staminapp.ui.explore.ExploreScreen
 import com.staminapp.ui.home.HomeScreen
@@ -131,7 +133,7 @@ fun NavigationAppHost(navController: NavHostController) {
         ) { entry ->
             val id = entry.arguments?.getInt("id")
             if (id == null || id == -1) {
-                Toast.makeText(ctx, "ERROR FATAL. Volver a correr la aplicación", Toast.LENGTH_SHORT).show()
+                Toast.makeText(ctx, stringResource(R.string.fatal_error_navigation), Toast.LENGTH_SHORT).show()
             } else {
                 RoutineScreen(id, isAuthenticated, navController)
             }

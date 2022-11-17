@@ -10,6 +10,7 @@ import com.staminapp.data.repository.RoutineRepository
 import com.staminapp.data.repository.UserRepository
 import com.staminapp.ui.home.HomeUiState
 import com.staminapp.util.SessionManager
+import com.staminapp.util.getDifficultyApiStringFromIndex
 import com.staminapp.util.translateDifficutlyForApi
 import kotlinx.coroutines.launch
 
@@ -42,13 +43,13 @@ class ExploreViewModel (
         }
     }
 
-    fun selectDifficulty(diff : String) {
+    fun selectDifficulty(diff : Int) {
         val newList: MutableList<Routine> = mutableListOf()
         uiState.selectedDifficulties[diff] = true
         val difficulties: MutableList<String> = mutableListOf()
-        for (entry in uiState.selectedDifficulties.entries) {
-            if (entry.value) {
-                difficulties.add(translateDifficutlyForApi(entry.key))
+        uiState.selectedDifficulties.forEachIndexed { index, entry ->
+            if (entry) {
+                difficulties.add(getDifficultyApiStringFromIndex(index))
             }
         }
         for (routine in uiState.routines!!) {
@@ -62,12 +63,12 @@ class ExploreViewModel (
         )
     }
 
-    fun unselectDifficulty(diff : String) {
+    fun unselectDifficulty(diff : Int) {
         uiState.selectedDifficulties[diff] = false
         val newList: MutableList<Routine> = mutableListOf()
         var allFalse = true
-        for (value in uiState.selectedDifficulties.values) {
-            if (value) {
+        for (entry in uiState.selectedDifficulties) {
+            if (entry) {
                 allFalse = false;
             }
         }
@@ -76,7 +77,7 @@ class ExploreViewModel (
         } else {
             newList.addAll(uiState.displayedRoutines!!)
             for (routine in uiState.displayedRoutines!!) {
-                if (routine.difficulty == translateDifficutlyForApi(diff)) {
+                if (routine.difficulty == getDifficultyApiStringFromIndex(diff)) {
                     newList.remove(routine)
                 }
             }
