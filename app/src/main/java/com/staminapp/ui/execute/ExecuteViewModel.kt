@@ -7,6 +7,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.staminapp.data.model.Cycle
 import com.staminapp.data.model.Exercise
+import com.staminapp.data.model.Routine
 import com.staminapp.data.repository.ReviewRepository
 import com.staminapp.data.repository.RoutineRepository
 import com.staminapp.ui.explore.ExploreUiState
@@ -14,6 +15,8 @@ import com.staminapp.util.SessionManager
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
+import java.util.LinkedList
+import java.util.Queue
 
 class ExecuteViewModel (
     private val sessionManager: SessionManager,
@@ -24,6 +27,8 @@ class ExecuteViewModel (
     var uiState by mutableStateOf(ExecuteUiState())
         private set
 
+
+    /* Variables for Execution Routine 1 */
     private val _progressBar = MutableStateFlow(0f)
     val progressBar = _progressBar.asStateFlow()
 
@@ -59,8 +64,25 @@ class ExecuteViewModel (
         _currentExerciseIndex.value = index
     }
 
-    val currentExercise = mutableStateOf(Exercise(0, "", "", 0, 0, 0))
 
+    /* Variables for Execution Routine 2 */
+    val exercisesList :MutableList<Exercise> = mutableListOf()
+
+    private val _exercisesListIndex = MutableStateFlow(0)
+    val exercisesListIndex = _exercisesListIndex.asStateFlow()
+
+    fun setExercisesListIndex(index: Int) {
+        _exercisesListIndex.value = index
+    }
+
+    val cyclesList :MutableList<Cycle> = mutableListOf()
+
+    private val _cyclesListIndex = MutableStateFlow(0)
+    val cyclesListIndex = _cyclesListIndex.asStateFlow()
+
+    fun setCyclesListIndex(index: Int) {
+        _cyclesListIndex.value = index
+    }
 
     fun getRoutine(id: Int) = viewModelScope.launch {
         uiState = uiState.copy(
@@ -150,4 +172,15 @@ class ExecuteViewModel (
             )
         }
     }
+}
+
+class Pair (exercise : Exercise, cycle : Cycle){
+    var exerciseIn : Exercise = exercise
+        get() : Exercise {
+            return exerciseIn
+        }
+    var cycleIn : Cycle = cycle
+        get() : Cycle {
+            return cycleIn
+        }
 }

@@ -48,8 +48,13 @@ sealed class Destination(val route: String) {
     object ExecutionPreviewRoutine: Destination("routine/execute/{id}") {
         fun createRoute(routineId: Int) = "routine/execute/$routineId"
     }
+
     object ExecutionRoutineScreen: Destination("routine/execute/exercise-preview/{id}") {
         fun createRoute(routineId: Int) = "routine/execute/exercise-preview/$routineId"
+    }
+
+    object ExecutionRoutineScreen2: Destination("routine/execute/exercise-preview2/{id}") {
+        fun createRoute(routineId: Int) = "routine/execute/exercise-preview2/$routineId"
     }
 
     object ExecutionFinishedRoutine: Destination("routine/execute/routine-finished/{id}/{totalTime}") {
@@ -193,6 +198,21 @@ fun NavigationAppHost(navController: NavHostController) {
                 Toast.makeText(ctx, "ERROR FATAL. Volver a correr la aplicación", Toast.LENGTH_SHORT).show()
             } else {
                 Execution(id, navController)
+            }
+        }
+
+        composable(route = Destination.ExecutionRoutineScreen2.route,
+            arguments = listOf(
+                navArgument("id") {
+                    type = NavType.IntType
+                    defaultValue = -1
+                }
+            )) { entry ->
+            val id = entry.arguments?.getInt("id")
+            if (id == null || id == -1) {
+                Toast.makeText(ctx, "ERROR FATAL. Volver a correr la aplicación", Toast.LENGTH_SHORT).show()
+            } else {
+                ExecuteRoutine2Screen(id, navController)
             }
         }
 

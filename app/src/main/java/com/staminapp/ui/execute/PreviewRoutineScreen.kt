@@ -97,7 +97,7 @@ fun StartExecutionScreen(
                 onClick = {
                     when (executionMode) {
                         0 -> navController.navigate(Destination.ExecutionRoutineScreen.createRoute(routineId = id))
-                        1 -> navController.navigate(Destination.ExecutionRoutineScreen.createRoute(routineId = id))
+                        1 -> navController.navigate(Destination.ExecutionRoutineScreen2.createRoute(routineId = id))
                     }
                 }
             ) {

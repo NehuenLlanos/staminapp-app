@@ -214,7 +214,19 @@ fun Execution(
                             animationPlayed = true
                         }
                     }) {
-                    Icon(Icons.Filled.Pause, contentDescription = "Inicio")
+                    if (animationPlayed) {
+                        Icon(
+                            Icons.Filled.Pause,
+                            contentDescription = null,
+                            tint = Color.White,
+                        )
+                    } else {
+                        Icon(
+                            Icons.Filled.PlayArrow,
+                            contentDescription = null,
+                            tint = Color.White,
+                        )
+                    }
                 }
                 Button(
                     modifier = Modifier.fillMaxWidth(),
