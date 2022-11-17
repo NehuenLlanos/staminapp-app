@@ -11,7 +11,7 @@ data class NetworkCycleExercise(
     @SerializedName("duration")
     var duration: Int? = null,
 
-    @SerializedName("repetitons")
+    @SerializedName("repetitions")
     var repetitions: Int? = null,
 
     @SerializedName("exercise")
@@ -23,7 +23,7 @@ data class NetworkCycleExercise(
             name = exercise?.name?: "",
             detail = exercise?.detail?: "",
             duration = duration?: 0,
-            repetitions = repetitions?: 1,
+            repetitions = repetitions?: 0,
             order = order?: 1,
         )
     }
