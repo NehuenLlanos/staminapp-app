@@ -45,7 +45,7 @@ class SignInViewModel (
     )
         private set
 
-    fun login(username: String, password: String, navController: NavHostController) = viewModelScope.launch {
+    fun login(username: String, password: String, navController: NavHostController, after: String?) = viewModelScope.launch {
         uiState = uiState.copy(
             isFetching = true,
             message = null,
@@ -58,7 +58,7 @@ class SignInViewModel (
                 isAuthenticated = true,
             )
             navController.backQueue.clear()
-            navController.navigate(Destination.Home.route)
+            navController.navigate(after?: Destination.Home.route)
         }.onFailure { e ->
             // Handle the error and notify the UI when appropriate.
             uiState = uiState.copy(

@@ -28,6 +28,7 @@ import com.staminapp.util.getSignInViewModelFactory
 @OptIn(ExperimentalComposeUiApi::class)
 @Composable
 fun SignInScreen(
+    after: String? = null,
     navController: NavHostController,
     viewModel: SignInViewModel = viewModel(factory = getSignInViewModelFactory())
 ) {
@@ -110,13 +111,13 @@ fun SignInScreen(
                 MaterialTheme.colors.primaryVariant,
             ),
             keyboardActions = KeyboardActions(
-                onDone = { viewModel.login(username, password, navController) }
+                onDone = { viewModel.login(username, password, navController, after) }
             ),
             singleLine = true
         )
         Button(
             modifier = Modifier.padding(top = 30.dp),
-            onClick = { viewModel.login(username, password, navController) },
+            onClick = { viewModel.login(username, password, navController, after) },
             shape = RoundedCornerShape(50), // = 50% percent
         ) {
             Text(text=stringResource(R.string.login))

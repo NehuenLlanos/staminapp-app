@@ -54,7 +54,7 @@ class ProfileViewModel (
                 currentUser = null,
             )
             navController.backQueue.clear()
-            navController.navigate(Destination.SignIn.route)
+            navController.navigate(Destination.SignIn.withoutAfter())
         }.onFailure { e ->
             // Handle the error and notify the UI when appropriate.
             uiState = uiState.copy(
