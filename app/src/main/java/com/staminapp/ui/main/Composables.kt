@@ -4,25 +4,23 @@ import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
-import com.staminapp.R
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Star
-import androidx.compose.runtime.Composable
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
-import com.staminapp.Destination
 import com.staminapp.data.model.Routine
 import com.staminapp.ui.theme.Gray
 import com.staminapp.util.decodeBase64Image
@@ -33,13 +31,32 @@ fun RatingBar(
     rating: Int = 0,
     stars: Int = 5,
     starsColor: Color = Color.Yellow,
+    rate: (score: Int) -> Unit
 ) {
+    var mutableRating by remember { mutableStateOf(rating) }
+
     Row(modifier = modifier) {
-        repeat(rating) {
-            Icon(Icons.Filled.Star, contentDescription = null, tint = starsColor)
+        repeat(mutableRating) {
+            Icon(
+                Icons.Filled.Star,
+                contentDescription = null,
+                tint = starsColor,
+                modifier = Modifier.clickable {
+                    rate(it + 1)
+                    mutableRating = it + 1
+                }
+            )
         }
-        repeat(stars - rating) {
-            Icon(Icons.Filled.Star, contentDescription = null, tint = Gray)
+        repeat(stars - mutableRating) {
+            Icon(
+                Icons.Filled.Star,
+                contentDescription = null,
+                tint = Gray,
+                modifier = Modifier.clickable {
+                    rate(it + mutableRating + 1)
+                    mutableRating += it + 1
+                }
+            )
         }
     }
 }
@@ -59,8 +76,7 @@ fun CustomChip(
             selected -> Color.White
             else -> MaterialTheme.colors.primaryVariant
         },
-        shape = CircleShape,
-        modifier = modifier,
+        modifier = modifier.clip(CircleShape),
     ) {
         Text(
             text = text.uppercase(),
@@ -81,13 +97,14 @@ fun RoutineCard(navController: NavController, routine: Routine, modifier: Modifi
         elevation = 5.dp
     ) {
         Box(modifier = Modifier
-            .fillMaxWidth()
-            .height(160.dp)
+            .fillMaxSize()
+            .aspectRatio(1f / 1f)
         ) {
             Image(
                 bitmap = decodeBase64Image(routine.image).asImageBitmap(),
                 contentDescription = "Imagen de Rutina",
-                contentScale = ContentScale.Crop
+                contentScale = ContentScale.Crop,
+                modifier = Modifier.fillMaxSize()
             )
             Box(
                 modifier = Modifier
@@ -116,5 +133,19 @@ fun RoutineCard(navController: NavController, routine: Routine, modifier: Modifi
                 )
             }
         }
+    }
+}
+
+@Composable
+fun LoadingIndicator() {
+    Box(
+        modifier = Modifier
+            .fillMaxSize(),
+        contentAlignment = Alignment.Center
+    ) {
+        CircularProgressIndicator(
+            color = MaterialTheme.colors.primaryVariant,
+            strokeWidth = 6.dp
+        )
     }
 }

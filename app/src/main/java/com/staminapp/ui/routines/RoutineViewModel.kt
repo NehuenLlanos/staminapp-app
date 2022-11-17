@@ -5,8 +5,6 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import androidx.navigation.NavHostController
-import com.staminapp.Destination
 import com.staminapp.data.repository.FavouriteRepository
 import com.staminapp.data.repository.ReviewRepository
 import com.staminapp.data.repository.RoutineRepository

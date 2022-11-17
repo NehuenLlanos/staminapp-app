@@ -7,10 +7,8 @@ import androidx.compose.ui.text.input.TextFieldValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.navigation.NavHostController
-import com.staminapp.Destination
-import com.staminapp.data.repository.RoutineRepository
+import com.staminapp.ui.main.Destination
 import com.staminapp.data.repository.UserRepository
-import com.staminapp.ui.explore.ExploreUiState
 import com.staminapp.util.SessionManager
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -59,9 +57,8 @@ class SignInViewModel (
                 isFetching = false,
                 isAuthenticated = true,
             )
-            navController.popBackStack()
+            navController.backQueue.clear()
             navController.navigate(Destination.Home.route)
-
         }.onFailure { e ->
             // Handle the error and notify the UI when appropriate.
             uiState = uiState.copy(

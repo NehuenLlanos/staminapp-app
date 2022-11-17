@@ -1,5 +1,6 @@
-package com.staminapp
+package com.staminapp.ui.main
 
+import android.content.Intent
 import android.os.Bundle
 import android.widget.Toast
 import androidx.activity.ComponentActivity
@@ -10,10 +11,15 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.navigation.NavHostController
+import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import androidx.navigation.navArgument
+import androidx.navigation.navDeepLink
+import com.staminapp.MyApplication
 import com.staminapp.ui.execute.*
+import com.staminapp.ui.explore.ExploreScreen
 import com.staminapp.ui.home.HomeScreen
 import com.staminapp.ui.profile.ProfileScreen
 import com.staminapp.ui.routines.RoutineScreen
@@ -23,19 +29,27 @@ import com.staminapp.ui.theme.StaminappAppTheme
 
 sealed class Destination(val route: String) {
     object SignIn: Destination("sign-in")
+
     object Home: Destination("home")
+    object Explore: Destination("explore")
     object Profile: Destination("profile")
-//    object List: Destination("list")
-    object Routine: Destination("routine/{elementId}") {
+
+    object Routine: Destination("routine/{id}") {
         fun createRoute(routineId: Int) = "routine/$routineId"
     }
-    object ExecuteRoutine: Destination("routine/execute")
-    object ExercisePreview: Destination("routine/execute/exercise-preview")
-    object ExerciseScreenTime: Destination("routine/execute/exercise")
-    object ExerciseScreenReps: Destination("routine/execute/exercise-reps")
-    object ExerciseScreenRepsAndTime: Destination("routine/execute/exercise-reps-and-time")
+
+    object ExecutionPreviewRoutine: Destination("routine/execute/{id}") {
+        fun createRoute(routineId: Int) = "routine/execute/$routineId"
+    }
+    object ExecutionRoutineScreen: Destination("routine/execute/exercise-preview/{id}") {
+        fun createRoute(routineId: Int) = "routine/execute/exercise-preview/$routineId"
+    }
     object ExerciseScreenFinished: Destination("routine/execute/exercise-finished")
-    object Execution: Destination("routine/execute2")
+
+    object ExecutionFinishedRoutine: Destination("routine/execute/routine-finished/{id}") {
+        fun createRoute(routineId: Int) = "routine/execute/routine-finished/$routineId"
+    }
+
 }
 
 class MainActivity : ComponentActivity() {
@@ -43,129 +57,135 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         setContent {
             StaminappAppTheme {
-                // A surface container using the 'background' color from the theme
                 Surface(
                     modifier = Modifier.fillMaxSize(),
                     color = MaterialTheme.colors.background
                 ) {
                     val navController = rememberNavController()
                     NavigationAppHost(navController = navController)
-//                    SignInScreen(navController = navController)
                 }
             }
         }
     }
 }
 
-//@Composable
-//fun ActionButton(
-//    str: String,
-//    enabled: Boolean = true,
-//    onClick: () -> Unit
-//) {
-//    Button(
-//        modifier = Modifier
-//            .fillMaxWidth()
-//            .padding(top = 16.dp, start = 16.dp, end = 16.dp),
-//        enabled = enabled,
-//        onClick = onClick,
-//    ) {
-//        Text(
-//            text = str,
-//            modifier = Modifier.padding(8.dp))
-//    }
-//}
-//@Composable
-//fun MainScreen(
-//    viewModel: MainViewModel = viewModel(factory = getViewModelFactory())
-//) {
-//    val uiState = viewModel.uiState
-//
-//    Column(
-//        modifier = Modifier.fillMaxWidth()
-//    ) {
-//        if (!uiState.isAuthenticated) {
-//            ActionButton(
-//                str = "Logueate",
-//                onClick = {
-//                    viewModel.login("nehuen", "1234")
-//                })
-//        } else {
-//            ActionButton(
-//                str = "Deslogueate PETE",
-//                onClick = {
-//                    viewModel.logout()
-//                })
-//        }
-//
-//        ActionButton(
-//            str = "Obtener el user de ahora",
-//            enabled = uiState.canGetCurrentUser,
-//            onClick = {
-//                viewModel.getCurrentUser()
-//            })
-//        Column(
-//            modifier = Modifier.fillMaxSize()
-//        ) {
-//            val currentUserData = uiState.currentUser?.let {
-//                "Current User: ${it.firstName} ${it.lastName} (${it.email})"
-//            }
-//            Text(
-//                text = currentUserData ?: "",
-//                modifier = Modifier
-//                    .fillMaxWidth()
-//                    .padding(top = 16.dp, start = 16.dp, end = 16.dp),
-//                fontSize = 18.sp,
-//                color = Color.Black
-//            )
-//            Text(
-//                text = uiState.message?: "",
-//                modifier = Modifier
-//                    .fillMaxSize()
-//                    .padding(top = 16.dp, start = 16.dp, end = 16.dp),
-//                fontSize = 18.sp,
-//                color = Color.Black
-//            )
-//        }
-//    }
-//}
-
 @Composable
 fun NavigationAppHost(navController: NavHostController) {
     val ctx = LocalContext.current
 
-    NavHost(navController = navController, startDestination = "sign-in") {
-        composable(Destination.SignIn.route) { SignInScreen(navController = navController) }
-        composable(Destination.Home.route) { HomeScreen(navController) }
-        composable(Destination.Profile.route) { ProfileScreen(navController = navController) }
-//        composable(Destination.List.route) { ListScreen(navController) }
-        composable(Destination.ExecuteRoutine.route) { navBackStackEntry ->
-            val routineId = navBackStackEntry.arguments?.getString("routineId")
-            if (routineId == null) {
-                Toast.makeText(ctx, "ERROR FATAL. Volver a correr la aplicación", Toast.LENGTH_SHORT).show()
-            } else {
-                StartExecutionScreen(routineId.toInt(), navController)
+    val isAuthenticated = (ctx.applicationContext as MyApplication).sessionManager.loadAuthToken() != null
+
+    NavHost(navController = navController, startDestination = if (isAuthenticated) Destination.Home.route else Destination.SignIn.route) {
+
+        composable(Destination.SignIn.route) {
+            SignInScreen(navController)
+        }
+
+        composable(Destination.Home.route) {
+            MainScaffold(
+                selectedIndex = 0,
+                navController = navController
+            ) { modifier, navController ->
+                HomeScreen(modifier, navController)
             }
         }
 
-        composable(Destination.Routine.route) { navBackStackEntry ->
-            val elementId = navBackStackEntry.arguments?.getString("elementId")
-            if (elementId == null) {
-                Toast.makeText(ctx, "ERROR FATAL. Volver a correr la aplicación", Toast.LENGTH_SHORT).show()
-            } else {
-                RoutineScreen(elementId.toInt(), navController)
-            }
-        }
-//        composable(Destination.ExercisePreview.route) { ExercisePreview() }
-        composable(Destination.Execution.route) { navBackStackEntry ->
-            val routineId = navBackStackEntry.arguments?.getString("routineId")
-            if (routineId == null) {
-                Toast.makeText(ctx, "ERROR FATAL. Volver a correr la aplicación", Toast.LENGTH_SHORT).show()
-            } else {
-                Execution(modifier = Modifier, routineId = routineId.toInt(), navController = navController)
+        composable(Destination.Explore.route) {
+            MainScaffold(
+                selectedIndex = 1,
+                navController = navController
+            ) { modifier, navController ->
+                ExploreScreen(modifier, navController)
             }
         }
 
-        composable(Destination.ExerciseScreenFinished.route) { ExerciseScreenFinished() }
+        composable(Destination.Profile.route) {
+            MainScaffold(
+                selectedIndex = 2,
+                navController = navController
+            ) { modifier, navController ->
+                ProfileScreen(modifier, navController)
+            }
+        }
+
+        composable(
+            route = Destination.Routine.route,
+            deepLinks = listOf(
+                navDeepLink {
+                    uriPattern = "https://www.staminapp.com/routine/{id}"
+                    action = Intent.ACTION_VIEW
+                },
+                navDeepLink {
+                    uriPattern = "https://staminapp.com/routine/{id}"
+                    action = Intent.ACTION_VIEW
+                },
+                navDeepLink {
+                    uriPattern = "http://www.staminapp.com/routine/{id}"
+                    action = Intent.ACTION_VIEW
+                },
+                navDeepLink {
+                    uriPattern = "http://staminapp.com/routine/{id}"
+                    action = Intent.ACTION_VIEW
+                }
+            ),
+            arguments = listOf(
+                navArgument("id") {
+                    type = NavType.IntType
+                    defaultValue = -1
+                }
+            )
+        ) { entry ->
+            val id = entry.arguments?.getInt("id")
+            if (id == null || id == -1) {
+                Toast.makeText(ctx, "ERROR FATAL. Volver a correr la aplicación", Toast.LENGTH_SHORT).show()
+            } else {
+                RoutineScreen(id, isAuthenticated, navController)
+            }
+        }
+
+        composable(route = Destination.ExecutionPreviewRoutine.route,
+            arguments = listOf(
+                navArgument("id") {
+                    type = NavType.IntType
+                    defaultValue = -1
+                }
+        )) { entry ->
+            val id = entry.arguments?.getInt("id")
+            if (id == null || id == -1) {
+                Toast.makeText(ctx, "ERROR FATAL. Volver a correr la aplicación", Toast.LENGTH_SHORT).show()
+            } else {
+                StartExecutionScreen(id, navController)
+            }
+        }
+
+        composable(route = Destination.ExecutionRoutineScreen.route,
+            arguments = listOf(
+                navArgument("id") {
+                    type = NavType.IntType
+                    defaultValue = -1
+                }
+            )) { entry ->
+            val id = entry.arguments?.getInt("id")
+            if (id == null || id == -1) {
+                Toast.makeText(ctx, "ERROR FATAL. Volver a correr la aplicación", Toast.LENGTH_SHORT).show()
+            } else {
+                Execution(id, navController)
+            }
+        }
+
+        composable(route = Destination.ExecutionFinishedRoutine.route,
+            arguments = listOf(
+                navArgument("id") {
+                    type = NavType.IntType
+                    defaultValue = -1
+                }
+            )) { entry ->
+            val id = entry.arguments?.getInt("id")
+            if (id == null || id == -1) {
+                Toast.makeText(ctx, "ERROR FATAL. Volver a correr la aplicación", Toast.LENGTH_SHORT).show()
+            } else {
+                FinishedExecutionScreen(id, navController)
+            }
+        }
     }
 }

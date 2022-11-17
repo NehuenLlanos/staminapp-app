@@ -1,41 +1,25 @@
 package com.staminapp.ui.profile
 
-import android.content.res.Resources
-import android.graphics.Bitmap
-import android.graphics.BitmapFactory
-import android.provider.MediaStore
-import androidx.activity.compose.rememberLauncherForActivityResult
-import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ExpandMore
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.draw.rotate
-import androidx.compose.ui.graphics.Color.Companion.Red
 import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
-import com.staminapp.ui.execute.ExecuteViewModel
-import com.staminapp.util.getExecuteViewModelFactory
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.staminapp.util.decodeBase64Image
 import com.staminapp.util.getProfileViewModelFactory
-import java.sql.Date
-import java.time.LocalDateTime
 
 @Composable
 fun ProfileScreen(
@@ -43,11 +27,11 @@ fun ProfileScreen(
     navController: NavController,
     viewModel: ProfileViewModel = viewModel(factory = getProfileViewModelFactory())
 ) {
-    val iuState = viewModel.uiState
-    if (!iuState.isFetching && iuState.currentUser == null) {
+    val uiState = viewModel.uiState
+    if (!uiState.isFetching && uiState.currentUser == null) {
         viewModel.getCurrentUser()
     }
-    if (iuState.currentUser != null) {
+    if (uiState.currentUser != null) {
         Column(
             modifier = modifier
                 .fillMaxSize()
@@ -57,13 +41,14 @@ fun ProfileScreen(
         ) {
             Row(
                 modifier = Modifier
-                    .fillMaxWidth(),
-                horizontalArrangement = Arrangement.spacedBy(8.dp, Alignment.CenterHorizontally)
+                    .fillMaxWidth()
+                    .padding(bottom = 16.dp),
+                horizontalArrangement = Arrangement.spacedBy(8.dp),
+                verticalAlignment = Alignment.Bottom
             ) {
-                UserImage(iuState)
-                UserNameTitle(iuState)
+                UserImage(uiState)
+                UserNameTitle(uiState)
             }
-            //        StatisticsButton(Modifier.padding(vertical = 16.dp))
             PersonalInfoText()
             Column(
                 Modifier
@@ -71,9 +56,9 @@ fun ProfileScreen(
                     .padding(top = 12.dp, bottom = 40.dp),
                 verticalArrangement = Arrangement.spacedBy(8.dp, Alignment.CenterVertically)
             ) {
-                GenderTextField(Modifier.fillMaxWidth(), iuState)
-                EMailTextField(Modifier.fillMaxWidth(), iuState)
-                BirthdateTextField(Modifier.fillMaxWidth(), iuState)
+                GenderTextField(Modifier.fillMaxWidth(), uiState)
+                EMailTextField(Modifier.fillMaxWidth(), uiState)
+                BirthdateTextField(Modifier.fillMaxWidth(), uiState)
             }
             SignOutButton(viewModel, navController = navController)
         }
@@ -83,72 +68,37 @@ fun ProfileScreen(
 
 
 @Composable
-fun UserImage(iuState: ProfileUiState){
-
+fun UserImage(uiState: ProfileUiState) {
     Image(
         modifier = Modifier
-        .size(150.dp)
-        .padding(10.dp)
-        .clip(CircleShape)
-        .fillMaxHeight()
-        .fillMaxWidth(),
-        bitmap = decodeBase64Image(iuState.currentUser!!.image).asImageBitmap(),
-        contentDescription = "Imagen de Rutina",
+            .size(150.dp)
+            .padding(10.dp)
+            .clip(CircleShape)
+            .fillMaxHeight()
+            .fillMaxWidth(),
+        bitmap = decodeBase64Image(uiState.currentUser!!.image).asImageBitmap(),
+        contentDescription = "Imagen de Usuario",
         contentScale = ContentScale.Crop
     )
-
-//    val context = LocalContext.current
-//    val myImage: Bitmap = BitmapFactory.decodeResource(Resources.getSystem(),android.R.mipmap.sym_def_app_icon)
-//    val result= remember {
-//        mutableStateOf<Bitmap>(myImage)
-//    }
-//    val loadImage = rememberLauncherForActivityResult(ActivityResultContracts.GetContent()){
-//       //if(Build.VERSION.SDK_INT < 29){
-//            result.value= MediaStore.Images.Media.getBitmap(context.contentResolver,it)
-//        //}
-//        //else{
-//        //    val source = ImageDecoder.createSource(context.contentResolver,it)
-//        //    result.value= ImageDecoder.decodeBitmap(source)
-//        //}
-//    }
-//    Image(result.value.asImageBitmap(), contentDescription = "User Image", modifier = Modifier
-//        .size(150.dp)
-//        .padding(10.dp)
-//        .clip(CircleShape)
-//        .fillMaxHeight()
-//        .fillMaxWidth()
-//        .rotate(90f)
-//        .clickable { loadImage.launch("image/*") },
-//        contentScale = ContentScale.Crop)
-        // con FillBounds se soluciona pero queda muy feo
-
-//    OutlinedButton(onClick = {loadImage.launch("image/*")}, modifier = Modifier.width(150.dp).padding(10.dp)) {
-//        Text(text="Cargar Imagen")
-//    }
 }
 
 @Composable
-fun UserNameTitle(iuState: ProfileUiState){
+fun UserNameTitle(uiState: ProfileUiState){
     Column(
         verticalArrangement = Arrangement.Bottom
     ) {
-        Text(text = iuState.currentUser!!.firstName,
+        Text(
+            uiState.currentUser!!.firstName.uppercase(),
             color = MaterialTheme.colors.primaryVariant,
-            fontSize = 28.sp,
-            fontWeight = FontWeight.Bold,
+            style = MaterialTheme.typography.h2,
+            lineHeight = 44.sp,
             overflow = TextOverflow.Ellipsis,
             maxLines = 2
         )
-        Text(text = iuState.currentUser.birthdate!!.year.toString() + " " +"Años",
-//        LocalDateTime.now().minusYears(
-//            LocalDateTime.of(
-//                , iuState.currentUser.birthdate!!.month,
-//                iuState.currentUser.birthdate!!.day, iuState.currentUser.birthdate!!.hours,
-//                iuState.currentUser.birthdate!!.minutes).year.toLong()
-//        ).toString(),
+        Text(
+            uiState.currentUser.birthdate!!.year.toString() + " " +"años",
             color = MaterialTheme.colors.primaryVariant,
-            fontSize = 16.sp,
-            fontWeight = FontWeight.Bold,
+            style = MaterialTheme.typography.subtitle1,
             overflow = TextOverflow.Ellipsis,
             maxLines = 1
         )
@@ -156,23 +106,10 @@ fun UserNameTitle(iuState: ProfileUiState){
 }
 
 @Composable
-fun StatisticsButton(modifier: Modifier){
-    OutlinedButton(
-        modifier = modifier.fillMaxWidth(),
-        onClick = {},
-        shape = RoundedCornerShape(50), // = 50% percent
-        // or shape = CircleShape
-    ) {
-        Text(text="Ver estadísticas")
-    }
-}
-
-@Composable
 fun PersonalInfoText(){
     Text(text = "Información Personal",
         color = MaterialTheme.colors.primaryVariant,
-        fontSize = 28.sp,
-        fontWeight = FontWeight.Bold,
+        style = MaterialTheme.typography.h3,
         overflow = TextOverflow.Ellipsis,
         maxLines = 1
     )
@@ -180,16 +117,16 @@ fun PersonalInfoText(){
 
 
 @Composable
-fun GenderTextField(modifier: Modifier, iuState: ProfileUiState){
+fun GenderTextField(modifier: Modifier, uiState: ProfileUiState){
     Box(modifier = modifier
         .wrapContentSize(Alignment.TopStart)
     ) {
         TextField(
             modifier = Modifier.fillMaxWidth(),
             value =
-                if (iuState.currentUser!!.gender == "male") {
+                if (uiState.currentUser!!.gender == "male") {
                     "Masculino"
-                } else if (iuState.currentUser!!.gender == "female") {
+                } else if (uiState.currentUser.gender == "female") {
                     "Femenino"
                 } else {
                     "Otro"
@@ -203,49 +140,18 @@ fun GenderTextField(modifier: Modifier, iuState: ProfileUiState){
                 MaterialTheme.colors.primaryVariant,
                 fontWeight = FontWeight.Bold
             ),
-//            trailingIcon = {
-//                Icon(
-//                    Icons.Filled.ExpandMore ,
-//                    contentDescription = null,
-//                    Modifier.clickable {
-//                        expanded = true
-//                    }
-//                )
-//            }
         )
-//        DropdownMenu(
-//            expanded = expanded,
-//            onDismissRequest = { expanded = false }
-//        ) {
-//            DropdownMenuItem(onClick = {
-//                genre = TextFieldValue("Masculino")
-//                }) {
-//                Text("Masculino")
-//            }
-//            DropdownMenuItem(onClick = {
-//                genre = TextFieldValue("Femenino")
-//                }) {
-//                Text("Femenino")
-//            }
-//            DropdownMenuItem(onClick = {
-//                genre = TextFieldValue("Otro")
-//                }) {
-//                Text("Otro")
-//            }
-//        }
     }
 }
 
 @Composable
-fun EMailTextField(modifier: Modifier, iuState: ProfileUiState){
+fun EMailTextField(modifier: Modifier, uiState: ProfileUiState){
     TextField(
         modifier = modifier,
-        value = iuState.currentUser!!.username,
+        value = uiState.currentUser!!.username,
         enabled = false,
         readOnly = true,
-        onValueChange = {
-            iuState.currentUser.username = it
-        },
+        onValueChange = {},
         label = { Text(text = "Email", fontWeight = FontWeight.Bold) },
         textStyle = TextStyle(
             MaterialTheme.colors.primaryVariant,
@@ -255,17 +161,15 @@ fun EMailTextField(modifier: Modifier, iuState: ProfileUiState){
 }
 
 @Composable
-fun BirthdateTextField(modifier: Modifier, iuState: ProfileUiState) {
+fun BirthdateTextField(modifier: Modifier, uiState: ProfileUiState) {
     TextField(
         modifier = modifier,
-        value = iuState.currentUser!!.birthdate!!.date.toString() + "/" +
-                iuState.currentUser!!.birthdate!!.month.toString() + "/" +
-                iuState.currentUser!!.birthdate!!.year.toString(),
+        value = uiState.currentUser!!.birthdate!!.date.toString() + "/" +
+                uiState.currentUser.birthdate!!.month.toString() + "/" +
+                uiState.currentUser.birthdate!!.year.toString(),
         enabled = false,
         readOnly = true,
-        onValueChange = {
-
-        },
+        onValueChange = {},
         label = { Text(text = "Fecha de nacimiento", fontWeight = FontWeight.Bold) },
         textStyle = TextStyle(
             MaterialTheme.colors.primaryVariant,
@@ -276,11 +180,11 @@ fun BirthdateTextField(modifier: Modifier, iuState: ProfileUiState) {
 
 @Composable
 fun SignOutButton(viewModel: ProfileViewModel, navController: NavController) {
-    OutlinedButton(
+    Button(
         modifier = Modifier.fillMaxWidth(),
         onClick = { viewModel.logout(navController) },
-        shape = RoundedCornerShape(50), // = 50% percent
-        colors = ButtonDefaults.buttonColors(Red),
+        shape = RoundedCornerShape(50),
+        colors = ButtonDefaults.buttonColors(MaterialTheme.colors.error),
     ) {
         Text(text="Cerrar sesión")
     }

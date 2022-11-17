@@ -13,9 +13,9 @@ import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.unit.dp
@@ -27,113 +27,99 @@ import com.staminapp.util.getSignInViewModelFactory
 @OptIn(ExperimentalComposeUiApi::class)
 @Composable
 fun SignInScreen(
-    viewModel: SignInViewModel = viewModel(factory = getSignInViewModelFactory()),
-    navController: NavHostController
+    navController: NavHostController,
+    viewModel: SignInViewModel = viewModel(factory = getSignInViewModelFactory())
 ) {
-    val (focusRequester) = FocusRequester.createRefs()
     val uiState = viewModel.uiState
     val username by viewModel.name.collectAsState(initial = "")
     val password by viewModel.password.collectAsState(initial = "")
     val failLogin by viewModel.failLogin.collectAsState(false)
-//    var name by remember { mutableStateOf("") }
-        Column(
-            modifier = Modifier
-                .padding(horizontal = 30.dp, vertical = 180.dp)
-                .fillMaxSize(1f)
-                .background(MaterialTheme.colors.background),
-            horizontalAlignment = Alignment.CenterHorizontally,
-            ) {
-            if (failLogin) {
-                AlertDialog(
-                    onDismissRequest = {
-                        viewModel.setFail(false)
-                    },
-                    buttons = {
-                        Row(
-                            modifier = Modifier.padding(all = 8.dp).fillMaxWidth(),
-                            horizontalArrangement = Arrangement.End
-                        ) {
-                            Button(
-                                onClick = { viewModel.setFail(false) }
-                            ) {
-                                Text("OK")
-                            }
-                        }
-                    },
-                    title = {Text("Error")},
-                    text = {Text("Chequeá que el email y la contraseña sean correctos y " +
-                            "verifica que hayas confirmado tu email.")}
-                )
 
-            }
-            LogoImage()
-            UsernameTextField(Modifier.padding(top = 70.dp), viewModel, username, focusRequester)
-            PasswordTextField(Modifier.padding(top = 20.dp), viewModel, password, focusRequester)
-            SignInButton(Modifier.padding(top = 30.dp), viewModel, username, password, navController)
+    val (focusRequester) = FocusRequester.createRefs()
 
-        }
-}
-
-@Composable
-fun LogoImage() {
-    Image(
-        painter = painterResource(id = R.drawable.logofc),
-        contentDescription = "Hola",
-    )
-}
-
-@Composable
-fun UsernameTextField(modifier: Modifier, viewModel: SignInViewModel, username: String, focusRequester: FocusRequester) {
-    TextField(
-        modifier = modifier,
-        value = username,
-        onValueChange = viewModel::setName,
-        label = { Text(text = "Email") },
-        textStyle = TextStyle(
-            MaterialTheme.colors.primaryVariant,
-            fontWeight = FontWeight.Bold
-        ),
-        keyboardActions = KeyboardActions(
-            onDone = { focusRequester.requestFocus() }
-        ),
-        singleLine = true,
-    )
-}
-
-@Composable
-fun PasswordTextField(modifier: Modifier, viewModel: SignInViewModel, password: String, focusRequester : FocusRequester) {
-    TextField(
-        modifier = modifier.focusRequester(focusRequester),
-        value = password,
-        onValueChange = viewModel::setPassword,
-        label = { Text(text = "Contraseña") },
-        visualTransformation = PasswordVisualTransformation(),
-        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
-        textStyle = TextStyle(
-            MaterialTheme.colors.primaryVariant,
-            fontWeight = FontWeight.Bold
-        ),
-        singleLine = true,
-    )
-}
-
-@Composable
-fun SignInButton(
-    modifier: Modifier,
-    viewModel: SignInViewModel,
-    username: String,
-    password: String,
-    navController: NavHostController
-) {
-    Button(
-        modifier = modifier,
-        onClick = {
-            viewModel.login(username, password, navController)
-        },
-        colors = ButtonDefaults.buttonColors(backgroundColor = MaterialTheme.colors.primary),
-        shape = RoundedCornerShape(50.dp)
+    Column(
+        modifier = Modifier
+            .padding(horizontal = 30.dp)
+            .fillMaxSize()
+            .background(MaterialTheme.colors.background),
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.Center
     ) {
-        Text(text = "Ingresar",color = MaterialTheme.colors.background)
+        if (failLogin) {
+            AlertDialog(
+                onDismissRequest = {
+                    viewModel.setFail(false)
+                },
+                buttons = {
+                    Row(
+                        modifier = Modifier
+                            .padding(all = 8.dp)
+                            .fillMaxWidth(),
+                        horizontalArrangement = Arrangement.End
+                    ) {
+                        Button(
+                            onClick = {
+                                viewModel.setFail(false)
+                            }
+                        ) {
+                            Text("OK")
+                        }
+                    }
+                },
+                title = {
+                    Text("Error")
+                },
+                text = {
+                    Text("Chequeá que el email y la contraseña sean correctos y verificá que hayas confirmado tu email.")
+                }
+            )
+        }
+        Image(
+            painter = painterResource(R.drawable.logofc),
+            contentDescription = "StaminApp",
+        )
+        TextField(
+            modifier = Modifier.padding(top = 70.dp),
+            value = username,
+            onValueChange = viewModel::setName,
+            label = {
+                Text(text = "Email")
+            },
+            textStyle = TextStyle(
+                MaterialTheme.colors.primaryVariant,
+            ),
+            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email),
+            keyboardActions = KeyboardActions(
+                onDone = { focusRequester.requestFocus() }
+            ),
+            singleLine = true
+        )
+        TextField(
+            modifier = Modifier
+                .padding(top = 20.dp)
+                .focusRequester(focusRequester),
+            value = password,
+            onValueChange = viewModel::setPassword,
+            label = {
+                Text(text = "Contraseña")
+            },
+            visualTransformation = PasswordVisualTransformation(),
+            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
+            textStyle = TextStyle(
+                MaterialTheme.colors.primaryVariant,
+            ),
+            keyboardActions = KeyboardActions(
+                onDone = { viewModel.login(username, password, navController) }
+            ),
+            singleLine = true
+        )
+        Button(
+            modifier = Modifier.padding(top = 30.dp),
+            onClick = { viewModel.login(username, password, navController) },
+            shape = RoundedCornerShape(50), // = 50% percent
+        ) {
+            Text(text="Ingresar")
+        }
+
     }
 }
-
