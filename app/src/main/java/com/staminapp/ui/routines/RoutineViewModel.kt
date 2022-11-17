@@ -69,7 +69,7 @@ class RoutineViewModel (
         runCatching {
             routineRepository.getExerciseForCycle(id = id)
         }.onSuccess { response ->
-            uiState.exercises?.put(id, response)
+            uiState.exercises[id] = response
             uiState = uiState.copy(
                 isFetching = false,
                 exercises = uiState.exercises

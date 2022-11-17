@@ -13,6 +13,7 @@ import androidx.compose.material.icons.outlined.Search
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.staminapp.R
@@ -32,7 +33,7 @@ fun MainScaffold(
                         .padding(15.dp)
                         .weight(1f),
                     painter = painterResource(id = R.drawable.logoblack),
-                    contentDescription = "StaminApp",
+                    contentDescription = stringResource(R.string.app_name),
                 )
             }
         },
@@ -41,12 +42,12 @@ fun MainScaffold(
                 BottomNavigation(elevation = 10.dp) {
                     BottomNavigationItem(icon = {
                             if (selectedIndex == 0) {
-                                Icon(Icons.Filled.Home, contentDescription = "Inicio")
+                                Icon(Icons.Filled.Home, contentDescription = stringResource(R.string.home_bottom_bar))
                             } else {
-                                Icon(Icons.Outlined.Home, contentDescription = "Inicio")
+                                Icon(Icons.Outlined.Home, contentDescription = stringResource(R.string.home_bottom_bar))
                             }
                         },
-                        label = { Text(text = "Inicio") },
+                        label = { Text(text = stringResource(R.string.home_bottom_bar)) },
                         selected = (selectedIndex == 0),
                         onClick = {
                             if (selectedIndex != 0) {
@@ -57,12 +58,12 @@ fun MainScaffold(
 
                     BottomNavigationItem(icon = {
                             if (selectedIndex == 1) {
-                                Icon(Icons.Filled.Search, contentDescription = "Explorar")
+                                Icon(Icons.Filled.Search, contentDescription = stringResource(R.string.explore_bottom_bar))
                             } else {
-                                Icon(Icons.Outlined.Search, contentDescription = "Explorar")
+                                Icon(Icons.Outlined.Search, contentDescription = stringResource(R.string.explore_bottom_bar))
                             }
                         },
-                        label = { Text(text = "Explorar") },
+                        label = { Text(text = stringResource(R.string.explore_bottom_bar)) },
                         selected = (selectedIndex == 1),
                         onClick = {
                             if (selectedIndex != 1) {
@@ -73,12 +74,12 @@ fun MainScaffold(
 
                     BottomNavigationItem(icon = {
                         if (selectedIndex == 2) {
-                            Icon(Icons.Filled.Person, contentDescription = "Perfil")
+                            Icon(Icons.Filled.Person, contentDescription = stringResource(R.string.profile_bottom_bar))
                         } else {
-                            Icon(Icons.Outlined.Person, contentDescription = "Perfil")
+                            Icon(Icons.Outlined.Person, contentDescription = stringResource(R.string.profile_bottom_bar))
                         }
                     },
-                        label = { Text(text = "Perfil") },
+                        label = { Text(text = stringResource(R.string.profile_bottom_bar)) },
                         selected = (selectedIndex == 2),
                         onClick = {
                             if (selectedIndex != 2) {

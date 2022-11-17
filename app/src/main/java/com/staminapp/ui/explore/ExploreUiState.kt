@@ -1,5 +1,7 @@
 package com.staminapp.ui.explore
 
+import androidx.compose.ui.res.stringResource
+import com.staminapp.R
 import com.staminapp.data.model.Routine
 
 data class ExploreUiState (
@@ -8,9 +10,5 @@ data class ExploreUiState (
 
     val routines : List<Routine>? = null,
     val displayedRoutines : List<Routine>? = null,
-    val selectedDifficulties : MutableMap<String, Boolean> = mutableMapOf(Pair("novato", false),
-                                                                          Pair("principiante", false),
-                                                                          Pair("intermedio", false),
-                                                                          Pair("avanzado", false),
-                                                                          Pair("experto", false))
+    val selectedDifficulties : MutableList<Boolean> = mutableListOf(false, false, false, false, false) // rookie, beginner, intermediate, advanced, expert
 )

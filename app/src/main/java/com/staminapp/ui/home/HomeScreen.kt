@@ -20,6 +20,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
@@ -63,7 +64,7 @@ fun HomeScreen(
                 GridItemSpan(maxLineSpan)
             }) {
                 Text(
-                    "Buenos días".uppercase(),
+                    stringResource(R.string.good_morning).uppercase(),
                     color = MaterialTheme.colors.primaryVariant,
                     style = MaterialTheme.typography.h2
                 )
@@ -96,7 +97,7 @@ fun HomeScreen(
             item(span = {
                 GridItemSpan(maxLineSpan)
             }) {
-                Text(text = "Mi Biblioteca",
+                Text(text = stringResource(R.string.my_library),
                     color = MaterialTheme.colors.primaryVariant,
                     style = MaterialTheme.typography.h3
                 )
@@ -136,7 +137,7 @@ fun RecentCard(navController: NavController, modifier: Modifier = Modifier, rout
                         .fillMaxHeight()
                         .width(56.dp),
                     bitmap = decodeBase64Image(routine.image).asImageBitmap(),
-                    contentDescription = "Imagen de Rutina",
+                    contentDescription = stringResource(R.string.routine_image),
                     contentScale = ContentScale.Crop
                 )
                 Text(

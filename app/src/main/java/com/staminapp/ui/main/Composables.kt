@@ -17,10 +17,12 @@ import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
+import com.staminapp.R
 import com.staminapp.data.model.Routine
 import com.staminapp.ui.theme.Gray
 import com.staminapp.util.decodeBase64Image
@@ -102,7 +104,7 @@ fun RoutineCard(navController: NavController, routine: Routine, modifier: Modifi
         ) {
             Image(
                 bitmap = decodeBase64Image(routine.image).asImageBitmap(),
-                contentDescription = "Imagen de Rutina",
+                contentDescription = stringResource(R.string.routine_image),
                 contentScale = ContentScale.Crop,
                 modifier = Modifier.fillMaxSize()
             )

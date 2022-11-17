@@ -10,12 +10,15 @@ import androidx.compose.material.icons.filled.Sort
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.staminapp.util.getExploreViewModelFactory
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.staminapp.R
 import com.staminapp.ui.main.CustomChip
 import com.staminapp.ui.main.RoutineCard
+import com.staminapp.util.getDifficultyApiStringFromIndex
 
 @Composable
 fun ExploreScreen(
@@ -30,7 +33,13 @@ fun ExploreScreen(
 
     var expanded by remember { mutableStateOf(false) }
     var order by remember { mutableStateOf(0) }
-    val difficulties = listOf("novato","principiante","intermedio","avanzado","experto")
+    val difficulties = listOf(
+        stringResource(R.string.rookie),
+        stringResource(R.string.beginner),
+        stringResource(R.string.intermediate),
+        stringResource(R.string.advanced),
+        stringResource(R.string.expert)
+    )
 
     LazyVerticalGrid(
         modifier = modifier
@@ -51,17 +60,17 @@ fun ExploreScreen(
                         .weight(1f)
                         .horizontalScroll(rememberScrollState()),
                 ) {
-                    difficulties.forEach {
+                    difficulties.forEachIndexed { index, it ->
                         CustomChip(
-                            selected = uiState.selectedDifficulties[it]!!,
+                            selected = uiState.selectedDifficulties[index],
                             text = it,
                             modifier = Modifier
                                 .padding(4.dp)
                                 .clickable {
-                                    if (uiState.selectedDifficulties[it]!!) {
-                                        viewModel.unselectDifficulty(it);
+                                    if (uiState.selectedDifficulties[index]) {
+                                        viewModel.unselectDifficulty(index);
                                     } else {
-                                        viewModel.selectDifficulty(it);
+                                        viewModel.selectDifficulty(index);
                                     }
                                 }
                         )
@@ -70,7 +79,7 @@ fun ExploreScreen(
                 Box {
                     Icon(
                         Icons.Default.Sort,
-                        contentDescription = "Ordenar por",
+                        contentDescription = stringResource(R.string.order_by),
                         tint = MaterialTheme.colors.primaryVariant,
                         modifier = Modifier
                             .padding(start = 8.dp)
@@ -88,7 +97,7 @@ fun ExploreScreen(
                                 expanded = false
                             }
                         ) {
-                            Text("Por nombre")
+                            Text(stringResource(R.string.by_name))
                         }
                         DropdownMenuItem(
                             onClick = {
@@ -96,7 +105,7 @@ fun ExploreScreen(
                                 expanded = false
                             }
                         ) {
-                            Text("Por fecha")
+                            Text(stringResource(R.string.by_date))
                         }
                         DropdownMenuItem(
                             onClick = {
@@ -104,7 +113,7 @@ fun ExploreScreen(
                                 expanded = false
                             }
                         ) {
-                            Text("Por calificación")
+                            Text(stringResource(R.string.by_rating))
                         }
                     }
                 }
