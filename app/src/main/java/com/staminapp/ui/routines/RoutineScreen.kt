@@ -29,12 +29,11 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import com.staminapp.R
 import com.staminapp.ui.main.Destination
 import com.staminapp.data.model.Exercise
+import com.staminapp.data.model.Routine
 import com.staminapp.ui.main.CustomChip
 import com.staminapp.ui.main.LoadingIndicator
 import com.staminapp.ui.main.RatingBar
-import com.staminapp.util.decodeBase64Image
-import com.staminapp.util.getRoutineViewModelFactory
-import com.staminapp.util.translateDifficultyForApp
+import com.staminapp.util.*
 
 @Composable
 fun RoutineScreen(
@@ -65,7 +64,7 @@ fun RoutineScreen(
     val shareIntent = Intent.createChooser(sendIntent, stringResource(R.string.share_title))
     val context = LocalContext.current
 
-    var isDescriptionOpen by remember { mutableStateOf(true) }
+    val windowInfo = rememberWindowInfo()
 
     Scaffold (
         topBar = {
@@ -146,121 +145,189 @@ fun RoutineScreen(
                 }
             )
         } else {
-            LazyColumn(
-                modifier = Modifier
-                    .padding(paddingValues)
-                    .fillMaxWidth()
-                    .padding(16.dp)
-            ) {
-                if (uiState.routine == null) {
-                    item {
-                        LoadingIndicator()
-                    }
-                } else {
-                    item {
-                        Row(
-                            verticalAlignment = Alignment.Bottom,
-                            horizontalArrangement = Arrangement.spacedBy(16.dp)
+            if (uiState.routine == null) {
+                Box(
+                    modifier = Modifier.fillMaxSize()
+                ) {
+                    LoadingIndicator()
+                }
+            } else {
+                if (windowInfo.screenWidthInfo !is WindowInfo.WindowType.Compact && windowInfo.orientation is WindowInfo.Orientation.Landscape) {
+                    Row(
+                        modifier = Modifier
+                            .padding(paddingValues)
+                            .fillMaxWidth()
+                            .padding(16.dp),
+                        horizontalArrangement = Arrangement.spacedBy(16.dp)
+                    ) {
+                        Column(
+                            modifier = Modifier
+                                .weight(0.4f)
+                                .verticalScroll(rememberScrollState())
                         ) {
-                            Image(
-                                bitmap = decodeBase64Image(uiState.routine.image).asImageBitmap(),
-                                contentDescription = stringResource(R.string.routine_image),
-                                contentScale = ContentScale.Crop,
-                                modifier = Modifier
-                                    .fillMaxWidth(0.4f)
-                                    .aspectRatio(1f / 1f)
-                                    .clip(RoundedCornerShape(10))
+                            RoutineInfo(
+                                routine = uiState.routine,
+                                viewModel = viewModel
                             )
-                            Column(
-                                horizontalAlignment = Alignment.End
-                            ) {
-                                CustomChip(
-                                    selected = false,
-                                    text = translateDifficultyForApp(uiState.routine.difficulty)
+                        }
+                        LazyColumn(
+                            modifier = Modifier.weight(0.6f)
+                        ) {
+                            item {
+                                Text(stringResource(R.string.cycles),
+                                    style = MaterialTheme.typography.subtitle1,
+                                    color = MaterialTheme.colors.primaryVariant,
+                                    modifier = Modifier.padding(bottom = 8.dp)
                                 )
-                                Text(
-                                    uiState.routine.name.uppercase(),
-                                    style = MaterialTheme.typography.h2,
-                                    lineHeight = 42.sp,
-                                    maxLines = 3,
-                                    overflow = TextOverflow.Ellipsis,
-                                    color = MaterialTheme.colors.primaryVariant
+                            }
+                            items(uiState.cycles!!) {
+                                Cycle(
+                                    title = it.name,
+                                    repetitions = it.repetitions,
+                                    exercises = uiState.exercises.getOrDefault(it.id, listOf()),
+                                    modifier = Modifier.padding(bottom = 8.dp)
                                 )
                             }
                         }
-                        Spacer(modifier = Modifier.height(8.dp))
-                        Row(
-                            modifier = Modifier.fillMaxWidth(),
-                            horizontalArrangement = Arrangement.SpaceBetween,
-                            verticalAlignment = Alignment.CenterVertically
-                        ) {
-                            Text(stringResource(R.string.rating),
-                                style = MaterialTheme.typography.subtitle1,
-                                color = MaterialTheme.colors.primaryVariant
-                            )
-                            RatingBar(
-                                rating = uiState.routine.score,
-                                starsColor = MaterialTheme.colors.primary,
-                                modifier = Modifier.padding(bottom = 2.dp),
-                                rate = {
-                                    viewModel.rate(routineId, it)
-                                }
-                            )
-                        }
-                        Row(
-                            horizontalArrangement = Arrangement.SpaceBetween,
-                            verticalAlignment = Alignment.CenterVertically,
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .clickable {
-                                    isDescriptionOpen = !isDescriptionOpen
-                                }
-                        ) {
-                            Text(stringResource(R.string.description),
-                                style = MaterialTheme.typography.subtitle1,
-                                color = MaterialTheme.colors.primaryVariant
-                            )
-                            Icon(
-                                when {
-                                    isDescriptionOpen -> Icons.Filled.ExpandLess
-                                    else -> Icons.Filled.ExpandMore
-                                },
-                                contentDescription = null,
-                                tint = MaterialTheme.colors.primaryVariant
-                            )
-                        }
-                        if (isDescriptionOpen) {
-                            Text(
-                                uiState.routine.detail,
-                                color = MaterialTheme.colors.primaryVariant,
-                                style = MaterialTheme.typography.body1
-                            )
-
-                        }
-                        Spacer(modifier = Modifier
-                            .padding(top = 8.dp)
-                            .height(4.dp)
-                            .fillMaxWidth()
-                            .background(Gray))
-                        Text(stringResource(R.string.cycles),
-                            style = MaterialTheme.typography.subtitle1,
-                            color = MaterialTheme.colors.primaryVariant,
-                            modifier = Modifier.padding(bottom = 8.dp)
-                        )
                     }
-                    items(uiState.cycles!!) {
-                        Cycle(
-                            title = it.name,
-                            repetitions = it.repetitions,
-                            exercises = uiState.exercises.getOrDefault(it.id, listOf()),
-                            modifier = Modifier.padding(bottom = 8.dp)
-                        )
+                } else {
+                    LazyColumn(
+                        modifier = Modifier
+                            .padding(paddingValues)
+                            .fillMaxWidth()
+                            .padding(16.dp)
+                    ) {
+                        item {
+                            RoutineInfo(
+                                routine = uiState.routine,
+                                viewModel = viewModel
+                            )
+                            Spacer(modifier = Modifier
+                                .padding(top = 8.dp)
+                                .height(4.dp)
+                                .fillMaxWidth()
+                                .background(Gray))
+                            Text(stringResource(R.string.cycles),
+                                style = MaterialTheme.typography.subtitle1,
+                                color = MaterialTheme.colors.primaryVariant,
+                                modifier = Modifier.padding(bottom = 8.dp)
+                            )
+                        }
+                        items(uiState.cycles!!) {
+                            Cycle(
+                                title = it.name,
+                                repetitions = it.repetitions,
+                                exercises = uiState.exercises.getOrDefault(it.id, listOf()),
+                                modifier = Modifier.padding(bottom = 8.dp)
+                            )
+                        }
                     }
                 }
             }
         }
     }
 
+}
+
+@Composable
+fun RoutineInfo(
+    routine: Routine,
+    viewModel: RoutineViewModel
+) {
+    var isDescriptionOpen by remember { mutableStateOf(true) }
+    val windowInfo = rememberWindowInfo()
+
+    var maxWidth = 0.4f
+    if (windowInfo.orientation is WindowInfo.Orientation.Portrait && windowInfo.screenWidthInfo !is WindowInfo.WindowType.Compact) {
+        maxWidth = 0.2f
+    }
+
+    Row(
+        modifier = Modifier.fillMaxWidth(),
+        verticalAlignment = Alignment.Bottom,
+        horizontalArrangement = Arrangement.spacedBy(16.dp)
+    ) {
+        Image(
+            bitmap = decodeBase64Image(routine.image).asImageBitmap(),
+            contentDescription = stringResource(R.string.routine_image),
+            contentScale = ContentScale.Crop,
+            modifier = Modifier
+                .fillMaxWidth(maxWidth)
+                .aspectRatio(1f / 1f)
+                .clip(RoundedCornerShape(10))
+        )
+        Column(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalAlignment = Alignment.Start
+        ) {
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.End
+            ) {
+                CustomChip(
+                    selected = false,
+                    text = translateDifficultyForApp(routine.difficulty)
+                )
+            }
+            Text(
+                routine.name.uppercase(),
+                style = MaterialTheme.typography.h2,
+                lineHeight = 42.sp,
+                maxLines = 3,
+                overflow = TextOverflow.Ellipsis,
+                color = MaterialTheme.colors.primaryVariant
+            )
+        }
+    }
+    Spacer(modifier = Modifier.height(8.dp))
+    Row(
+        modifier = Modifier.fillMaxWidth(),
+        horizontalArrangement = Arrangement.SpaceBetween,
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        Text(stringResource(R.string.rating),
+            style = MaterialTheme.typography.subtitle1,
+            color = MaterialTheme.colors.primaryVariant
+        )
+        RatingBar(
+            rating = routine.score,
+            starsColor = MaterialTheme.colors.primary,
+            modifier = Modifier.padding(bottom = 2.dp),
+            rate = {
+                viewModel.rate(routine.id, it)
+            }
+        )
+    }
+    Row(
+        horizontalArrangement = Arrangement.SpaceBetween,
+        verticalAlignment = Alignment.CenterVertically,
+        modifier = Modifier
+            .fillMaxWidth()
+            .clickable {
+                isDescriptionOpen = !isDescriptionOpen
+            }
+    ) {
+        Text(stringResource(R.string.description),
+            style = MaterialTheme.typography.subtitle1,
+            color = MaterialTheme.colors.primaryVariant
+        )
+        Icon(
+            when {
+                isDescriptionOpen -> Icons.Filled.ExpandLess
+                else -> Icons.Filled.ExpandMore
+            },
+            contentDescription = null,
+            tint = MaterialTheme.colors.primaryVariant
+        )
+    }
+    if (isDescriptionOpen) {
+        Text(
+            routine.detail,
+            color = MaterialTheme.colors.primaryVariant,
+            style = MaterialTheme.typography.body1
+        )
+
+    }
 }
 
 @Composable
@@ -321,7 +388,7 @@ fun Cycle(
                 exercises.forEach { exercise ->
                     var info = ""
                     if (exercise.duration > 0 ) {
-                        info += exercise.duration.toString() + stringResource(R.string.second) + if (exercise.duration == 1) "" else "s"
+                        info += exercise.duration.toString() + " " + stringResource(R.string.second) + if (exercise.duration == 1) "" else "s"
                     }
                     if (info != "") {
                         info += " | "
