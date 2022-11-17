@@ -53,7 +53,6 @@ class ProfileViewModel (
                 isFetching = false,
                 currentUser = null,
             )
-            // The following code erase history navigation
             navController.backQueue.clear()
             navController.navigate(Destination.SignIn.route)
         }.onFailure { e ->

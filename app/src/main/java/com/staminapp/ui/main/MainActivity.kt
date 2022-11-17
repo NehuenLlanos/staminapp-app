@@ -13,6 +13,7 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import com.staminapp.MyApplication
 import com.staminapp.ui.execute.*
 import com.staminapp.ui.explore.ExploreScreen
 import com.staminapp.ui.home.HomeScreen
@@ -62,7 +63,9 @@ class MainActivity : ComponentActivity() {
 fun NavigationAppHost(navController: NavHostController) {
     val ctx = LocalContext.current
 
-    NavHost(navController = navController, startDestination = "sign-in") {
+    val isAuthenticated = (ctx.applicationContext as MyApplication).sessionManager.loadAuthToken() != null
+
+    NavHost(navController = navController, startDestination = if (isAuthenticated) Destination.Home.route else Destination.SignIn.route) {
 
         composable(Destination.SignIn.route) {
             SignInScreen(navController)
