@@ -46,4 +46,13 @@
     <string name="repetitions">repetitions</string>
     <string name="login_error_message">Check that the email and password are correct and verify that you have confirmed your email.</string>
     <string name="password">Password</string>
+    <string name="app_configuration">App Configuration</string>
+    <string name="home_screen">Home Screen</string>
+    <string name="show_recent_routines">Show recent routines</string>
+    <string name="routine_view">Routine View</string>
+    <string name="dropdowns_open">Dropdowns are open by default</string>
+    <string name="execution_mode">Routine Execution Mode</string>
+    <string name="execution_mode_text">Routines execute in this mode</string>
+    <string name="immersive_view">Immersive View</string>
+    <string name="detailed_view">Detailed View</string>
 </resources>

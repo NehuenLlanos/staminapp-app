@@ -20,8 +20,11 @@ import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.staminapp.R
+import com.staminapp.ui.main.Destination
 import com.staminapp.util.decodeBase64Image
 import com.staminapp.util.getProfileViewModelFactory
+import java.time.temporal.ChronoField
+import java.util.*
 
 @Composable
 fun ProfileScreen(
@@ -51,11 +54,23 @@ fun ProfileScreen(
                 UserImage(uiState)
                 UserNameTitle(uiState)
             }
+            Button(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(bottom = 16.dp),
+                onClick = {
+                    navController.navigate(Destination.AppConfig.route)
+                },
+                shape = RoundedCornerShape(50),
+                colors = ButtonDefaults.buttonColors(MaterialTheme.colors.primaryVariant),
+            ) {
+                Text(text= stringResource(R.string.app_configuration).uppercase())
+            }
             PersonalInfoText()
             Column(
                 Modifier
                     .fillMaxWidth()
-                    .padding(top = 12.dp, bottom = 40.dp),
+                    .padding(top = 16.dp, bottom = 8.dp),
                 verticalArrangement = Arrangement.spacedBy(8.dp, Alignment.CenterVertically)
             ) {
                 GenderTextField(Modifier.fillMaxWidth(), uiState)
@@ -86,6 +101,11 @@ fun UserImage(uiState: ProfileUiState) {
 
 @Composable
 fun UserNameTitle(uiState: ProfileUiState){
+    val calendar = Calendar.getInstance()
+    calendar.time = uiState.currentUser!!.birthdate!!
+
+    val age = Calendar.getInstance().get(Calendar.YEAR) - calendar.get(Calendar.YEAR)
+
     Column(
         verticalArrangement = Arrangement.Bottom
     ) {
@@ -98,7 +118,7 @@ fun UserNameTitle(uiState: ProfileUiState){
             maxLines = 2
         )
         Text(
-            uiState.currentUser.birthdate!!.year.toString() + " " + stringResource(R.string.years),
+            age.toString() + " " + stringResource(R.string.years),
             color = MaterialTheme.colors.primaryVariant,
             style = MaterialTheme.typography.subtitle1,
             overflow = TextOverflow.Ellipsis,
@@ -164,11 +184,18 @@ fun EMailTextField(modifier: Modifier, uiState: ProfileUiState){
 
 @Composable
 fun BirthdateTextField(modifier: Modifier, uiState: ProfileUiState) {
+    val calendar = Calendar.getInstance()
+    calendar.time = uiState.currentUser!!.birthdate!!
+
+    val string = String.format(
+        "%d-%02d-%02d",
+        calendar.get(Calendar.YEAR),
+        calendar.get(Calendar.MONTH),
+        calendar.get(Calendar.DAY_OF_MONTH)
+    )
     TextField(
         modifier = modifier,
-        value = uiState.currentUser!!.birthdate!!.year.toString() + "-" +
-                uiState.currentUser.birthdate!!.month.toString() + "-" +
-                uiState.currentUser.birthdate!!.day.toString(),
+        value = string,
         enabled = false,
         readOnly = true,
         onValueChange = {},
@@ -188,6 +215,6 @@ fun SignOutButton(viewModel: ProfileViewModel, navController: NavController) {
         shape = RoundedCornerShape(50),
         colors = ButtonDefaults.buttonColors(MaterialTheme.colors.error),
     ) {
-        Text(text= stringResource(R.string.logout))
+        Text(text= stringResource(R.string.logout).uppercase())
     }
 }
