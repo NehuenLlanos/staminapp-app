@@ -3,6 +3,7 @@ package com.staminapp.ui.execute
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Button
 import androidx.compose.material.ButtonDefaults
 import androidx.compose.material.MaterialTheme
@@ -49,7 +50,7 @@ fun StartExecutionScreen(
         ) {
             Column(
                 modifier = Modifier
-                    .fillMaxHeight(0.8f)
+                    .fillMaxHeight(0.6f)
                     .fillMaxWidth()
                     .padding(32.dp),
                 horizontalAlignment = Alignment.CenterHorizontally,
@@ -89,21 +90,24 @@ fun StartExecutionScreen(
                 )
             }
             Button(
-                modifier = Modifier,
-                colors = ButtonDefaults.buttonColors(backgroundColor = Color(0XFFFBD5D1)),
-                onClick = {
-                    navController.navigate(Destination.ExecutionRoutineScreen.createRoute(routineId = id))
-                }) {
-                Text(text = "Iniciar",
-                    color = MaterialTheme.colors.error,
+                modifier = Modifier.fillMaxWidth(0.5f),
+                colors = ButtonDefaults.buttonColors(backgroundColor = MaterialTheme.colors.primary),
+                shape = RoundedCornerShape(16.dp),
+                onClick = { navController.navigate(Destination.ExecutionRoutineScreen.createRoute(routineId = id)) }) {
+                Text(
+                    text = "Iniciar".uppercase(),
+                    color = Color.White,
                     style = MaterialTheme.typography.body2,
                 )
             }
+
             Button(
-                modifier = Modifier,
+                modifier = Modifier.fillMaxWidth(0.5f),
                 colors = ButtonDefaults.buttonColors(backgroundColor = Color(0XFFFBD5D1)),
+                shape = RoundedCornerShape(16.dp),
                 onClick = { navController.navigate(Destination.Routine.createRoute(routineId = id)) }) {
-                Text(text = "Cancelar",
+                Text(
+                    text = "Cancelar".uppercase(),
                     color = MaterialTheme.colors.error,
                     style = MaterialTheme.typography.body2,
                 )
