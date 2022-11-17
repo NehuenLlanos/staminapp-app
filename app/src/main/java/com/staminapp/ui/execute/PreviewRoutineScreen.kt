@@ -93,7 +93,7 @@ fun StartExecutionScreen(
                 modifier = Modifier.fillMaxWidth(0.5f),
                 colors = ButtonDefaults.buttonColors(backgroundColor = MaterialTheme.colors.primary),
                 shape = RoundedCornerShape(16.dp),
-                onClick = { navController.navigate(Destination.ExecutionRoutineScreen.createRoute(routineId = id)) }) {
+                onClick = { navController.navigate(Destination.ExecutionRoutineScreen2.createRoute(routineId = id)) }) {
                 Text(
                     text = "Iniciar".uppercase(),
                     color = Color.White,
