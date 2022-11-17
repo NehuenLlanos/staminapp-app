@@ -46,12 +46,11 @@
     <string name="login_error_message">Chequeá que el email y la contraseña sean correctos y verificá que hayas confirmado tu email.</string>
     <string name="password">Contraseña</string>
     <string name="app_configuration">Configuración de la app</string>
-    <string name="home_screen">Home Screen</string>
-    <string name="show_recent_routines">Show recent routines</string>
-    <string name="routine_view">Routine View</string>
-    <string name="dropdowns_open">Dropdowns are open by default</string>
-    <string name="execution_mode">Routine Execution Mode</string>
-    <string name="execution_mode_text">Routines execute in this mode</string>
-    <string name="immersive_view">Immersive View</string>
-    <string name="detailed_view">Detailed View</string>
+    <string name="home_screen">Página de inicio</string>
+    <string name="show_recent_routines">Mostrar las rutinas recientes</string>
+    <string name="routine_view">Vista de rutina</string>
+    <string name="dropdowns_open">Los despleguables están abiertos por defecto</string>
+    <string name="execution_mode">Modo de ejecución de rutinas</string>
+    <string name="immersive_view">Vista inmersiva</string>
+    <string name="detailed_view">Vista detallada</string>
 </resources>

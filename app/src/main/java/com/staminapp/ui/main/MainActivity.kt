@@ -177,7 +177,7 @@ fun NavigationAppHost(navController: NavHostController) {
             if (id == null || id == -1) {
                 Toast.makeText(ctx, "ERROR FATAL. Volver a correr la aplicación", Toast.LENGTH_SHORT).show()
             } else {
-                StartExecutionScreen(id, navController)
+                StartExecutionScreen(id, sessionManager.getExecutionMode(), navController)
             }
         }
 

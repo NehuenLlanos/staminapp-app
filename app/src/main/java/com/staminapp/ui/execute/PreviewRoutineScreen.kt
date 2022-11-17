@@ -34,6 +34,7 @@ import com.staminapp.util.decodeBase64Image
 @Composable
 fun StartExecutionScreen(
     id : Int = 1,
+    executionMode: Int = 0,
     navController: NavController,
     viewModel: ExecuteViewModel = viewModel ( factory = getExecuteViewModelFactory() )
 ) {
@@ -93,7 +94,13 @@ fun StartExecutionScreen(
                 modifier = Modifier.fillMaxWidth(0.5f),
                 colors = ButtonDefaults.buttonColors(backgroundColor = MaterialTheme.colors.primary),
                 shape = RoundedCornerShape(16.dp),
-                onClick = { navController.navigate(Destination.ExecutionRoutineScreen.createRoute(routineId = id)) }) {
+                onClick = {
+                    when (executionMode) {
+                        0 -> navController.navigate(Destination.ExecutionRoutineScreen.createRoute(routineId = id))
+                        1 -> navController.navigate(Destination.ExecutionRoutineScreen.createRoute(routineId = id))
+                    }
+                }
+            ) {
                 Text(
                     text = "Iniciar".uppercase(),
                     color = Color.White,

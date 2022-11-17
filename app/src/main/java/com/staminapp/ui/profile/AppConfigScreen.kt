@@ -9,7 +9,7 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
-import androidx.compose.runtime.Composable
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
@@ -25,6 +25,10 @@ fun AppConfigScreen(
     sessionManager: SessionManager,
     navController: NavController
 ) {
+    var showRecents by remember { mutableStateOf(sessionManager.getShowRecent()) }
+    var dropdownsOpen by remember { mutableStateOf(sessionManager.getDropdownsOpen()) }
+    var executionMode by remember { mutableStateOf(sessionManager.getExecutionMode()) }
+
     val executionOptions = listOf(
         stringResource(R.string.immersive_view),
         stringResource(R.string.detailed_view)
@@ -69,9 +73,10 @@ fun AppConfigScreen(
                     color = MaterialTheme.colors.primaryVariant
                 )
                 Switch(
-                    checked = sessionManager.getShowRecent(),
+                    checked = showRecents,
                     onCheckedChange = {
                         sessionManager.setShowRecent(it)
+                        showRecents = it
                     },
                     colors = SwitchDefaults.colors(MaterialTheme.colors.primary)
                 )
@@ -99,9 +104,10 @@ fun AppConfigScreen(
                     color = MaterialTheme.colors.primaryVariant
                 )
                 Switch(
-                    checked = sessionManager.getDropdownsOpen(),
+                    checked = dropdownsOpen,
                     onCheckedChange = {
                         sessionManager.setDropdownsOpen(it)
+                        dropdownsOpen = it
                     },
                     colors = SwitchDefaults.colors(MaterialTheme.colors.primary)
                 )
@@ -124,16 +130,17 @@ fun AppConfigScreen(
                         Modifier
                             .fillMaxWidth()
                             .selectable(
-                                selected = sessionManager.getExecutionMode() == index,
+                                selected = executionMode == index,
                                 onClick = {
                                     sessionManager.setExecutionMode(index)
+                                    executionMode = index
                                 },
                                 role = Role.RadioButton
                             ),
                         verticalAlignment = Alignment.CenterVertically
                     ) {
                         RadioButton(
-                            selected = sessionManager.getExecutionMode() == index,
+                            selected = executionMode == index,
                             onClick = null,
                             colors = RadioButtonDefaults.colors(MaterialTheme.colors.primary)
                         )

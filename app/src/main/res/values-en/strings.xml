@@ -52,7 +52,6 @@
     <string name="routine_view">Routine View</string>
     <string name="dropdowns_open">Dropdowns are open by default</string>
     <string name="execution_mode">Routine Execution Mode</string>
-    <string name="execution_mode_text">Routines execute in this mode</string>
     <string name="immersive_view">Immersive View</string>
     <string name="detailed_view">Detailed View</string>
 </resources>
