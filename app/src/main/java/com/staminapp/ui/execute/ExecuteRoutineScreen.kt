@@ -5,45 +5,34 @@ import androidx.compose.animation.core.*
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
-import androidx.compose.foundation.gestures.awaitFirstDown
 import androidx.compose.foundation.layout.*
-import androidx.compose.ui.Alignment
-import androidx.compose.ui.Modifier
-import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
 import androidx.compose.runtime.*
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.graphics.drawscope.Stroke
-import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.TextUnit
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
-import com.staminapp.R
-import com.staminapp.data.model.Cycle
 import com.staminapp.ui.main.Destination
 import com.staminapp.ui.main.RatingBar
-import com.staminapp.ui.theme.StaminappAppTheme
 import com.staminapp.util.decodeBase64Image
 import com.staminapp.util.getExecuteViewModelFactory
-import kotlinx.coroutines.coroutineScope
-import kotlinx.coroutines.launch
-import okhttp3.internal.wait
+import kotlinx.coroutines.*
 import java.util.concurrent.TimeUnit
 
 
@@ -59,37 +48,55 @@ fun Execution(
     }
     val uiState = viewModel.uiState
 
-    if (!uiState.isFetching && uiState.routine == null) {
-        viewModel.getRoutine(routineId)
-        viewModel.getCyclesForRoutine(routineId)
-    }
+    var ticks by remember { mutableStateOf(0) }
 
-    if (uiState.exercises.isEmpty() && uiState.cycles != null) {
-        uiState.cycles.forEach {
-            viewModel.getExercisesForCycle(it.id)
+    LaunchedEffect(Unit) {
+        while(true) {
+            delay(1000)
+            ticks++
         }
     }
 
 
+    if (!uiState.isFetching && uiState.routine == null) {
+        viewModel.getRoutine(routineId)
+//        viewModel.getCyclesForRoutine(routineId)
+    }
 
-    println("Recompose con " + viewModel.typeOfExecution.value.toString())
+//    if (uiState.exercises.isEmpty() && uiState.cycles != null) {
+//        uiState.cycles.forEach {
+//            viewModel.getExercisesForCycle(it.id)
+//        }
+//    }
+
 
     if (typeOfExecution == -1) {
-        if (uiState.routine != null && uiState.cycles != null && uiState.exercises.isNotEmpty()) {
-            val cycle = viewModel.uiState.cycles!!.get(viewModel.currentCycleIndex.value)
-            val exercise = viewModel.uiState.exercises!!.get(cycle.id)!!.get(viewModel.currentExerciseIndex.value)
+        if (uiState.routine != null && uiState.cycles != null && uiState.exercises.isNotEmpty() && !uiState.isAllFetching) {
 
-            if (exercise.duration != 0 && exercise.repetitions != 0) {
-                typeOfExecution = 0 // Time and Reps
-            } else if (exercise.duration == 0) {
-                typeOfExecution = 1 // Reps
-            } else {
-                typeOfExecution = 2 // Time
-            }
+                val cycle = viewModel.uiState.cycles!!.get(viewModel.currentCycleIndex.value)
+                val exercise = viewModel.uiState.exercises!!.get(cycle.id)!!.get(viewModel.currentExerciseIndex.value)
+
+
+
+                if (exercise.duration != 0 && exercise.repetitions != 0) {
+                    typeOfExecution = 0 // Time and Reps
+                } else if (exercise.duration == 0) {
+                    typeOfExecution = 1 // Reps
+                } else {
+                    typeOfExecution = 2 // Time
+                }
+
+
 
         }
     }
     else if (typeOfExecution == 0 && uiState.routine != null && uiState.cycles != null && uiState.exercises.isNotEmpty()) { // Time and Reps
+        var totalDivisions = 0
+        uiState.cycles.forEach {
+            totalDivisions += it.repetitions * uiState.exercises!!.get(it.id)!!.size
+        }
+        viewModel.setProgressBarInc(1/totalDivisions.toFloat())
+
         Column(modifier = Modifier
             .fillMaxHeight()
             .fillMaxWidth()
@@ -134,8 +141,7 @@ fun Execution(
             )
 
             uiState.routine!!.image?.let {
-                TopBarRoutineExecution(Modifier.padding(bottom = 16.dp),
-                    it, uiState.routine.name)
+                TopBarRoutineExecution(Modifier.padding(bottom = 16.dp),it, uiState.routine.name, viewModel.progressBar.value)
             }
             Column(
                 horizontalAlignment = Alignment.CenterHorizontally
@@ -231,6 +237,8 @@ fun Execution(
                         /* 1. Incrementar el indice indexExercises */
                         viewModel.setExerciseIndex(viewModel.currentExerciseIndex.value + 1)
 
+                        viewModel.setProgressBar()
+
                         val currentCycle = viewModel.uiState.cycles!!.get(viewModel.currentCycleIndex.value)
                         val exerciseQuantity = viewModel.uiState.exercises!!.get(currentCycle.id)!!.size
 
@@ -249,7 +257,7 @@ fun Execution(
                                 viewModel.setCycleIndex(viewModel.currentCycleIndex.value + 1)
                                 /* Verifico si llegue al final de mi rutina comparando el currentCycleIndex con la cantidad total de ciclos en el vector de ciclos*/
                                 if (viewModel.currentCycleIndex.value == viewModel.uiState.cycles!!.size) {
-                                    navController.navigate(Destination.ExecutionFinishedRoutine.createRoute(routineId = routineId))
+                                    navController.navigate(Destination.ExecutionFinishedRoutine.createRoute(routineId = routineId, totalTime = ticks))
                                     typeOfExecution = 9
                                 }
                                 else {
@@ -300,7 +308,8 @@ fun Execution(
 
 
                     }) {
-                    Text(text = "Finalizar Ejercicio".uppercase(),
+                    Text(
+                        text = "Finalizar Ejercicio".uppercase(),
                         color = MaterialTheme.colors.primaryVariant,
                         style = MaterialTheme.typography.body2,
                     )
@@ -310,9 +319,10 @@ fun Execution(
                     colors = ButtonDefaults.buttonColors(backgroundColor = Color(0XFFFBD5D1)),
                     shape = RoundedCornerShape(16.dp),
                     onClick = {
-                        navController.navigate(Destination.ExecutionFinishedRoutine.createRoute(routineId = routineId))
+                        navController.navigate(Destination.ExecutionFinishedRoutine.createRoute(routineId = routineId, totalTime = ticks))
                     }) {
-                    Text(text = "Finalizar Rutina".uppercase(),
+                    Text(
+                        text = "Finalizar Rutina".uppercase(),
                         color = MaterialTheme.colors.error,
                         style = MaterialTheme.typography.body2,
                     )
@@ -320,7 +330,13 @@ fun Execution(
             }
         }
     }
-    else if (typeOfExecution == 1 && uiState.routine != null && uiState.cycles != null && uiState.exercises.isNotEmpty()) { // Reps
+    else if (typeOfExecution == 1 && uiState.routine != null && uiState.cycles != null && uiState.exercises.isNotEmpty() ) { // Reps
+        var totalDivisions = 0
+        uiState.cycles.forEach {
+            totalDivisions += it.repetitions * uiState.exercises!!.get(it.id)!!.size
+        }
+        viewModel.setProgressBarInc(1/totalDivisions.toFloat())
+
         Column(modifier = Modifier
             .fillMaxHeight()
             .fillMaxWidth()
@@ -329,7 +345,7 @@ fun Execution(
         ) {
             uiState.routine.image?.let {
                 TopBarRoutineExecution(Modifier.padding(bottom = 16.dp),
-                    it, uiState.routine.name)
+                    it, uiState.routine.name, viewModel.progressBar.value)
             }
             Column(
                 horizontalAlignment = Alignment.CenterHorizontally
@@ -382,6 +398,8 @@ fun Execution(
                         /* 1. Incrementar el indice indexExercises */
                         viewModel.setExerciseIndex(viewModel.currentExerciseIndex.value + 1)
 
+                        viewModel.setProgressBar()
+
                         val currentCycle = viewModel.uiState.cycles!!.get(viewModel.currentCycleIndex.value)
                         val exerciseQuantity = viewModel.uiState.exercises!!.get(currentCycle.id)!!.size
 
@@ -400,7 +418,7 @@ fun Execution(
                                 viewModel.setCycleIndex(viewModel.currentCycleIndex.value + 1)
                                 /* Verifico si llegue al final de mi rutina comparando el currentCycleIndex con la cantidad total de ciclos en el vector de ciclos*/
                                 if (viewModel.currentCycleIndex.value == viewModel.uiState.cycles!!.size) {
-                                    navController.navigate(Destination.ExecutionFinishedRoutine.createRoute(routineId = routineId))
+                                    navController.navigate(Destination.ExecutionFinishedRoutine.createRoute(routineId = routineId, totalTime = ticks))
                                     typeOfExecution = 9
                                 }
                                 else {
@@ -448,7 +466,8 @@ fun Execution(
                             }
                         }
                     }) {
-                    Text(text = "Listo",
+                    Text(
+                        text = "Listo",
                         color = MaterialTheme.colors.primaryVariant,
                         style = MaterialTheme.typography.body2,
                     )
@@ -458,9 +477,10 @@ fun Execution(
                     colors = ButtonDefaults.buttonColors(backgroundColor = Color(0XFFFBD5D1)),
                     shape = RoundedCornerShape(16.dp),
                     onClick = {
-                        navController.navigate(Destination.ExecutionFinishedRoutine.createRoute(routineId = routineId))
+                        navController.navigate(Destination.ExecutionFinishedRoutine.createRoute(routineId = routineId, totalTime = ticks))
                     }) {
-                    Text(text = "Finalizar Rutina".uppercase(),
+                    Text(
+                        text = "Finalizar Rutina".uppercase(),
                         color = MaterialTheme.colors.error,
                         style = MaterialTheme.typography.body2,
                     )
@@ -469,6 +489,12 @@ fun Execution(
         }
     }
     else if (typeOfExecution == 2 && uiState.routine != null && uiState.cycles != null && uiState.exercises.isNotEmpty()) { // Time
+        var totalDivisions = 0
+        uiState.cycles.forEach {
+            totalDivisions += it.repetitions * uiState.exercises!!.get(it.id)!!.size
+        }
+        viewModel.setProgressBarInc(1/totalDivisions.toFloat())
+
         Column(modifier = Modifier
             .fillMaxHeight()
             .fillMaxWidth()
@@ -514,7 +540,7 @@ fun Execution(
             )
             uiState.routine!!.image?.let {
                 TopBarRoutineExecution(Modifier.padding(bottom = 16.dp),
-                    it, uiState.routine.name)
+                    it, uiState.routine.name, viewModel.progressBar.value)
             }
             Column(
                 horizontalAlignment = Alignment.CenterHorizontally
@@ -598,18 +624,28 @@ fun Execution(
                         /* 1. Incrementar el indice indexExercises */
                         viewModel.setExerciseIndex(viewModel.currentExerciseIndex.value + 1)
 
+                        viewModel.setProgressBar()
+
                         val currentCycle = viewModel.uiState.cycles!!.get(viewModel.currentCycleIndex.value)
                         val exerciseQuantity = viewModel.uiState.exercises!!.get(currentCycle.id)!!.size
 
                         println(viewModel.currentExerciseIndex.value.toString())
 
                         /* Si la cantidad de ejercicios del ciclo actual es igual al indexExercise */
-                        if (viewModel.currentExerciseIndex.value == exerciseQuantity) {
+                        if (viewModel.currentExerciseIndex.value >= exerciseQuantity) {
                             /* Incrmento las repeticiones del ciclo actual */
                             viewModel.setCycleReps(viewModel.currentCycleReps.value + 1)
 
+                            println("INDEX DEL CICLO DEL ORTO " + viewModel.currentCycleIndex.value.toString())
+
+                            println("CANTIDAD DE ELEMENTOS EN LA LISTA DE CICLOS DE MIERDA " + viewModel.uiState.cycles!!.size.toString())
+
+                            println("CANTIDAD DE CICLOS DE MIERDA QUE TENGO HASTA AHORA " + viewModel.currentCycleReps.value.toString())
+
+                            println("CANTIDAD DE CICLOS DE MIERDA QUE TENGO QUE HACER " + viewModel.uiState.cycles!!.get(viewModel.currentCycleIndex.value).repetitions.toString())
+
                             /* Si la cantidad de repeticiones del ciclo actual es igual a la cantidad de currentCycleReps */
-                            if (viewModel.currentCycleReps.value == currentCycle.repetitions) {
+                            if (viewModel.currentCycleReps.value >= currentCycle.repetitions) {
                                 println("ESTOY CUANDO HAY QUE VER SI LLEGUE AL FINAL O NO")
 
 
@@ -619,9 +655,9 @@ fun Execution(
                                 println("INDEX DEL CICLO DEL ORTO " + viewModel.currentCycleIndex.value.toString())
                                 println("CANTIDAD DE ELEMENTOS EN LA LISTA DE CICLOS DE MIERDA " + viewModel.uiState.cycles!!.size.toString())
                                 /* Verifico si llegue al final de mi rutina comparando el currentCycleIndex con la cantidad total de ciclos en el vector de ciclos*/
-                                if (viewModel.currentCycleIndex.value == viewModel.uiState.cycles!!.size) {
+                                if (viewModel.currentCycleIndex.value >= viewModel.uiState.cycles!!.size) {
                                     println("ENTRE LA CONCHA DE TU MADRE" + viewModel.uiState.cycles!!.size.toString())
-                                    navController.navigate(Destination.ExecutionFinishedRoutine.createRoute(routineId = routineId))
+                                    navController.navigate(Destination.ExecutionFinishedRoutine.createRoute(routineId = routineId, totalTime = ticks))
                                     typeOfExecution = 9
                                 }
                                 else {
@@ -670,7 +706,8 @@ fun Execution(
                             }
                         }
                     }) {
-                    Text(text = "Finalizar Ejercicio".uppercase(),
+                    Text(
+                        text = "Finalizar Ejercicio".uppercase(),
                         color = MaterialTheme.colors.primaryVariant,
                         style = MaterialTheme.typography.body2,
                     )
@@ -680,9 +717,10 @@ fun Execution(
                     colors = ButtonDefaults.buttonColors(backgroundColor = Color(0XFFFBD5D1)),
                     shape = RoundedCornerShape(16.dp),
                     onClick = {
-                        navController.navigate(Destination.ExecutionFinishedRoutine.createRoute(routineId = routineId))
+                        navController.navigate(Destination.ExecutionFinishedRoutine.createRoute(routineId = routineId, totalTime = ticks))
                     }) {
-                    Text(text = "Finalizar Rutina".uppercase(),
+                    Text(
+                        text = "Finalizar Rutina".uppercase(),
                         color = MaterialTheme.colors.error,
                         style = MaterialTheme.typography.body2,
                     )
@@ -697,6 +735,7 @@ fun Execution(
     } else if(typeOfExecution == 5) {
         typeOfExecution = 2
     }
+
 }
 
 
@@ -705,7 +744,12 @@ fun Execution(
 
 /* TopBar que aparece en todas las vistas de Ejecución de Rutina */
 @Composable
-fun TopBarRoutineExecution(modifier: Modifier, image : String, routineName : String) {
+fun TopBarRoutineExecution(
+    modifier: Modifier,
+    image : String,
+    routineName : String,
+    progress : Float
+) {
     Column(
         modifier = modifier,
         verticalArrangement = Arrangement.spacedBy(16.dp)
@@ -730,7 +774,7 @@ fun TopBarRoutineExecution(modifier: Modifier, image : String, routineName : Str
                 maxLines = 1
             )
         }
-        LinearProgressIndicator(progress = 0.3f, modifier = Modifier.fillMaxWidth())
+        LinearProgressIndicator(progress = progress, modifier = Modifier.fillMaxWidth())
     }
 }
 
@@ -806,7 +850,8 @@ fun ExercisePreview() {
                 colors = ButtonDefaults.buttonColors(backgroundColor = MaterialTheme.colors.primary),
                 shape = RoundedCornerShape(16.dp),
                 onClick = { /*TODO*/ }) {
-                Text(text = "Empezar",
+                Text(
+                    text = "Empezar",
                     color = MaterialTheme.colors.primaryVariant,
                     style = MaterialTheme.typography.body2,
                 )
@@ -836,7 +881,8 @@ fun ExercisePreview() {
                 colors = ButtonDefaults.buttonColors(backgroundColor = Color(0XFFFBD5D1)),
                 shape = RoundedCornerShape(16.dp),
                 onClick = { /*TODO*/ }) {
-                Text(text = "Finalizar Rutina",
+                Text(
+                    text = "Finalizar Rutina",
                     color = MaterialTheme.colors.error,
                     style = MaterialTheme.typography.body2,
                 )
@@ -954,7 +1000,8 @@ fun CircularProgressBar(
             }
 
         }) {
-        Text(text = "PARAR EL TIMER".uppercase(),
+        Text(
+            text = "PARAR EL TIMER".uppercase(),
             color = MaterialTheme.colors.error,
             style = MaterialTheme.typography.body2,
         )
@@ -1063,99 +1110,144 @@ fun CircularProgressBar(
 @Composable
 fun FinishedExecutionScreen (
     routineId : Int,
-    navController: NavController
+    totalTime : Int,
+    navController: NavController,
+    viewModel: ExecuteViewModel = viewModel(factory = getExecuteViewModelFactory())
 ){
-    Column(modifier = Modifier
-        .fillMaxHeight()
-        .fillMaxWidth()
-        .padding(horizontal = 16.dp, vertical = 16.dp),
-        horizontalAlignment = Alignment.CenterHorizontally
-    ) {
-//        TopBarRoutineExecution(Modifier.padding(bottom = 16.dp), uiState.routine.image, uiState.routine.name)
-        Column(
-            horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.spacedBy(16.dp, Alignment.CenterVertically)
-        ) {
-            Text(text = "¡Terminó!".uppercase(),
-                color = MaterialTheme.colors.primaryVariant,
-                fontSize = 40.sp,
-                fontWeight = FontWeight.Bold,
-                textAlign = TextAlign.Center,
-                overflow = TextOverflow.Ellipsis,
-                maxLines = 1
-            )
-            Column(
-                modifier = Modifier
-                    .height(120.dp)
-                    .width(264.dp)
-                    .fillMaxWidth()
-                    .padding(vertical = 4.dp, horizontal = 4.dp)
-                    .clip(shape = RoundedCornerShape(16.dp))
-                    .background(MaterialTheme.colors.primaryVariant),
-                horizontalAlignment = Alignment.CenterHorizontally,
-                verticalArrangement = Arrangement.spacedBy(4.dp, Alignment.CenterVertically),
-            ) {
-                Text(text = "01:23:43",
-                    color = MaterialTheme.colors.primary,
-                    fontSize = 32.sp,
-                    fontWeight = FontWeight.Bold,
-                    textAlign = TextAlign.Center,
-                    overflow = TextOverflow.Ellipsis,
-                    maxLines = 1
-                )
-                Text(text = "Tiempo Utilizado".uppercase(),
-                    color = MaterialTheme.colors.primary,
-                    fontSize = 15.sp,
-                    fontWeight = FontWeight.Bold,
-                    textAlign = TextAlign.Center,
-                    overflow = TextOverflow.Ellipsis,
-                    maxLines = 1
-                )
-            }
-            Column(
-                modifier = Modifier
-                    .height(120.dp)
-                    .width(264.dp)
-                    .fillMaxWidth()
-                    .padding(vertical = 4.dp, horizontal = 4.dp)
-                    .clip(shape = RoundedCornerShape(16.dp))
-                    .background(MaterialTheme.colors.primaryVariant),
-                horizontalAlignment = Alignment.CenterHorizontally,
-                verticalArrangement = Arrangement.spacedBy(8.dp, Alignment.CenterVertically),
-            ) {
-                Text(text = "Calificá la rutina",
-                    color = MaterialTheme.colors.primary,
-                    fontSize = 24.sp,
-                    fontWeight = FontWeight.Bold,
-                    textAlign = TextAlign.Center,
-                    overflow = TextOverflow.Ellipsis,
-                    maxLines = 1
-                )
-//                RatingBar(
-//                    rating = 2,
-//                    starsColor = MaterialTheme.colors.primary,
-//                    modifier = Modifier.padding(bottom = 2.dp)
-//                )
-            }
+    val uiState = viewModel.uiState
+    val sb = java.lang.StringBuilder()
+
+    if (!uiState.isFetching && uiState.routine == null) {
+        viewModel.getRoutine(routineId)
+    }
+
+    var hours = totalTime/3600
+    var minutes = totalTime/60
+    var seconds = totalTime
+    if (hours >= 1) {
+        minutes -= hours * 60
+        seconds -= hours * 3600
+        if (minutes % 60 >= 1) {
+            seconds -= minutes * 60
+        } else {
+            seconds -= hours * 3600
         }
-        Column(
-            modifier = Modifier
-                .padding(horizontal = 64.dp)
-                .fillMaxSize(),
-            verticalArrangement = Arrangement.spacedBy(8.dp, Alignment.CenterVertically),
+    } else {
+        if (minutes % 60 >= 1) {
+            seconds -= minutes * 60
+        }
+    }
+
+    val s = String.format("%02d : %02d : %02d", hours, minutes, seconds)
+
+    if (!uiState.isAllFetching && uiState.routine != null) {
+        Column(modifier = Modifier
+            .fillMaxHeight()
+            .fillMaxWidth()
+            .padding(horizontal = 16.dp, vertical = 16.dp),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            Button(
-                modifier = Modifier.fillMaxWidth(),
-                colors = ButtonDefaults.buttonColors(backgroundColor = MaterialTheme.colors.primary),
-                shape = RoundedCornerShape(16.dp),
-                onClick = {
-                    navController.navigate(Destination.Routine.createRoute(routineId = routineId))
-                }) {
-                Text(text = "Finalizar".uppercase(),
+        uiState.routine!!.image?.let {
+            TopBarRoutineExecution(Modifier.padding(bottom = 16.dp),
+                it, uiState.routine.name, 1f)
+        }
+            Column(
+                horizontalAlignment = Alignment.CenterHorizontally,
+                verticalArrangement = Arrangement.spacedBy(16.dp, Alignment.CenterVertically)
+            ) {
+                Text(text = "¡Terminó!".uppercase(),
                     color = MaterialTheme.colors.primaryVariant,
-                    style = MaterialTheme.typography.body2,
+                    fontSize = 40.sp,
+                    fontWeight = FontWeight.Bold,
+                    textAlign = TextAlign.Center,
+                    overflow = TextOverflow.Ellipsis,
+                    maxLines = 1
                 )
+                Column(
+                    modifier = Modifier
+                        .height(120.dp)
+                        .width(264.dp)
+                        .fillMaxWidth()
+                        .padding(vertical = 4.dp, horizontal = 4.dp)
+                        .clip(shape = RoundedCornerShape(16.dp))
+                        .background(MaterialTheme.colors.primaryVariant),
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    verticalArrangement = Arrangement.spacedBy(4.dp, Alignment.CenterVertically),
+                ) {
+                    Text(text = s,
+//                    sb.append(hours.toString())
+//                        .append(":")
+//                        .append(minutes.toString())
+//                        .append(":")
+//                        .append(
+//                            seconds.
+//                            seconds.toString()
+//                        ).toString(),
+                        color = MaterialTheme.colors.primary,
+                        fontSize = 32.sp,
+                        fontWeight = FontWeight.Bold,
+                        textAlign = TextAlign.Center,
+                        overflow = TextOverflow.Ellipsis,
+                        maxLines = 1
+                    )
+                    Text(text = "Tiempo estimado".uppercase() ,
+                        color = MaterialTheme.colors.primary,
+                        fontSize = 15.sp,
+                        fontWeight = FontWeight.Bold,
+                        textAlign = TextAlign.Center,
+                        overflow = TextOverflow.Ellipsis,
+                        maxLines = 1
+                    )
+                }
+                Column(
+                    modifier = Modifier
+                        .height(120.dp)
+                        .width(264.dp)
+                        .fillMaxWidth()
+                        .padding(vertical = 4.dp, horizontal = 4.dp)
+                        .clip(shape = RoundedCornerShape(16.dp))
+                        .background(MaterialTheme.colors.primaryVariant),
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    verticalArrangement = Arrangement.spacedBy(8.dp, Alignment.CenterVertically),
+                ) {
+                    Text(text = "Calificá la rutina",
+                        color = MaterialTheme.colors.primary,
+                        fontSize = 24.sp,
+                        fontWeight = FontWeight.Bold,
+                        textAlign = TextAlign.Center,
+                        overflow = TextOverflow.Ellipsis,
+                        maxLines = 1
+                    )
+                    RatingBar(
+                        rating = uiState.routine.score,
+                        starsColor = MaterialTheme.colors.primary,
+                        modifier = Modifier.padding(bottom = 2.dp),
+                        rate = {
+                            viewModel.rate(routineId, it)
+                        }
+                    )
+                }
+            }
+            Column(
+                modifier = Modifier
+                    .padding(horizontal = 64.dp)
+                    .fillMaxSize(),
+                verticalArrangement = Arrangement.spacedBy(8.dp, Alignment.CenterVertically),
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
+                Button(
+                    modifier = Modifier.fillMaxWidth(),
+                    colors = ButtonDefaults.buttonColors(backgroundColor = MaterialTheme.colors.primary),
+                    shape = RoundedCornerShape(16.dp),
+                    onClick = {
+                        navController.navigate(Destination.Routine.createRoute(routineId = routineId))
+                    }) {
+                    Text(
+                        text = "Finalizar".uppercase(),
+                        color = Color.White,
+                        style = MaterialTheme.typography.body2,
+                    )
+                }
             }
         }
     }

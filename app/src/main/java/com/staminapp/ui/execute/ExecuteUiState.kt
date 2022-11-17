@@ -6,6 +6,7 @@ import com.staminapp.data.model.Routine
 
 data class ExecuteUiState (
     val isFetching: Boolean = false,
+    val isAllFetching: Boolean = false,
     val message: String? = null,
 
     val routine : Routine? = null,

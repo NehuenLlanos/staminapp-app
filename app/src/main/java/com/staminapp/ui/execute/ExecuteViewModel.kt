@@ -24,11 +24,18 @@ class ExecuteViewModel (
     var uiState by mutableStateOf(ExecuteUiState())
         private set
 
-    private val _typeOfExecution = MutableStateFlow(-1)
-    val typeOfExecution = _typeOfExecution.asStateFlow()
+    private val _progressBar = MutableStateFlow(0f)
+    val progressBar = _progressBar.asStateFlow()
 
-    fun setTypeExecution(index: Int) {
-        _typeOfExecution.value = index
+    fun setProgressBar() {
+        _progressBar.value += _progressBarInc.value
+    }
+
+    private val _progressBarInc = MutableStateFlow(0f)
+    val progressBarInc = _progressBarInc.asStateFlow()
+
+    fun setProgressBarInc(value: Float) {
+        _progressBarInc.value = value
     }
 
     private val _currentCycleReps = MutableStateFlow(0)
@@ -57,6 +64,7 @@ class ExecuteViewModel (
 
     fun getRoutine(id: Int) = viewModelScope.launch {
         uiState = uiState.copy(
+            isAllFetching = true,
             isFetching = true,
             message = null
         )
@@ -67,6 +75,7 @@ class ExecuteViewModel (
                 isFetching = false,
                 routine = response
             )
+            getCyclesForRoutine(id)
         }.onFailure { e ->
             // Handle the error and notify the UI when appropriate.
             uiState = uiState.copy(
@@ -86,6 +95,12 @@ class ExecuteViewModel (
             uiState = uiState.copy(
                 isFetching = false,
                 cycles = response
+            )
+            response.forEach {
+                getExercisesForCycle(it.id)
+            }
+            uiState = uiState.copy(
+                isAllFetching = false,
             )
         }.onFailure { e ->
             // Handle the error and notify the UI when appropriate.
