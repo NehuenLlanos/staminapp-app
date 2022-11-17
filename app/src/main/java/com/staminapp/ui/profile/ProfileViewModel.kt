@@ -6,10 +6,10 @@ import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.navigation.NavController
-import com.staminapp.Destination
 import com.staminapp.data.repository.RoutineRepository
 import com.staminapp.data.repository.UserRepository
 import com.staminapp.ui.explore.ExploreUiState
+import com.staminapp.ui.main.Destination
 import com.staminapp.util.SessionManager
 import kotlinx.coroutines.launch
 
@@ -53,12 +53,8 @@ class ProfileViewModel (
                 isFetching = false,
                 currentUser = null,
             )
-            // The following code erase history navigation
-            navController.navigate(Destination.SignIn.route) {
-                popUpTo(Destination.SignIn.route) {
-                    inclusive = true
-                }
-            }
+            navController.backQueue.clear()
+            navController.navigate(Destination.SignIn.route)
         }.onFailure { e ->
             // Handle the error and notify the UI when appropriate.
             uiState = uiState.copy(

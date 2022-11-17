@@ -25,7 +25,7 @@ import androidx.navigation.NavController
 import com.staminapp.ui.theme.Gray
 import androidx.compose.material.Icon as Icon
 import androidx.lifecycle.viewmodel.compose.viewModel
-import com.staminapp.Destination
+import com.staminapp.ui.main.Destination
 import com.staminapp.data.model.Exercise
 import com.staminapp.ui.main.CustomChip
 import com.staminapp.ui.main.RatingBar
