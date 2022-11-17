@@ -135,3 +135,17 @@ fun RoutineCard(navController: NavController, routine: Routine, modifier: Modifi
         }
     }
 }
+
+@Composable
+fun LoadingIndicator() {
+    Box(
+        modifier = Modifier
+            .fillMaxSize(),
+        contentAlignment = Alignment.Center
+    ) {
+        CircularProgressIndicator(
+            color = MaterialTheme.colors.primaryVariant,
+            strokeWidth = 6.dp
+        )
+    }
+}
