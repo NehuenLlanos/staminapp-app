@@ -1,5 +1,6 @@
 package com.staminapp.ui.main
 
+import android.content.Intent
 import android.os.Bundle
 import android.widget.Toast
 import androidx.activity.ComponentActivity
@@ -10,9 +11,12 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.navigation.NavHostController
+import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import androidx.navigation.navArgument
+import androidx.navigation.navDeepLink
 import com.staminapp.MyApplication
 import com.staminapp.ui.execute.*
 import com.staminapp.ui.explore.ExploreScreen
@@ -30,7 +34,7 @@ sealed class Destination(val route: String) {
     object Explore: Destination("explore")
     object Profile: Destination("profile")
 
-    object Routine: Destination("routine/{elementId}") {
+    object Routine: Destination("routine/{id}") {
         fun createRoute(routineId: Int) = "routine/$routineId"
     }
 
@@ -98,12 +102,38 @@ fun NavigationAppHost(navController: NavHostController) {
             }
         }
 
-        composable(Destination.Routine.route) { navBackStackEntry ->
-            val elementId = navBackStackEntry.arguments?.getString("elementId")
-            if (elementId == null) {
+        composable(
+            route = Destination.Routine.route,
+            deepLinks = listOf(
+                navDeepLink {
+                    uriPattern = "https://www.staminapp.com/routine/{id}"
+                    action = Intent.ACTION_VIEW
+                },
+                navDeepLink {
+                    uriPattern = "https://staminapp.com/routine/{id}"
+                    action = Intent.ACTION_VIEW
+                },
+                navDeepLink {
+                    uriPattern = "http://www.staminapp.com/routine/{id}"
+                    action = Intent.ACTION_VIEW
+                },
+                navDeepLink {
+                    uriPattern = "http://staminapp.com/routine/{id}"
+                    action = Intent.ACTION_VIEW
+                }
+            ),
+            arguments = listOf(
+                navArgument("id") {
+                    type = NavType.IntType
+                    defaultValue = -1
+                }
+            )
+        ) { entry ->
+            val id = entry.arguments?.getInt("id")
+            if (id == null || id == -1) {
                 Toast.makeText(ctx, "ERROR FATAL. Volver a correr la aplicación", Toast.LENGTH_SHORT).show()
             } else {
-                RoutineScreen(elementId.toInt(), navController)
+                RoutineScreen(id, navController)
             }
         }
 
