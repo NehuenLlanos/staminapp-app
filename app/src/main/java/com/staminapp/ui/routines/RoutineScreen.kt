@@ -28,6 +28,7 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import com.staminapp.ui.main.Destination
 import com.staminapp.data.model.Exercise
 import com.staminapp.ui.main.CustomChip
+import com.staminapp.ui.main.LoadingIndicator
 import com.staminapp.ui.main.RatingBar
 import com.staminapp.util.decodeBase64Image
 import com.staminapp.util.getRoutineViewModelFactory
@@ -36,6 +37,7 @@ import com.staminapp.util.translateDifficultyForApp
 @Composable
 fun RoutineScreen(
     routineId: Int,
+    isAuthenticated: Boolean = true,
     navController: NavController,
     viewModel: RoutineViewModel = viewModel(factory = getRoutineViewModelFactory())
 ) {
@@ -115,118 +117,143 @@ fun RoutineScreen(
             )
         }
     ) { paddingValues ->
-        LazyColumn(
-            modifier = Modifier
-                .padding(paddingValues)
-                .fillMaxWidth()
-                .padding(16.dp)
-        ) {
-            if (uiState.routine == null) {
-                item {
-                    CircularProgressIndicator(
-                        color = MaterialTheme.colors.primaryVariant,
-                        strokeWidth = 6.dp
-                    )
-                }
-            } else {
-                item {
+        if (!isAuthenticated) {
+            AlertDialog(
+                onDismissRequest = {},
+                buttons = {
                     Row(
-                        verticalAlignment = Alignment.Bottom,
-                        horizontalArrangement = Arrangement.spacedBy(16.dp)
+                        modifier = Modifier
+                            .padding(all = 8.dp)
+                            .fillMaxWidth(),
+                        horizontalArrangement = Arrangement.End
                     ) {
-                        Image(
-                            bitmap = decodeBase64Image(uiState.routine.image).asImageBitmap(),
-                            contentDescription = "Imagen de Rutina",
-                            contentScale = ContentScale.Crop,
-                            modifier = Modifier
-                                .fillMaxWidth(0.4f)
-                                .aspectRatio(1f / 1f)
-                                .clip(RoundedCornerShape(10))
-                        )
-                        Column(
-                            horizontalAlignment = Alignment.End
+                        Button(
+                            onClick = {
+                                navController.navigate(Destination.SignIn.route)
+                            }
                         ) {
-                            CustomChip(
-                                selected = false,
-                                text = translateDifficultyForApp(uiState.routine.difficulty)
-                            )
-                            Text(
-                                uiState.routine.name.uppercase(),
-                                style = MaterialTheme.typography.h2,
-                                lineHeight = 42.sp,
-                                maxLines = 3,
-                                overflow = TextOverflow.Ellipsis,
-                                color = MaterialTheme.colors.primaryVariant
-                            )
+                            Text("Iniciar sesión")
                         }
                     }
-                    Spacer(modifier = Modifier.height(8.dp))
-                    Row(
-                        modifier = Modifier.fillMaxWidth(),
-                        horizontalArrangement = Arrangement.SpaceBetween,
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
-                        Text("Calificación",
-                            style = MaterialTheme.typography.subtitle1,
-                            color = MaterialTheme.colors.primaryVariant
-                        )
-                        RatingBar(
-                            rating = uiState.routine.score,
-                            starsColor = MaterialTheme.colors.primary,
-                            modifier = Modifier.padding(bottom = 2.dp),
-                            rate = {
-                                viewModel.rate(routineId, it)
-                            }
-                        )
-                    }
-                    Row(
-                        horizontalArrangement = Arrangement.SpaceBetween,
-                        verticalAlignment = Alignment.CenterVertically,
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .clickable {
-                                isDescriptionOpen = !isDescriptionOpen
-                            }
-                    ) {
-                        Text("Descripción",
-                            style = MaterialTheme.typography.subtitle1,
-                            color = MaterialTheme.colors.primaryVariant
-                        )
-                        Icon(
-                            when {
-                                isDescriptionOpen -> Icons.Filled.ExpandLess
-                                else -> Icons.Filled.ExpandMore
-                            },
-                            contentDescription = null,
-                            tint = MaterialTheme.colors.primaryVariant
-                        )
-                    }
-                    if (isDescriptionOpen) {
-                        Text(
-                            uiState.routine.detail,
-                            color = MaterialTheme.colors.primaryVariant,
-                            style = MaterialTheme.typography.body1
-                        )
-
-                    }
-                    Spacer(modifier = Modifier
-                        .padding(top = 8.dp)
-                        .height(4.dp)
-                        .fillMaxWidth()
-                        .background(Gray))
-                    Text("Ciclos",
-                        style = MaterialTheme.typography.subtitle1,
-                        color = MaterialTheme.colors.primaryVariant,
-                        modifier = Modifier.padding(bottom = 8.dp)
-                    )
+                },
+                title = {
+                    Text("Error")
+                },
+                text = {
+                    Text("Debés iniciar sesión antes de ver la rutina. Autenticate y volvé a intentarlo.")
                 }
-                items(uiState.cycles!!) {
-                    Cycle(
-                        title = it.name,
-                        repetitions = it.repetitions,
-                        exercises = uiState.exercises.getOrDefault(it.id, listOf()),
-                        modifier = Modifier.padding(bottom = 8.dp)
-                    )
+            )
+        } else {
+            LazyColumn(
+                modifier = Modifier
+                    .padding(paddingValues)
+                    .fillMaxWidth()
+                    .padding(16.dp)
+            ) {
+                if (uiState.routine == null) {
+                    item {
+                        LoadingIndicator()
+                    }
+                } else {
+                    item {
+                        Row(
+                            verticalAlignment = Alignment.Bottom,
+                            horizontalArrangement = Arrangement.spacedBy(16.dp)
+                        ) {
+                            Image(
+                                bitmap = decodeBase64Image(uiState.routine.image).asImageBitmap(),
+                                contentDescription = "Imagen de Rutina",
+                                contentScale = ContentScale.Crop,
+                                modifier = Modifier
+                                    .fillMaxWidth(0.4f)
+                                    .aspectRatio(1f / 1f)
+                                    .clip(RoundedCornerShape(10))
+                            )
+                            Column(
+                                horizontalAlignment = Alignment.End
+                            ) {
+                                CustomChip(
+                                    selected = false,
+                                    text = translateDifficultyForApp(uiState.routine.difficulty)
+                                )
+                                Text(
+                                    uiState.routine.name.uppercase(),
+                                    style = MaterialTheme.typography.h2,
+                                    lineHeight = 42.sp,
+                                    maxLines = 3,
+                                    overflow = TextOverflow.Ellipsis,
+                                    color = MaterialTheme.colors.primaryVariant
+                                )
+                            }
+                        }
+                        Spacer(modifier = Modifier.height(8.dp))
+                        Row(
+                            modifier = Modifier.fillMaxWidth(),
+                            horizontalArrangement = Arrangement.SpaceBetween,
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            Text("Calificación",
+                                style = MaterialTheme.typography.subtitle1,
+                                color = MaterialTheme.colors.primaryVariant
+                            )
+                            RatingBar(
+                                rating = uiState.routine.score,
+                                starsColor = MaterialTheme.colors.primary,
+                                modifier = Modifier.padding(bottom = 2.dp),
+                                rate = {
+                                    viewModel.rate(routineId, it)
+                                }
+                            )
+                        }
+                        Row(
+                            horizontalArrangement = Arrangement.SpaceBetween,
+                            verticalAlignment = Alignment.CenterVertically,
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .clickable {
+                                    isDescriptionOpen = !isDescriptionOpen
+                                }
+                        ) {
+                            Text("Descripción",
+                                style = MaterialTheme.typography.subtitle1,
+                                color = MaterialTheme.colors.primaryVariant
+                            )
+                            Icon(
+                                when {
+                                    isDescriptionOpen -> Icons.Filled.ExpandLess
+                                    else -> Icons.Filled.ExpandMore
+                                },
+                                contentDescription = null,
+                                tint = MaterialTheme.colors.primaryVariant
+                            )
+                        }
+                        if (isDescriptionOpen) {
+                            Text(
+                                uiState.routine.detail,
+                                color = MaterialTheme.colors.primaryVariant,
+                                style = MaterialTheme.typography.body1
+                            )
+
+                        }
+                        Spacer(modifier = Modifier
+                            .padding(top = 8.dp)
+                            .height(4.dp)
+                            .fillMaxWidth()
+                            .background(Gray))
+                        Text("Ciclos",
+                            style = MaterialTheme.typography.subtitle1,
+                            color = MaterialTheme.colors.primaryVariant,
+                            modifier = Modifier.padding(bottom = 8.dp)
+                        )
+                    }
+                    items(uiState.cycles!!) {
+                        Cycle(
+                            title = it.name,
+                            repetitions = it.repetitions,
+                            exercises = uiState.exercises.getOrDefault(it.id, listOf()),
+                            modifier = Modifier.padding(bottom = 8.dp)
+                        )
+                    }
                 }
             }
         }
