@@ -30,7 +30,10 @@ import com.staminapp.ui.theme.StaminappAppTheme
 
 
 sealed class Destination(val route: String) {
-    object SignIn: Destination("sign-in")
+    object SignIn: Destination("sign-in?after={after}") {
+        fun withoutAfter() = "sign-in?after="
+        fun withAfter(after: String) = "sign-in?after=$after"
+    }
 
     object Home: Destination("home")
     object Explore: Destination("explore")
@@ -69,12 +72,20 @@ class MainActivity : ComponentActivity() {
 fun NavigationAppHost(navController: NavHostController) {
     val ctx = LocalContext.current
 
-    val isAuthenticated = (ctx.applicationContext as MyApplication).sessionManager.loadAuthToken() != null
+    var isAuthenticated = (ctx.applicationContext as MyApplication).sessionManager.loadAuthToken() != null
 
     NavHost(navController = navController, startDestination = if (isAuthenticated) Destination.Home.route else Destination.SignIn.route) {
 
-        composable(Destination.SignIn.route) {
-            SignInScreen(navController)
+        composable(
+            route = Destination.SignIn.route,
+            arguments = listOf(
+                navArgument("after") {
+                    type = NavType.StringType
+                    nullable
+                }
+            )
+        ) {
+            SignInScreen(it.arguments?.getString("after"), navController)
         }
 
         composable(Destination.Home.route) {
@@ -130,11 +141,12 @@ fun NavigationAppHost(navController: NavHostController) {
                     defaultValue = -1
                 }
             )
-        ) { entry ->
-            val id = entry.arguments?.getInt("id")
+        ) {
+            val id = it.arguments?.getInt("id")
             if (id == null || id == -1) {
                 Toast.makeText(ctx, stringResource(R.string.fatal_error_navigation), Toast.LENGTH_SHORT).show()
             } else {
+                isAuthenticated = (ctx.applicationContext as MyApplication).sessionManager.loadAuthToken() != null
                 RoutineScreen(id, isAuthenticated, navController)
             }
         }

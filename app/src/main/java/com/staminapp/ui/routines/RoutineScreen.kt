@@ -131,7 +131,7 @@ fun RoutineScreen(
                     ) {
                         Button(
                             onClick = {
-                                navController.navigate(Destination.SignIn.route)
+                                navController.navigate(Destination.SignIn.withAfter(Destination.Routine.createRoute(routineId)))
                             }
                         ) {
                             Text(stringResource(R.string.login))
