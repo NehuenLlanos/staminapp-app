@@ -45,12 +45,17 @@ sealed class Destination(val route: String) {
         fun createRoute(routineId: Int) = "routine/$routineId"
     }
 
-    object ExecuteRoutine: Destination("routine/execute")
-    object ExercisePreview: Destination("routine/execute/exercise-preview")
-    object ExerciseScreenTime: Destination("routine/execute/exercise")
-    object ExerciseScreenReps: Destination("routine/execute/exercise-reps")
-    object ExerciseScreenRepsAndTime: Destination("routine/execute/exercise-reps-and-time")
-    object ExerciseScreenFinished: Destination("routine/execute/exercise-finished")
+    object ExecutionPreviewRoutine: Destination("routine/execute/{id}") {
+        fun createRoute(routineId: Int) = "routine/execute/$routineId"
+    }
+    object ExecutionRoutineScreen: Destination("routine/execute/exercise-preview/{id}") {
+        fun createRoute(routineId: Int) = "routine/execute/exercise-preview/$routineId"
+    }
+
+    object ExecutionFinishedRoutine: Destination("routine/execute/routine-finished/{id}/{totalTime}") {
+        fun createRoute(routineId: Int, totalTime : Int) = "routine/execute/routine-finished/$routineId/$totalTime"
+    }
+
 }
 
 class MainActivity : ComponentActivity() {
@@ -161,13 +166,54 @@ fun NavigationAppHost(navController: NavHostController) {
             }
         }
 
-        composable(Destination.ExecuteRoutine.route) {
-            StartExecutionScreen()
+        composable(route = Destination.ExecutionPreviewRoutine.route,
+            arguments = listOf(
+                navArgument("id") {
+                    type = NavType.IntType
+                    defaultValue = -1
+                }
+        )) { entry ->
+            val id = entry.arguments?.getInt("id")
+            if (id == null || id == -1) {
+                Toast.makeText(ctx, "ERROR FATAL. Volver a correr la aplicación", Toast.LENGTH_SHORT).show()
+            } else {
+                StartExecutionScreen(id, navController)
+            }
         }
-        composable(Destination.ExercisePreview.route) { ExercisePreview() }
-        composable(Destination.ExerciseScreenTime.route) { ExerciseScreenTime() }
-        composable(Destination.ExerciseScreenReps.route) { ExerciseScreenReps() }
-        composable(Destination.ExerciseScreenRepsAndTime.route) { ExerciseScreenRepsAndTime() }
-        composable(Destination.ExerciseScreenFinished.route) { ExerciseScreenFinished() }
+
+        composable(route = Destination.ExecutionRoutineScreen.route,
+            arguments = listOf(
+                navArgument("id") {
+                    type = NavType.IntType
+                    defaultValue = -1
+                }
+            )) { entry ->
+            val id = entry.arguments?.getInt("id")
+            if (id == null || id == -1) {
+                Toast.makeText(ctx, "ERROR FATAL. Volver a correr la aplicación", Toast.LENGTH_SHORT).show()
+            } else {
+                Execution(id, navController)
+            }
+        }
+
+        composable(route = Destination.ExecutionFinishedRoutine.route,
+            arguments = listOf(
+                navArgument("id") {
+                    type = NavType.IntType
+                    defaultValue = -1
+                },
+                navArgument("totalTime") {
+                    type = NavType.IntType
+                    defaultValue = -1
+                }
+            )) { entry ->
+            val id = entry.arguments?.getInt("id")
+            val totalTime = entry.arguments?.getInt("totalTime")
+            if (id == null || id == -1 || totalTime == null) {
+                Toast.makeText(ctx, "ERROR FATAL. Volver a correr la aplicación", Toast.LENGTH_SHORT).show()
+            } else {
+                FinishedExecutionScreen(id, totalTime, navController)
+            }
+        }
     }
 }

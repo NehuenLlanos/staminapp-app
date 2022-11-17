@@ -29,6 +29,7 @@ import com.staminapp.ui.main.Destination
 import com.staminapp.R
 import com.staminapp.data.model.Routine
 import com.staminapp.ui.execute.ExecuteViewModel
+import com.staminapp.ui.execute.Execution
 import com.staminapp.ui.profile.ProfileScreen
 import com.staminapp.ui.explore.ExploreScreen
 import com.staminapp.ui.main.LoadingIndicator
