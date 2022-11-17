@@ -8,6 +8,7 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Block
 import androidx.compose.material.icons.filled.Star
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -21,6 +22,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import com.staminapp.R
 import com.staminapp.data.model.Routine
@@ -149,5 +151,62 @@ fun LoadingIndicator() {
             color = MaterialTheme.colors.primaryVariant,
             strokeWidth = 6.dp
         )
+    }
+}
+
+@Composable
+fun ApiErrorDialog(
+    action : () -> Unit
+) {
+    AlertDialog(
+        onDismissRequest = {},
+        buttons = {
+            Row(
+                modifier = Modifier
+                    .padding(all = 8.dp)
+                    .fillMaxWidth(),
+                horizontalArrangement = Arrangement.End
+            ) {
+                Button(
+                    onClick = {
+                        action()
+                    }
+                ) {
+                    Text(stringResource(R.string.try_again))
+                }
+            }
+        },
+        title = {
+            Text(stringResource(R.string.error))
+        },
+        text = {
+            Text(stringResource(R.string.api_error_message))
+        }
+    )
+}
+
+@Composable
+fun EmptyRoutineList() {
+    Box(
+        modifier = Modifier
+            .fillMaxSize(),
+        contentAlignment = Alignment.Center
+    ) {
+        Column (
+           horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+            Icon(
+                Icons.Filled.Block,
+                contentDescription = null,
+                tint = Gray,
+                modifier = Modifier.size(50.dp)
+            )
+            Text(
+                stringResource(R.string.empty_routine_list).uppercase(),
+                style = MaterialTheme.typography.h1,
+                fontSize = 24.sp,
+                color = Gray
+            )
+        }
     }
 }

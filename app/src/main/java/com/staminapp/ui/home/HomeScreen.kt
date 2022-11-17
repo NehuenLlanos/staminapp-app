@@ -25,15 +25,13 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import androidx.lifecycle.viewmodel.compose.viewModel
-import com.staminapp.ui.main.Destination
 import com.staminapp.R
 import com.staminapp.data.model.Routine
 import com.staminapp.ui.execute.ExecuteViewModel
 import com.staminapp.ui.execute.Execution
 import com.staminapp.ui.profile.ProfileScreen
 import com.staminapp.ui.explore.ExploreScreen
-import com.staminapp.ui.main.LoadingIndicator
-import com.staminapp.ui.main.RoutineCard
+import com.staminapp.ui.main.*
 import com.staminapp.util.*
 
 
@@ -50,19 +48,32 @@ fun HomeScreen(
         viewModel.getFavourites()
     }
 
-    LazyVerticalGrid(
-        modifier = modifier
-            .fillMaxWidth()
-            .padding(16.dp),
-        columns = GridCells.Adaptive(minSize = 160.dp),
-        verticalArrangement = Arrangement.spacedBy(16.dp),
-        horizontalArrangement = Arrangement.spacedBy(16.dp)
-    ) {
-        if (uiState.routines == null && uiState.favouriteRoutines == null) {
-            item {
-                LoadingIndicator()
-            }
-        } else {
+    if (uiState.message != null) {
+        ApiErrorDialog {
+            viewModel.getUserRoutines()
+            viewModel.getFavourites()
+        }
+    } else if (uiState.routines == null || uiState.favouriteRoutines == null) {
+        Box(
+            modifier = Modifier.fillMaxSize()
+        ) {
+            LoadingIndicator()
+        }
+    } else if (uiState.routines.isEmpty() && uiState.favouriteRoutines.isEmpty()) {
+        Box(
+            modifier = Modifier.fillMaxSize()
+        ) {
+            EmptyRoutineList()
+        }
+    } else {
+        LazyVerticalGrid(
+            modifier = modifier
+                .fillMaxSize()
+                .padding(16.dp),
+            columns = GridCells.Adaptive(minSize = 160.dp),
+            verticalArrangement = Arrangement.spacedBy(16.dp),
+            horizontalArrangement = Arrangement.spacedBy(16.dp)
+        ) {
             item(span = {
                 GridItemSpan(maxLineSpan)
             }) {
@@ -73,7 +84,7 @@ fun HomeScreen(
                 )
             }
             if (showRecent) {
-                if (uiState.routines != null && uiState.routines.isNotEmpty()) {
+                if (uiState.routines.isNotEmpty()) {
                     item(span = {
                         GridItemSpan(maxLineSpan)
                     }) {
@@ -108,12 +119,8 @@ fun HomeScreen(
                 }
             }
             val list = mutableListOf<Routine>()
-            if (uiState.routines != null) {
-                list.addAll(uiState.routines)
-            }
-            if (uiState.favouriteRoutines != null) {
-                list.addAll(uiState.favouriteRoutines)
-            }
+            list.addAll(uiState.routines)
+            list.addAll(uiState.favouriteRoutines)
             items(list) {
                 RoutineCard(navController = navController, it)
             }

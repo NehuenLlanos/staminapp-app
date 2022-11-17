@@ -1,7 +1,9 @@
 package com.staminapp.util
 
+import android.content.Context
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
+import android.net.ConnectivityManager
 import android.os.Bundle
 import android.util.Base64
 import androidx.compose.runtime.Composable
@@ -108,4 +110,9 @@ fun getDifficultyApiStringFromIndex(index: Int): String {
     )
 
     return dict.getOrDefault(index, "")
+}
+
+fun isConnected(context: Context) : Boolean {
+    val cm = context.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
+    return cm.isDefaultNetworkActive
 }

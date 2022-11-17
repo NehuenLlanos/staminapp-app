@@ -27,12 +27,9 @@ import com.staminapp.ui.theme.Gray
 import androidx.compose.material.Icon as Icon
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.staminapp.R
-import com.staminapp.ui.main.Destination
 import com.staminapp.data.model.Exercise
 import com.staminapp.data.model.Routine
-import com.staminapp.ui.main.CustomChip
-import com.staminapp.ui.main.LoadingIndicator
-import com.staminapp.ui.main.RatingBar
+import com.staminapp.ui.main.*
 import com.staminapp.util.*
 
 @Composable
@@ -45,13 +42,13 @@ fun RoutineScreen(
 ) {
     val uiState = viewModel.uiState
 
-    if (!uiState.isFetching && uiState.routine == null) {
+    if (uiState.message == null && !uiState.isFetching && uiState.routine == null) {
         viewModel.getRoutine(routineId)
         viewModel.isFavourite()
         viewModel.getCyclesForRoutine(routineId)
     }
 
-    if (uiState.exercises.isEmpty() && uiState.cycles != null) {
+    if (uiState.message == null && uiState.exercises.isEmpty() && uiState.cycles != null) {
         uiState.cycles.forEach {
             viewModel.getExercisesForCycle(it.id)
         }
@@ -130,7 +127,13 @@ fun RoutineScreen(
                     ) {
                         Button(
                             onClick = {
-                                navController.navigate(Destination.SignIn.withAfter(Destination.Routine.createRoute(routineId)))
+                                navController.navigate(
+                                    Destination.SignIn.withAfter(
+                                        Destination.Routine.createRoute(
+                                            routineId
+                                        )
+                                    )
+                                )
                             }
                         ) {
                             Text(stringResource(R.string.login))
@@ -144,6 +147,12 @@ fun RoutineScreen(
                     Text(stringResource(R.string.not_logged_in_message))
                 }
             )
+        } else if (uiState.message != null) {
+            ApiErrorDialog {
+                viewModel.getRoutine(routineId)
+                viewModel.isFavourite()
+                viewModel.getCyclesForRoutine(routineId)
+            }
         } else {
             if (uiState.routine == null) {
                 Box(

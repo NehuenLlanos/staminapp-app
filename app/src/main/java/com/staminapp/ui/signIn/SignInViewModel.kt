@@ -58,7 +58,11 @@ class SignInViewModel (
                 isAuthenticated = true,
             )
             navController.backQueue.clear()
-            navController.navigate(after?: Destination.Home.route)
+            if ((after ?: "") == "") {
+                navController.navigate(Destination.Home.route)
+            } else {
+                navController.navigate(after!!)
+            }
         }.onFailure { e ->
             // Handle the error and notify the UI when appropriate.
             uiState = uiState.copy(

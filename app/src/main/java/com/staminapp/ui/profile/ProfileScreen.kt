@@ -20,7 +20,9 @@ import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.staminapp.R
+import com.staminapp.ui.main.ApiErrorDialog
 import com.staminapp.ui.main.Destination
+import com.staminapp.ui.main.LoadingIndicator
 import com.staminapp.util.decodeBase64Image
 import com.staminapp.util.getProfileViewModelFactory
 import java.time.temporal.ChronoField
@@ -33,10 +35,21 @@ fun ProfileScreen(
     viewModel: ProfileViewModel = viewModel(factory = getProfileViewModelFactory())
 ) {
     val uiState = viewModel.uiState
-    if (!uiState.isFetching && uiState.currentUser == null) {
+    if (uiState.message == null && !uiState.isFetching && uiState.currentUser == null) {
         viewModel.getCurrentUser()
     }
-    if (uiState.currentUser != null) {
+
+    if (uiState.message != null) {
+        ApiErrorDialog {
+            viewModel.getCurrentUser()
+        }
+    } else if (uiState.currentUser == null) {
+        Box(
+            modifier = Modifier.fillMaxSize()
+        ) {
+            LoadingIndicator()
+        }
+    } else {
         Column(
             modifier = modifier
                 .fillMaxSize()

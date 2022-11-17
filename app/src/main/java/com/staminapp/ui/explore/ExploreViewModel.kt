@@ -44,8 +44,8 @@ class ExploreViewModel (
     }
 
     fun selectDifficulty(diff : Int) {
-        val newList: MutableList<Routine> = mutableListOf()
         uiState.selectedDifficulties[diff] = true
+        val newList: MutableList<Routine> = mutableListOf()
         val difficulties: MutableList<String> = mutableListOf()
         uiState.selectedDifficulties.forEachIndexed { index, entry ->
             if (entry) {

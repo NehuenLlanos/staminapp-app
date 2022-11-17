@@ -54,4 +54,7 @@
     <string name="execution_mode">Routine Execution Mode</string>
     <string name="immersive_view">Immersive View</string>
     <string name="detailed_view">Detailed View</string>
+    <string name="try_again">Try Again</string>
+    <string name="api_error_message">Something went wrong. Please check your internet connection and try again later.</string>
+    <string name="empty_routine_list">There\'s nothing here</string>
 </resources>

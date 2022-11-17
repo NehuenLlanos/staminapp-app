@@ -16,8 +16,7 @@ import androidx.navigation.NavController
 import com.staminapp.util.getExploreViewModelFactory
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.staminapp.R
-import com.staminapp.ui.main.CustomChip
-import com.staminapp.ui.main.RoutineCard
+import com.staminapp.ui.main.*
 import com.staminapp.util.getDifficultyApiStringFromIndex
 
 @Composable
@@ -41,96 +40,118 @@ fun ExploreScreen(
         stringResource(R.string.expert)
     )
 
-    LazyVerticalGrid(
-        modifier = modifier
-            .fillMaxWidth()
-            .padding(16.dp),
-        columns = GridCells.Adaptive(minSize = 160.dp),
-        verticalArrangement = Arrangement.spacedBy(16.dp),
-        horizontalArrangement = Arrangement.spacedBy(16.dp)
-    ) {
-        item(
-            span = { GridItemSpan(maxLineSpan) }
+    if (uiState.message != null) {
+        ApiErrorDialog {
+            viewModel.getAllRoutines()
+        }
+    } else if (uiState.displayedRoutines == null) {
+        Box(
+            modifier = Modifier.fillMaxSize()
         ) {
-            Row(
-                verticalAlignment = Alignment.CenterVertically
+            LoadingIndicator()
+        }
+    } else {
+        LazyVerticalGrid(
+            modifier = modifier
+                .fillMaxSize()
+                .padding(16.dp),
+            columns = GridCells.Adaptive(minSize = 160.dp),
+            verticalArrangement = Arrangement.spacedBy(16.dp),
+            horizontalArrangement = Arrangement.spacedBy(16.dp)
+        ) {
+            item(
+                span = { GridItemSpan(maxLineSpan) }
             ) {
                 Row(
-                    modifier = Modifier
-                        .weight(1f)
-                        .horizontalScroll(rememberScrollState()),
+                    verticalAlignment = Alignment.CenterVertically
                 ) {
-                    difficulties.forEachIndexed { index, it ->
-                        CustomChip(
-                            selected = uiState.selectedDifficulties[index],
-                            text = it,
-                            modifier = Modifier
-                                .padding(4.dp)
-                                .clickable {
-                                    if (uiState.selectedDifficulties[index]) {
-                                        viewModel.unselectDifficulty(index);
-                                    } else {
-                                        viewModel.selectDifficulty(index);
+                    Row(
+                        modifier = Modifier
+                            .weight(1f)
+                            .horizontalScroll(rememberScrollState()),
+                    ) {
+                        difficulties.forEachIndexed { index, it ->
+                            CustomChip(
+                                selected = uiState.selectedDifficulties[index],
+                                text = it,
+                                modifier = Modifier
+                                    .padding(4.dp)
+                                    .clickable {
+                                        if (uiState.selectedDifficulties[index]) {
+                                            viewModel.unselectDifficulty(index);
+                                        } else {
+                                            viewModel.selectDifficulty(index);
+                                        }
                                     }
+                            )
+                        }
+                    }
+                    Box {
+                        Icon(
+                            Icons.Default.Sort,
+                            contentDescription = stringResource(R.string.order_by),
+                            tint = MaterialTheme.colors.primaryVariant,
+                            modifier = Modifier
+                                .padding(start = 8.dp)
+                                .clickable {
+                                    expanded = !expanded
                                 }
                         )
-                    }
-                }
-                Box {
-                    Icon(
-                        Icons.Default.Sort,
-                        contentDescription = stringResource(R.string.order_by),
-                        tint = MaterialTheme.colors.primaryVariant,
-                        modifier = Modifier
-                            .padding(start = 8.dp)
-                            .clickable {
-                                expanded = !expanded
-                            }
-                    )
-                    DropdownMenu(
-                        expanded = expanded,
-                        onDismissRequest = { expanded = false }
-                    ) {
-                        DropdownMenuItem(
-                            onClick = {
-                                order = 0
-                                expanded = false
-                            }
+                        DropdownMenu(
+                            expanded = expanded,
+                            onDismissRequest = { expanded = false }
                         ) {
-                            Text(stringResource(R.string.by_name))
-                        }
-                        DropdownMenuItem(
-                            onClick = {
-                                order = 1
-                                expanded = false
+                            DropdownMenuItem(
+                                onClick = {
+                                    order = 0
+                                    expanded = false
+                                }
+                            ) {
+                                Text(stringResource(R.string.by_name))
                             }
-                        ) {
-                            Text(stringResource(R.string.by_date))
-                        }
-                        DropdownMenuItem(
-                            onClick = {
-                                order = 2
-                                expanded = false
+                            DropdownMenuItem(
+                                onClick = {
+                                    order = 1
+                                    expanded = false
+                                }
+                            ) {
+                                Text(stringResource(R.string.by_date))
                             }
-                        ) {
-                            Text(stringResource(R.string.by_rating))
+                            DropdownMenuItem(
+                                onClick = {
+                                    order = 2
+                                    expanded = false
+                                }
+                            ) {
+                                Text(stringResource(R.string.by_rating))
+                            }
                         }
                     }
                 }
+
             }
 
-        }
-
-        if (uiState.displayedRoutines != null) {
-            items(
-                when (order) {
-                    0 -> uiState.displayedRoutines.sortedBy { it.name }
-                    1 -> uiState.displayedRoutines.sortedBy { it.date }
-                    2 -> uiState.displayedRoutines.sortedBy { it.score }
-                    else -> uiState.displayedRoutines
+            if (uiState.displayedRoutines.isEmpty()) {
+                item(
+                    span = { GridItemSpan(maxLineSpan) }
+                ) {
+                    Box(
+                        modifier = Modifier.fillMaxSize()
+                    ) {
+                        EmptyRoutineList()
+                    }
                 }
-            ) {
-                RoutineCard(navController = navController, routine = it)
+            } else {
+                items(
+                    when (order) {
+                        0 -> uiState.displayedRoutines.sortedBy { it.name }
+                        1 -> uiState.displayedRoutines.sortedBy { it.date }
+                        2 -> uiState.displayedRoutines.sortedBy { it.score }
+                        else -> uiState.displayedRoutines
+                    }
+                ) {
+                    RoutineCard(navController = navController, routine = it)
+                }
             }
         }
     }
