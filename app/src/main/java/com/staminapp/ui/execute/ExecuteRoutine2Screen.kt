@@ -105,8 +105,6 @@ fun ExecuteRoutine2Screen(
 
     if (uiState.routine != null && uiState.cycles != null && uiState.exercises.isNotEmpty() && !uiState.isAllFetching && typeOfExecution == 2) {
 
-//        var animDurationSec = viewModel.uiState.exercises!!.get(viewModel.uiState.cycles!!.get(viewModel.currentCycleIndex.value).id)!!
-//            .get(viewModel.currentExerciseIndex.value).duration
         var animDurationSec = viewModel.exercisesList.get(viewModel.exercisesListIndex.value).duration
 
         var animationPlayed by remember {
