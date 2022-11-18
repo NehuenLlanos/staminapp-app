@@ -1,5 +1,6 @@
 package com.staminapp.ui.main
 
+import android.graphics.Bitmap
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -16,8 +17,10 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.Color.Companion.White
 import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
@@ -28,6 +31,7 @@ import com.staminapp.R
 import com.staminapp.data.model.Routine
 import com.staminapp.ui.theme.Gray
 import com.staminapp.util.decodeBase64Image
+import com.staminapp.util.getQrCodeBitmap
 
 @Composable
 fun RatingBar(
@@ -210,6 +214,54 @@ fun EmptyRoutineList() {
                 style = MaterialTheme.typography.h1,
                 fontSize = 24.sp,
                 color = Gray
+            )
+        }
+    }
+}
+
+@Composable
+fun CapturableImage(
+    url: String,
+    title: String,
+) {
+    val qrCode: Bitmap = getQrCodeBitmap(url);
+
+    Box(
+        modifier = Modifier
+            .width(375.dp)
+            .height(200.dp)
+            .background(MaterialTheme.colors.primaryVariant)
+            .padding(16.dp)
+    ) {
+        Column(
+            modifier = Modifier.fillMaxSize(),
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .weight(1f),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Image(
+                    bitmap = qrCode.asImageBitmap(),
+                    contentDescription = stringResource(R.string.qr_code),
+                )
+                Text(
+                    title.uppercase(),
+                    modifier = Modifier.padding(start = 4.dp),
+                    style = MaterialTheme.typography.h3,
+                    color = White,
+                    lineHeight = 30.sp,
+                    maxLines = 2,
+                    overflow = TextOverflow.Ellipsis
+                )
+            }
+            Image(
+                painter = painterResource(R.drawable.logoalt),
+                contentDescription = stringResource(R.string.app_name),
+                modifier = Modifier
+                    .width(144.dp)
             )
         }
     }

@@ -3,15 +3,24 @@ package com.staminapp.util
 import android.content.Context
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
-import android.net.ConnectivityManager
+import android.graphics.Color
+import android.net.Uri
 import android.os.Bundle
+import android.os.Environment
 import android.util.Base64
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalSavedStateRegistryOwner
 import androidx.compose.ui.res.stringResource
+import androidx.core.content.FileProvider
+import com.google.zxing.BarcodeFormat
+import com.google.zxing.EncodeHintType
+import com.google.zxing.qrcode.QRCodeWriter
 import com.staminapp.MyApplication
 import com.staminapp.R
+import java.io.File
+import java.io.FileOutputStream
+
 
 @Composable
 fun getRoutineViewModelFactory(defaultArgs: Bundle? = null): RoutineViewModelFactory {
@@ -112,7 +121,42 @@ fun getDifficultyApiStringFromIndex(index: Int): String {
     return dict.getOrDefault(index, "")
 }
 
-fun isConnected(context: Context) : Boolean {
-    val cm = context.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
-    return cm.isDefaultNetworkActive
+fun getQrCodeBitmap(url: String): Bitmap {
+    val size = 256 //pixels
+    val hintMap = mapOf(EncodeHintType.MARGIN to 1)
+    val code = QRCodeWriter().encode(url, BarcodeFormat.QR_CODE, size, size, hintMap)
+    val bitmap = Bitmap.createBitmap(code.width, code.height, Bitmap.Config.RGB_565)
+    for (x in 0 until  code.width) {
+        for (y in 0 until code.height) {
+            bitmap.setPixel(x, y, if (code.get(x, y)) Color.rgb(253,153,0) else Color.rgb(0,24,51))
+        }
+    }
+    return bitmap
+}
+
+fun saveImage(image: Bitmap, context: Context) : Uri {
+    val root = context.cacheDir.toString()
+    val myDir = File("$root/staminapp")
+    myDir.mkdirs()
+
+    val fName = "staminapp_image.jpg"
+    val file = File(myDir, fName)
+    if (file.exists()) {
+        file.delete()
+    }
+
+    try {
+        val out = FileOutputStream(file)
+        image.compress(Bitmap.CompressFormat.JPEG, 100, out)
+        out.flush()
+        out.close()
+    } catch (e: Exception) {
+        e.printStackTrace()
+    }
+
+    return FileProvider.getUriForFile(
+        context,
+        context.applicationContext.packageName + ".provider",
+        file
+    )
 }
