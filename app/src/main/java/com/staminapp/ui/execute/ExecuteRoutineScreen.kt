@@ -852,7 +852,9 @@ fun FinishedExecutionScreen (
                     colors = ButtonDefaults.buttonColors(backgroundColor = MaterialTheme.colors.primary),
                     shape = RoundedCornerShape(16.dp),
                     onClick = {
-                        navController.navigate(Destination.Routine.createRoute(routineId = routineId))
+                        navController.popBackStack()
+                        navController.popBackStack()
+                        navController.popBackStack()
                     }) {
                     Text(
                         text = "Finalizar".uppercase(),
