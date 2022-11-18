@@ -32,37 +32,20 @@ class ExecuteViewModel (
     private val _progressBar = MutableStateFlow(0f)
     val progressBar = _progressBar.asStateFlow()
 
-    fun setProgressBar() {
-        _progressBar.value += _progressBarInc.value
-    }
-
-    private val _progressBarInc = MutableStateFlow(0f)
-    val progressBarInc = _progressBarInc.asStateFlow()
-
     fun setProgressBarInc(value: Float) {
-        _progressBarInc.value = value
+        _progressBar.value += value
     }
 
-    private val _currentCycleReps = MutableStateFlow(0)
-    val currentCycleReps = _currentCycleReps.asStateFlow()
-
-    fun setCycleReps(index: Int) {
-        _currentCycleReps.value = index
+    fun setProgressBarDec(value: Float) {
+        _progressBar.value -= value
     }
 
-    private val _currentCycleIndex = MutableStateFlow(0)
-    val currentCycleIndex = _currentCycleIndex.asStateFlow()
-
-    fun setCycleIndex(index: Int) {
-        _currentCycleIndex.value = index
-    }
-
-    private val _currentExerciseIndex = MutableStateFlow(0)
-    val currentExerciseIndex = _currentExerciseIndex.asStateFlow()
-
-    fun setExerciseIndex(index: Int) {
-        _currentExerciseIndex.value = index
-    }
+//    private val _progressBarInc = MutableStateFlow(0f)
+//    val progressBarInc = _progressBarInc.asStateFlow()
+//
+//    fun setProgressBarInc(value: Float) {
+//        _progressBarInc.value += value
+//    }
 
 
     /* Variables for Execution Routine 2 */

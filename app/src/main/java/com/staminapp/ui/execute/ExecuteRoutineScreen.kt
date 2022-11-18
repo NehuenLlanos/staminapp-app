@@ -65,24 +65,35 @@ fun Execution(
     if (typeOfExecution == -1) {
         if (uiState.routine != null && uiState.cycles != null && uiState.exercises.isNotEmpty() && !uiState.isAllFetching) {
 
-                val cycle = viewModel.uiState.cycles!!.get(viewModel.currentCycleIndex.value)
-                val exercise = viewModel.uiState.exercises!!.get(cycle.id)!!.get(viewModel.currentExerciseIndex.value)
+            if (uiState.cycles.size != uiState.exercises.keys.size) {
+                typeOfExecution = 0
+            } else {
+                uiState.cycles!!.forEach {
+                    var i = 0
+                    var cycle = it
+                    while (i < it.repetitions) {
+                        uiState.exercises!!.get(it.id)!!.forEach {
+                            viewModel.exercisesList.add(it)
+                            viewModel.cyclesList.add(cycle)
+                        }
+                        i++
+                    }
+                }
+                val exercise = viewModel.exercisesList.get(viewModel.exercisesListIndex.value)
 
                 if (exercise.duration != 0 && exercise.repetitions != 0) {
-                    typeOfExecution = 0 // Time and Reps
+                    typeOfExecution = 1 // Time and Reps
                 } else if (exercise.duration == 0) {
-                    typeOfExecution = 1 // Reps
+                    typeOfExecution = 2 // Reps
                 } else {
-                    typeOfExecution = 2 // Time
+                    typeOfExecution = 3 // Time
                 }
+            }
+        } else {
+            typeOfExecution = 0
         }
     }
-    else if (typeOfExecution == 0 && uiState.routine != null && uiState.cycles != null && uiState.exercises.isNotEmpty()) { // Time and Reps
-        var totalDivisions = 0
-        uiState.cycles.forEach {
-            totalDivisions += it.repetitions * uiState.exercises!!.get(it.id)!!.size
-        }
-        viewModel.setProgressBarInc(1/totalDivisions.toFloat())
+    else if (typeOfExecution == 1 && uiState.routine != null && uiState.cycles != null && uiState.exercises.isNotEmpty()) { // Time and Reps
 
         Column(modifier = Modifier
             .fillMaxHeight()
@@ -94,8 +105,7 @@ fun Execution(
             val radius = 50.dp
             val color = MaterialTheme.colors.primary
             val stokeWidth = 12.dp
-            var animDurationSec = viewModel.uiState.exercises!!.get(viewModel.uiState.cycles!!.get(viewModel.currentCycleIndex.value).id)!!
-                .get(viewModel.currentExerciseIndex.value).duration
+            var animDurationSec = viewModel.exercisesList.get(viewModel.exercisesListIndex.value).duration
 
             var animationPlayed by remember {
                 mutableStateOf(false)
@@ -134,8 +144,8 @@ fun Execution(
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
                 ExerciseHeader(
-                    viewModel.uiState.cycles!!.get(viewModel.currentCycleIndex.value).name,
-                    viewModel.uiState.exercises!!.get(viewModel.uiState.cycles!!.get(viewModel.currentCycleIndex.value).id)!!.get(viewModel.currentExerciseIndex.value).name
+                    viewModel.cyclesList.get(viewModel.exercisesListIndex.value).name,
+                    viewModel.exercisesList.get(viewModel.exercisesListIndex.value).name
                 )
                 Column(
                     modifier = Modifier
@@ -175,7 +185,7 @@ fun Execution(
                             fontWeight = FontWeight.Bold
                         )
                     }
-                    Text(text = viewModel.uiState.exercises!!.get(viewModel.uiState.cycles!!.get(viewModel.currentCycleIndex.value).id)!!.get(viewModel.currentExerciseIndex.value).repetitions.toString(),
+                    Text(text = viewModel.exercisesList.get(viewModel.exercisesListIndex.value).repetitions.toString(),
                         color = MaterialTheme.colors.primary,
                         fontSize = 30.sp,
                         fontWeight = FontWeight.Bold,
@@ -228,77 +238,68 @@ fun Execution(
                         )
                     }
                 }
-                Button(
-                    modifier = Modifier.fillMaxWidth(),
-                    colors = ButtonDefaults.buttonColors(backgroundColor = MaterialTheme.colors.primary),
-                    shape = RoundedCornerShape(16.dp),
-                    onClick = {
-                        viewModel.setExerciseIndex(viewModel.currentExerciseIndex.value + 1)
-                        viewModel.setProgressBar()
-
-                        val currentCycle = viewModel.uiState.cycles!!.get(viewModel.currentCycleIndex.value)
-                        val exerciseQuantity = viewModel.uiState.exercises!!.get(currentCycle.id)!!.size
-
-                        if (viewModel.currentExerciseIndex.value == exerciseQuantity) {
-                            viewModel.setCycleReps(viewModel.currentCycleReps.value + 1)
-
-                            if (viewModel.currentCycleReps.value == currentCycle.repetitions) {
-                                viewModel.setCycleIndex(viewModel.currentCycleIndex.value + 1)
-
-                                if (viewModel.currentCycleIndex.value == viewModel.uiState.cycles!!.size) {
-                                    navController.navigate(Destination.ExecutionFinishedRoutine.createRoute(routineId = routineId, totalTime = ticks))
-                                    typeOfExecution = 9
-                                }
-                                else {
-                                    viewModel.setExerciseIndex(0)
-                                    val cycle = viewModel.uiState.cycles!!.get(viewModel.currentCycleIndex.value)
-                                    val exercise = viewModel.uiState.exercises!!.get(cycle.id)!!.get(viewModel.currentExerciseIndex.value)
-
-                                    if (exercise.duration != 0 && exercise.repetitions != 0) {
-                                        typeOfExecution = 3
-
-                                    } else if (exercise.duration == 0) {
-                                        typeOfExecution = 1
-                                    } else {
-                                        typeOfExecution = 2
-                                    }
-                                }
-                            }
-                            else {
-                                viewModel.setExerciseIndex(0)
-                                val exercise = viewModel.uiState.exercises!!.get(viewModel.uiState.cycles!!.get(viewModel.currentCycleIndex.value).id)!!.get(viewModel.currentExerciseIndex.value)
-
+                Row(
+                    horizontalArrangement = Arrangement.spacedBy(8.dp)
+                ) {
+                    /* BOTON VOLVER PARA EL EJERCICIO ANTERIOR */
+                    Button(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .weight(1f),
+                        colors = ButtonDefaults.buttonColors(backgroundColor = Color(0xFFFFD28C)),
+                        shape = RoundedCornerShape(16.dp),
+                        onClick = {
+                            if (viewModel.exercisesList.isNotEmpty() && viewModel.exercisesListIndex.value > 0) {
+                                viewModel.setExercisesListIndex(viewModel.exercisesListIndex.value - 1)
+                                val exercise = viewModel.exercisesList.get(viewModel.exercisesListIndex.value)
+                                viewModel.setProgressBarDec(1/viewModel.exercisesList.size.toFloat())
                                 if (exercise.duration != 0 && exercise.repetitions != 0) {
-                                    typeOfExecution = 3
+                                    typeOfExecution = 4 // Time and Reps
                                 } else if (exercise.duration == 0) {
-                                    typeOfExecution = 1
+                                    typeOfExecution = 2 // Reps
                                 } else {
-                                    typeOfExecution = 2
+                                    typeOfExecution = 3 // Time
                                 }
                             }
                         }
+                    ) {
+                        Icon(
+                            Icons.Filled.FastRewind,
+                            contentDescription = null,
+                            tint = Color.White,
+                        )
+                    }
 
-                        else {
-                            val exercise = viewModel.uiState.exercises!!.get(
-                                viewModel.uiState.cycles!!.get(viewModel.currentCycleIndex.value).id
-                            )!!.get(viewModel.currentExerciseIndex.value)
-
-                            if (exercise.duration != 0 && exercise.repetitions != 0) {
-                                typeOfExecution = 3
-                            } else if (exercise.duration == 0) {
-                                typeOfExecution = 1
+                    /* BOTON IR AL SIGUIENTE EJERCICIO */
+                    Button(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .weight(1f),
+                        colors = ButtonDefaults.buttonColors(backgroundColor = Color(0xFFFFD28C)),
+                        shape = RoundedCornerShape(16.dp),
+                        onClick = {
+                            if (viewModel.exercisesList.isNotEmpty() && viewModel.exercisesListIndex.value < viewModel.exercisesList.size - 1) {
+                                viewModel.setExercisesListIndex(viewModel.exercisesListIndex.value + 1)
+                                val exercise = viewModel.exercisesList.get(viewModel.exercisesListIndex.value)
+                                viewModel.setProgressBarInc(1/viewModel.exercisesList.size.toFloat())
+                                if (exercise.duration != 0 && exercise.repetitions != 0) {
+                                    typeOfExecution = 4 // Time and Reps
+                                } else if (exercise.duration == 0) {
+                                    typeOfExecution = 2 // Reps
+                                } else {
+                                    typeOfExecution = 3 // Time
+                                }
                             } else {
-                                typeOfExecution = 2
+                                navController.navigate(Destination.ExecutionFinishedRoutine.createRoute(routineId = routineId, totalTime = ticks))
                             }
                         }
-
-
-                    }) {
-                    Text(
-                        text = "Finalizar Ejercicio".uppercase(),
-                        color = Color.White,
-                        style = MaterialTheme.typography.body2,
-                    )
+                    ) {
+                        Icon(
+                            Icons.Filled.FastForward,
+                            contentDescription = null,
+                            tint = Color.White,
+                        )
+                    }
                 }
                 Button(
                     modifier = Modifier.fillMaxWidth(),
@@ -316,12 +317,7 @@ fun Execution(
             }
         }
     }
-    else if (typeOfExecution == 1 && uiState.routine != null && uiState.cycles != null && uiState.exercises.isNotEmpty() ) { // Reps
-        var totalDivisions = 0
-        uiState.cycles.forEach {
-            totalDivisions += it.repetitions * uiState.exercises!!.get(it.id)!!.size
-        }
-        viewModel.setProgressBarInc(1/totalDivisions.toFloat())
+    else if (typeOfExecution == 2 && uiState.routine != null && uiState.cycles != null && uiState.exercises.isNotEmpty() ) { // Reps
 
         Column(modifier = Modifier
             .fillMaxHeight()
@@ -330,15 +326,14 @@ fun Execution(
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             uiState.routine.image?.let {
-                TopBarRoutineExecution(Modifier.padding(bottom = 16.dp),
-                    it, uiState.routine.name, viewModel.progressBar.value)
+                TopBarRoutineExecution(Modifier.padding(bottom = 16.dp), it, uiState.routine.name, viewModel.progressBar.value)
             }
             Column(
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
                 ExerciseHeader(
-                    viewModel.uiState.cycles!!.get(viewModel.currentCycleIndex.value).name,
-                    viewModel.uiState.exercises!!.get(viewModel.uiState.cycles!!.get(viewModel.currentCycleIndex.value).id)!!.get(viewModel.currentExerciseIndex.value).name
+                    viewModel.cyclesList.get(viewModel.exercisesListIndex.value).name,
+                    viewModel.exercisesList.get(viewModel.exercisesListIndex.value).name
                 )
                 Column(
                     modifier = Modifier
@@ -351,7 +346,7 @@ fun Execution(
                     horizontalAlignment = Alignment.CenterHorizontally,
                     verticalArrangement = Arrangement.Center,
                 ) {
-                    Text(text = viewModel.uiState.exercises!!.get(viewModel.uiState.cycles!!.get(viewModel.currentCycleIndex.value).id)!!.get(viewModel.currentExerciseIndex.value).repetitions.toString(),
+                    Text(text = viewModel.exercisesList.get(viewModel.exercisesListIndex.value).repetitions.toString(),
                         color = MaterialTheme.colors.primary,
                         fontSize = 56.sp,
                         fontWeight = FontWeight.Bold,
@@ -376,75 +371,68 @@ fun Execution(
                 verticalArrangement = Arrangement.spacedBy(8.dp, Alignment.CenterVertically),
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
-                Button(
-                    modifier = Modifier.fillMaxWidth(),
-                    colors = ButtonDefaults.buttonColors(backgroundColor = MaterialTheme.colors.primary),
-                    shape = RoundedCornerShape(16.dp),
-                    onClick = {
-                        viewModel.setExerciseIndex(viewModel.currentExerciseIndex.value + 1)
-
-                        viewModel.setProgressBar()
-
-                        val currentCycle = viewModel.uiState.cycles!!.get(viewModel.currentCycleIndex.value)
-                        val exerciseQuantity = viewModel.uiState.exercises!!.get(currentCycle.id)!!.size
-
-                        if (viewModel.currentExerciseIndex.value == exerciseQuantity) {
-                            viewModel.setCycleReps(viewModel.currentCycleReps.value + 1)
-
-                            if (viewModel.currentCycleReps.value == currentCycle.repetitions) {
-                                viewModel.setCycleIndex(viewModel.currentCycleIndex.value + 1)
-
-                                if (viewModel.currentCycleIndex.value == viewModel.uiState.cycles!!.size) {
-                                    navController.navigate(Destination.ExecutionFinishedRoutine.createRoute(routineId = routineId, totalTime = ticks))
-                                    typeOfExecution = 9
-                                }
-                                else {
-                                    viewModel.setExerciseIndex(0)
-                                    val cycle = viewModel.uiState.cycles!!.get(viewModel.currentCycleIndex.value)
-                                    val exercise = viewModel.uiState.exercises!!.get(cycle.id)!!.get(viewModel.currentExerciseIndex.value)
-
-                                    if (exercise.duration != 0 && exercise.repetitions != 0) {
-                                        typeOfExecution = 0
-                                    } else if (exercise.duration == 0) {
-                                        typeOfExecution = 4
-                                    } else {
-                                        typeOfExecution = 2
-                                    }
-                                }
-                            }
-                            else {
-                                viewModel.setExerciseIndex(0)
-                                val exercise = viewModel.uiState.exercises!!.get(viewModel.uiState.cycles!!.get(viewModel.currentCycleIndex.value).id)!!.get(viewModel.currentExerciseIndex.value)
-
+                Row(
+                    horizontalArrangement = Arrangement.spacedBy(8.dp)
+                ) {
+                    /* BOTON VOLVER PARA EL EJERCICIO ANTERIOR */
+                    Button(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .weight(1f),
+                        colors = ButtonDefaults.buttonColors(backgroundColor = Color(0xFFFFD28C)),
+                        shape = RoundedCornerShape(16.dp),
+                        onClick = {
+                            if (viewModel.exercisesList.isNotEmpty() && viewModel.exercisesListIndex.value > 0) {
+                                viewModel.setExercisesListIndex(viewModel.exercisesListIndex.value - 1)
+                                val exercise = viewModel.exercisesList.get(viewModel.exercisesListIndex.value)
+                                viewModel.setProgressBarDec(1/viewModel.exercisesList.size.toFloat())
                                 if (exercise.duration != 0 && exercise.repetitions != 0) {
-                                    typeOfExecution = 0
+                                    typeOfExecution = 1 // Time and Reps
                                 } else if (exercise.duration == 0) {
-                                    typeOfExecution = 4
+                                    typeOfExecution = 5 // Reps
                                 } else {
-                                    typeOfExecution = 2
+                                    typeOfExecution = 3 // Time
                                 }
                             }
                         }
+                    ) {
+                        Icon(
+                            Icons.Filled.FastRewind,
+                            contentDescription = null,
+                            tint = Color.White,
+                        )
+                    }
 
-                        else {
-                            val exercise = viewModel.uiState.exercises!!.get(
-                                viewModel.uiState.cycles!!.get(viewModel.currentCycleIndex.value).id
-                            )!!.get(viewModel.currentExerciseIndex.value)
-                            println(exercise.name)
-                            if (exercise.duration != 0 && exercise.repetitions != 0) {
-                                typeOfExecution = 0
-                            } else if (exercise.duration == 0) {
-                                typeOfExecution = 4
+                    /* BOTON IR AL SIGUIENTE EJERCICIO */
+                    Button(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .weight(1f),
+                        colors = ButtonDefaults.buttonColors(backgroundColor = Color(0xFFFFD28C)),
+                        shape = RoundedCornerShape(16.dp),
+                        onClick = {
+                            if (viewModel.exercisesList.isNotEmpty() && viewModel.exercisesListIndex.value < viewModel.exercisesList.size - 1) {
+                                viewModel.setExercisesListIndex(viewModel.exercisesListIndex.value + 1)
+                                val exercise = viewModel.exercisesList.get(viewModel.exercisesListIndex.value)
+                                viewModel.setProgressBarInc(1/viewModel.exercisesList.size.toFloat())
+                                if (exercise.duration != 0 && exercise.repetitions != 0) {
+                                    typeOfExecution = 1 // Time and Reps
+                                } else if (exercise.duration == 0) {
+                                    typeOfExecution = 5 // Reps
+                                } else {
+                                    typeOfExecution = 3 // Time
+                                }
                             } else {
-                                typeOfExecution = 2
+                                navController.navigate(Destination.ExecutionFinishedRoutine.createRoute(routineId = routineId, totalTime = ticks))
                             }
                         }
-                    }) {
-                    Text(
-                        text = "Listo",
-                        color = Color.White,
-                        style = MaterialTheme.typography.body2,
-                    )
+                    ) {
+                        Icon(
+                            Icons.Filled.FastForward,
+                            contentDescription = null,
+                            tint = Color.White,
+                        )
+                    }
                 }
                 Button(
                     modifier = Modifier.fillMaxWidth(),
@@ -462,12 +450,7 @@ fun Execution(
             }
         }
     }
-    else if (typeOfExecution == 2 && uiState.routine != null && uiState.cycles != null && uiState.exercises.isNotEmpty()) { // Time
-        var totalDivisions = 0
-        uiState.cycles.forEach {
-            totalDivisions += it.repetitions * uiState.exercises!!.get(it.id)!!.size
-        }
-        viewModel.setProgressBarInc(1/totalDivisions.toFloat())
+    else if (typeOfExecution == 3 && uiState.routine != null && uiState.cycles != null && uiState.exercises.isNotEmpty()) { // Time
 
         Column(modifier = Modifier
             .fillMaxHeight()
@@ -480,8 +463,7 @@ fun Execution(
             val radius = 80.dp
             val color = MaterialTheme.colors.primary
             val stokeWidth = 16.dp
-            var animDurationSec = viewModel.uiState.exercises!!.get(viewModel.uiState.cycles!!.get(viewModel.currentCycleIndex.value).id)!!
-                .get(viewModel.currentExerciseIndex.value).duration
+            var animDurationSec = viewModel.exercisesList.get(viewModel.exercisesListIndex.value).duration
 
             var animationPlayed by remember {
                 mutableStateOf(false)
@@ -520,8 +502,8 @@ fun Execution(
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
                 ExerciseHeader(
-                    viewModel.uiState.cycles!!.get(viewModel.currentCycleIndex.value).name,
-                    viewModel.uiState.exercises!!.get(viewModel.uiState.cycles!!.get(viewModel.currentCycleIndex.value).id)!!.get(viewModel.currentExerciseIndex.value).name
+                    viewModel.cyclesList.get(viewModel.exercisesListIndex.value).name,
+                    viewModel.exercisesList.get(viewModel.exercisesListIndex.value).name
                 )
                 Column(
                     modifier = Modifier
@@ -586,77 +568,82 @@ fun Execution(
                             animationPlayed = true
                         }
                     }) {
-                    Icon(Icons.Filled.Pause, contentDescription = "Inicio")
+                    if (animationPlayed) {
+                        Icon(
+                            Icons.Filled.Pause,
+                            contentDescription = null,
+                            tint = Color.White,
+                        )
+                    } else {
+                        Icon(
+                            Icons.Filled.PlayArrow,
+                            contentDescription = null,
+                            tint = Color.White,
+                        )
+                    }
                 }
-                Button(
-                    modifier = Modifier.fillMaxWidth(),
-                    colors = ButtonDefaults.buttonColors(backgroundColor = MaterialTheme.colors.primary),
-                    shape = RoundedCornerShape(16.dp),
-                    onClick = {
-                        viewModel.setExerciseIndex(viewModel.currentExerciseIndex.value + 1)
-
-                        viewModel.setProgressBar()
-
-                        val currentCycle = viewModel.uiState.cycles!!.get(viewModel.currentCycleIndex.value)
-                        val exerciseQuantity = viewModel.uiState.exercises!!.get(currentCycle.id)!!.size
-
-
-                        if (viewModel.currentExerciseIndex.value >= exerciseQuantity) {
-                            viewModel.setCycleReps(viewModel.currentCycleReps.value + 1)
-
-                            if (viewModel.currentCycleReps.value >= currentCycle.repetitions) {
-                                viewModel.setCycleIndex(viewModel.currentCycleIndex.value + 1)
-
-                                if (viewModel.currentCycleIndex.value >= viewModel.uiState.cycles!!.size) {
-                                    navController.navigate(Destination.ExecutionFinishedRoutine.createRoute(routineId = routineId, totalTime = ticks))
-                                    typeOfExecution = 9
-                                }
-                                else {
-                                    viewModel.setExerciseIndex(0)
-                                    val cycle = viewModel.uiState.cycles!!.get(viewModel.currentCycleIndex.value)
-                                    val exercise = viewModel.uiState.exercises!!.get(cycle.id)!!.get(viewModel.currentExerciseIndex.value)
-
-                                    if (exercise.duration != 0 && exercise.repetitions != 0) {
-                                        typeOfExecution = 0
-                                    } else if (exercise.duration == 0) {
-                                        typeOfExecution = 1
-                                    } else {
-                                        typeOfExecution = 5
-                                    }
-                                }
-                            }
-                            else {
-                                viewModel.setExerciseIndex(0)
-                                val exercise = viewModel.uiState.exercises!!.get(viewModel.uiState.cycles!!.get(viewModel.currentCycleIndex.value).id)!!.get(viewModel.currentExerciseIndex.value)
-
+                Row(
+                    horizontalArrangement = Arrangement.spacedBy(8.dp)
+                ) {
+                    /* BOTON VOLVER PARA EL EJERCICIO ANTERIOR */
+                    Button(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .weight(1f),
+                        colors = ButtonDefaults.buttonColors(backgroundColor = Color(0xFFFFD28C)),
+                        shape = RoundedCornerShape(16.dp),
+                        onClick = {
+                            if (viewModel.exercisesList.isNotEmpty() && viewModel.exercisesListIndex.value > 0) {
+                                viewModel.setExercisesListIndex(viewModel.exercisesListIndex.value - 1)
+                                val exercise = viewModel.exercisesList.get(viewModel.exercisesListIndex.value)
+                                viewModel.setProgressBarDec(1/viewModel.exercisesList.size.toFloat())
                                 if (exercise.duration != 0 && exercise.repetitions != 0) {
-                                    typeOfExecution = 0
+                                    typeOfExecution = 1 // Time and Reps
                                 } else if (exercise.duration == 0) {
-                                    typeOfExecution = 1
+                                    typeOfExecution = 2 // Reps
                                 } else {
-                                    typeOfExecution = 5
+                                    typeOfExecution = 6 // Time
                                 }
                             }
                         }
-                        else {
-                            val exercise = viewModel.uiState.exercises!!.get(
-                                viewModel.uiState.cycles!!.get(viewModel.currentCycleIndex.value).id
-                            )!!.get(viewModel.currentExerciseIndex.value)
-                            println(exercise.name)
-                            if (exercise.duration != 0 && exercise.repetitions != 0) {
-                                typeOfExecution = 0
-                            } else if (exercise.duration == 0) {
-                                typeOfExecution = 1
+                    ) {
+                        Icon(
+                            Icons.Filled.FastRewind,
+                            contentDescription = null,
+                            tint = Color.White,
+                        )
+                    }
+
+                    /* BOTON IR AL SIGUIENTE EJERCICIO */
+                    Button(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .weight(1f),
+                        colors = ButtonDefaults.buttonColors(backgroundColor = Color(0xFFFFD28C)),
+                        shape = RoundedCornerShape(16.dp),
+                        onClick = {
+                            if (viewModel.exercisesList.isNotEmpty() && viewModel.exercisesListIndex.value < viewModel.exercisesList.size - 1) {
+                                viewModel.setExercisesListIndex(viewModel.exercisesListIndex.value + 1)
+                                val exercise = viewModel.exercisesList.get(viewModel.exercisesListIndex.value)
+                                viewModel.setProgressBarInc(1/viewModel.exercisesList.size.toFloat())
+                                if (exercise.duration != 0 && exercise.repetitions != 0) {
+                                    typeOfExecution = 1 // Time and Reps
+                                } else if (exercise.duration == 0) {
+                                    typeOfExecution = 2 // Reps
+                                } else {
+                                    typeOfExecution = 6 // Time
+                                }
                             } else {
-                                typeOfExecution = 5
+                                navController.navigate(Destination.ExecutionFinishedRoutine.createRoute(routineId = routineId, totalTime = ticks))
                             }
                         }
-                    }) {
-                    Text(
-                        text = "Finalizar Ejercicio".uppercase(),
-                        color = Color.White,
-                        style = MaterialTheme.typography.body2,
-                    )
+                    ) {
+                        Icon(
+                            Icons.Filled.FastForward,
+                            contentDescription = null,
+                            tint = Color.White,
+                        )
+                    }
                 }
                 Button(
                     modifier = Modifier.fillMaxWidth(),
@@ -674,12 +661,14 @@ fun Execution(
             }
         }
     }
-    else if (typeOfExecution == 3) {
-        typeOfExecution = 0
+    else if (typeOfExecution == 0) {
+        typeOfExecution = -1
     } else if (typeOfExecution == 4) {
         typeOfExecution = 1
-    } else if(typeOfExecution == 5) {
+    } else if (typeOfExecution == 5) {
         typeOfExecution = 2
+    } else if(typeOfExecution == 6) {
+        typeOfExecution = 3
     }
 }
 
@@ -863,7 +852,9 @@ fun FinishedExecutionScreen (
                     colors = ButtonDefaults.buttonColors(backgroundColor = MaterialTheme.colors.primary),
                     shape = RoundedCornerShape(16.dp),
                     onClick = {
-                        navController.navigate(Destination.Routine.createRoute(routineId = routineId))
+                        navController.popBackStack()
+                        navController.popBackStack()
+                        navController.popBackStack()
                     }) {
                     Text(
                         text = "Finalizar".uppercase(),
