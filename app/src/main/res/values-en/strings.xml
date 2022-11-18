@@ -57,6 +57,10 @@
     <string name="try_again">Try Again</string>
     <string name="api_error_message">Something went wrong. Please check your internet connection and try again later.</string>
     <string name="empty_routine_list">There\'s nothing here</string>
-    <string name="end_routine_execution">Finalizar Rutina</string>
+    <string name="end_routine_execution">End execution</string>
     <string name="cancel">Cancel</string>
+    <string name="finished">Finished!</string>
+    <string name="estimated_time">Estimated time</string>
+    <string name="rate_routine">Rate the routine</string>
+    <string name="finish">Finish</string>
 </resources>

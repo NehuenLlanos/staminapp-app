@@ -19,6 +19,7 @@ import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
@@ -28,8 +29,10 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
+import com.staminapp.R
 import com.staminapp.ui.main.Destination
 import com.staminapp.ui.main.RatingBar
+import com.staminapp.ui.theme.Gray
 import com.staminapp.util.decodeBase64Image
 import com.staminapp.util.getExecuteViewModelFactory
 import kotlinx.coroutines.*
@@ -68,11 +71,10 @@ fun Execution(
             if (uiState.cycles.size != uiState.exercises.keys.size) {
                 typeOfExecution = 0
             } else {
-                uiState.cycles!!.forEach {
+                uiState.cycles.forEach { cycle ->
                     var i = 0
-                    var cycle = it
-                    while (i < it.repetitions) {
-                        uiState.exercises!!.get(it.id)!!.forEach {
+                    while (i < cycle.repetitions) {
+                        uiState.exercises[cycle.id]!!.forEach {
                             viewModel.exercisesList.add(it)
                             viewModel.cyclesList.add(cycle)
                         }
@@ -105,7 +107,7 @@ fun Execution(
             val radius = 50.dp
             val color = MaterialTheme.colors.primary
             val stokeWidth = 12.dp
-            var animDurationSec = viewModel.exercisesList.get(viewModel.exercisesListIndex.value).duration
+            val animDurationSec = viewModel.exercisesList.get(viewModel.exercisesListIndex.value).duration
 
             var animationPlayed by remember {
                 mutableStateOf(false)
@@ -137,7 +139,7 @@ fun Execution(
                 )
             )
 
-            uiState.routine!!.image?.let {
+            uiState.routine.image?.let {
                 TopBarRoutineExecution(Modifier.padding(bottom = 16.dp),it, uiState.routine.name, viewModel.progressBar.value)
             }
             Column(
@@ -154,7 +156,7 @@ fun Execution(
                         .fillMaxWidth()
                         .padding(vertical = 8.dp, horizontal = 8.dp)
                         .clip(shape = RoundedCornerShape(16.dp))
-                        .background(MaterialTheme.colors.primaryVariant),
+                        .background(Gray),
                     horizontalAlignment = Alignment.CenterHorizontally,
                     verticalArrangement = Arrangement.spacedBy(8.dp, Alignment.CenterVertically),
                 ) {
@@ -176,10 +178,18 @@ fun Execution(
                                 style = Stroke(stokeWidth.toPx(), cap = StrokeCap.Round)
                             )
                         }
+                        val seconds = TimeUnit.SECONDS.toSeconds(((animDurationSec - curTime.value) % 60).toLong())
                         Text(
                             text = sb.append(TimeUnit.SECONDS.toMinutes((animDurationSec - curTime.value).toLong()).toString())
                                 .append(":")
-                                .append(TimeUnit.SECONDS.toSeconds(((animDurationSec - curTime.value) % 60).toLong()).toString()).toString(),
+                                .append(
+                                    if (seconds < 10) {
+                                        "0"
+                                    } else {
+                                        ""
+                                    }
+                                )
+                                .append(seconds.toString()).toString(),
                             color = MaterialTheme.colors.primary,
                             fontSize = fontSize,
                             fontWeight = FontWeight.Bold
@@ -193,7 +203,7 @@ fun Execution(
                         overflow = TextOverflow.Ellipsis,
                         maxLines = 1
                     )
-                    Text(text = "Repeticiones".uppercase(),
+                    Text(text = stringResource(R.string.repetitions).uppercase(),
                         color = MaterialTheme.colors.primary,
                         fontSize = 10.sp,
                         fontWeight = FontWeight.Bold,
@@ -309,9 +319,9 @@ fun Execution(
                         navController.navigate(Destination.ExecutionFinishedRoutine.createRoute(routineId = routineId, totalTime = ticks))
                     }) {
                     Text(
-                        text = "Finalizar Rutina".uppercase(),
+                        text = stringResource(R.string.end_routine_execution).uppercase(),
                         color = MaterialTheme.colors.error,
-                        style = MaterialTheme.typography.body2,
+                        style = MaterialTheme.typography.button,
                     )
                 }
             }
@@ -342,22 +352,21 @@ fun Execution(
                         .fillMaxWidth()
                         .padding(vertical = 8.dp, horizontal = 8.dp)
                         .clip(shape = RoundedCornerShape(16.dp))
-                        .background(MaterialTheme.colors.primaryVariant),
+                        .background(Gray),
                     horizontalAlignment = Alignment.CenterHorizontally,
                     verticalArrangement = Arrangement.Center,
                 ) {
                     Text(text = viewModel.exercisesList.get(viewModel.exercisesListIndex.value).repetitions.toString(),
                         color = MaterialTheme.colors.primary,
+                        style = MaterialTheme.typography.h1,
                         fontSize = 56.sp,
-                        fontWeight = FontWeight.Bold,
                         textAlign = TextAlign.Center,
                         overflow = TextOverflow.Ellipsis,
                         maxLines = 1
                     )
-                    Text(text = "Repeticiones".uppercase(),
+                    Text(text = stringResource(R.string.repetitions).uppercase(),
                         color = MaterialTheme.colors.primary,
-                        fontSize = 15.sp,
-                        fontWeight = FontWeight.Bold,
+                        style = MaterialTheme.typography.subtitle1,
                         textAlign = TextAlign.Center,
                         overflow = TextOverflow.Ellipsis,
                         maxLines = 1
@@ -442,15 +451,14 @@ fun Execution(
                         navController.navigate(Destination.ExecutionFinishedRoutine.createRoute(routineId = routineId, totalTime = ticks))
                     }) {
                     Text(
-                        text = "Finalizar Rutina".uppercase(),
+                        text = stringResource(R.string.end_routine_execution).uppercase(),
                         color = MaterialTheme.colors.error,
-                        style = MaterialTheme.typography.body2,
+                        style = MaterialTheme.typography.button,
                     )
                 }
             }
         }
-    }
-    else if (typeOfExecution == 3 && uiState.routine != null && uiState.cycles != null && uiState.exercises.isNotEmpty()) { // Time
+    } else if (typeOfExecution == 3 && uiState.routine != null && uiState.cycles != null && uiState.exercises.isNotEmpty()) { // Time
 
         Column(modifier = Modifier
             .fillMaxHeight()
@@ -463,7 +471,7 @@ fun Execution(
             val radius = 80.dp
             val color = MaterialTheme.colors.primary
             val stokeWidth = 16.dp
-            var animDurationSec = viewModel.exercisesList.get(viewModel.exercisesListIndex.value).duration
+            val animDurationSec = viewModel.exercisesList.get(viewModel.exercisesListIndex.value).duration
 
             var animationPlayed by remember {
                 mutableStateOf(false)
@@ -494,7 +502,7 @@ fun Execution(
                     easing = LinearEasing
                 )
             )
-            uiState.routine!!.image?.let {
+            uiState.routine.image?.let {
                 TopBarRoutineExecution(Modifier.padding(bottom = 16.dp),
                     it, uiState.routine.name, viewModel.progressBar.value)
             }
@@ -512,7 +520,7 @@ fun Execution(
                         .fillMaxWidth()
                         .padding(vertical = 8.dp, horizontal = 8.dp)
                         .clip(shape = RoundedCornerShape(16.dp))
-                        .background(MaterialTheme.colors.primaryVariant),
+                        .background(Gray),
                     horizontalAlignment = Alignment.CenterHorizontally,
                     verticalArrangement = Arrangement.Center,
                 ) {
@@ -535,10 +543,18 @@ fun Execution(
                                 style = Stroke(stokeWidth.toPx(), cap = StrokeCap.Round)
                             )
                         }
+                        val seconds = TimeUnit.SECONDS.toSeconds(((animDurationSec - curTime.value) % 60).toLong())
                         Text(
                             text = sb.append(TimeUnit.SECONDS.toMinutes((animDurationSec - curTime.value).toLong()).toString())
                                 .append(":")
-                                .append(TimeUnit.SECONDS.toSeconds(((animDurationSec - curTime.value) % 60).toLong()).toString()).toString(),
+                                .append(
+                                    if (seconds < 10) {
+                                        "0"
+                                    } else {
+                                        ""
+                                    }
+                                )
+                                .append(seconds.toString()).toString(),
                             color = MaterialTheme.colors.primary,
                             fontSize = fontSize,
                             fontWeight = FontWeight.Bold
@@ -653,9 +669,9 @@ fun Execution(
                         navController.navigate(Destination.ExecutionFinishedRoutine.createRoute(routineId = routineId, totalTime = ticks))
                     }) {
                     Text(
-                        text = "Finalizar Rutina".uppercase(),
+                        text = stringResource(R.string.end_routine_execution).uppercase(),
                         color = MaterialTheme.colors.error,
-                        style = MaterialTheme.typography.body2,
+                        style = MaterialTheme.typography.button,
                     )
                 }
             }
@@ -691,7 +707,7 @@ fun TopBarRoutineExecution(
                     .width(40.dp)
                     .height(40.dp),
                 bitmap = decodeBase64Image(image).asImageBitmap(),
-                contentDescription = "Imagen de Rutina",
+                contentDescription = stringResource(R.string.routine_image),
                 contentScale = ContentScale.Crop
             )
             Text(text = routineName.uppercase(),
@@ -709,7 +725,7 @@ fun TopBarRoutineExecution(
 
 @Composable
 fun ExerciseHeader(cycle : String, exercise : String) {
-    Text(text = cycle,
+    Text(text = cycle.uppercase(),
         color = MaterialTheme.colors.primaryVariant,
         fontSize = 20.sp,
         fontWeight = FontWeight.Bold,
@@ -725,144 +741,4 @@ fun ExerciseHeader(cycle : String, exercise : String) {
         overflow = TextOverflow.Ellipsis,
         maxLines = 1
     )
-}
-
-@Composable
-fun FinishedExecutionScreen (
-    routineId : Int,
-    totalTime : Int,
-    navController: NavController,
-    viewModel: ExecuteViewModel = viewModel(factory = getExecuteViewModelFactory())
-){
-    val uiState = viewModel.uiState
-    val sb = java.lang.StringBuilder()
-
-    if (!uiState.isFetching && uiState.routine == null) {
-        viewModel.getRoutine(routineId)
-    }
-
-    var hours = totalTime/3600
-    var minutes = totalTime/60
-    var seconds = totalTime
-    if (hours >= 1) {
-        minutes -= hours * 60
-        seconds -= hours * 3600
-        if (minutes % 60 >= 1) {
-            seconds -= minutes * 60
-        } else {
-            seconds -= hours * 3600
-        }
-    } else {
-        if (minutes % 60 >= 1) {
-            seconds -= minutes * 60
-        }
-    }
-
-    val s = String.format("%02d : %02d : %02d", hours, minutes, seconds)
-
-    if (!uiState.isAllFetching && uiState.routine != null) {
-        Column(modifier = Modifier
-            .fillMaxHeight()
-            .fillMaxWidth()
-            .padding(horizontal = 16.dp, vertical = 16.dp),
-            horizontalAlignment = Alignment.CenterHorizontally
-        ) {
-        uiState.routine!!.image?.let {
-            TopBarRoutineExecution(Modifier.padding(bottom = 16.dp),
-                it, uiState.routine.name, 1f)
-        }
-            Column(
-                horizontalAlignment = Alignment.CenterHorizontally,
-                verticalArrangement = Arrangement.spacedBy(16.dp, Alignment.CenterVertically)
-            ) {
-                Text(text = "¡Terminó!".uppercase(),
-                    color = MaterialTheme.colors.primaryVariant,
-                    fontSize = 40.sp,
-                    fontWeight = FontWeight.Bold,
-                    textAlign = TextAlign.Center,
-                    overflow = TextOverflow.Ellipsis,
-                    maxLines = 1
-                )
-                Column(
-                    modifier = Modifier
-                        .height(120.dp)
-                        .width(264.dp)
-                        .fillMaxWidth()
-                        .padding(vertical = 4.dp, horizontal = 4.dp)
-                        .clip(shape = RoundedCornerShape(16.dp))
-                        .background(MaterialTheme.colors.primaryVariant),
-                    horizontalAlignment = Alignment.CenterHorizontally,
-                    verticalArrangement = Arrangement.spacedBy(4.dp, Alignment.CenterVertically),
-                ) {
-                    Text(text = s,
-                        color = MaterialTheme.colors.primary,
-                        fontSize = 32.sp,
-                        fontWeight = FontWeight.Bold,
-                        textAlign = TextAlign.Center,
-                        overflow = TextOverflow.Ellipsis,
-                        maxLines = 1
-                    )
-                    Text(text = "Tiempo estimado".uppercase() ,
-                        color = MaterialTheme.colors.primary,
-                        fontSize = 15.sp,
-                        fontWeight = FontWeight.Bold,
-                        textAlign = TextAlign.Center,
-                        overflow = TextOverflow.Ellipsis,
-                        maxLines = 1
-                    )
-                }
-                Column(
-                    modifier = Modifier
-                        .height(120.dp)
-                        .width(264.dp)
-                        .fillMaxWidth()
-                        .padding(vertical = 4.dp, horizontal = 4.dp)
-                        .clip(shape = RoundedCornerShape(16.dp))
-                        .background(MaterialTheme.colors.primaryVariant),
-                    horizontalAlignment = Alignment.CenterHorizontally,
-                    verticalArrangement = Arrangement.spacedBy(8.dp, Alignment.CenterVertically),
-                ) {
-                    Text(text = "Calificá la rutina",
-                        color = MaterialTheme.colors.primary,
-                        fontSize = 24.sp,
-                        fontWeight = FontWeight.Bold,
-                        textAlign = TextAlign.Center,
-                        overflow = TextOverflow.Ellipsis,
-                        maxLines = 1
-                    )
-                    RatingBar(
-                        rating = uiState.routine.score,
-                        starsColor = MaterialTheme.colors.primary,
-                        modifier = Modifier.padding(bottom = 2.dp),
-                        rate = {
-                            viewModel.rate(routineId, it)
-                        }
-                    )
-                }
-            }
-            Column(
-                modifier = Modifier
-                    .padding(horizontal = 64.dp)
-                    .fillMaxSize(),
-                verticalArrangement = Arrangement.spacedBy(8.dp, Alignment.CenterVertically),
-                horizontalAlignment = Alignment.CenterHorizontally
-            ) {
-                Button(
-                    modifier = Modifier.fillMaxWidth(),
-                    colors = ButtonDefaults.buttonColors(backgroundColor = MaterialTheme.colors.primary),
-                    shape = RoundedCornerShape(16.dp),
-                    onClick = {
-                        navController.popBackStack()
-                        navController.popBackStack()
-                        navController.popBackStack()
-                    }) {
-                    Text(
-                        text = "Finalizar".uppercase(),
-                        color = Color.White,
-                        style = MaterialTheme.typography.body2,
-                    )
-                }
-            }
-        }
-    }
 }
