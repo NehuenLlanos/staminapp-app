@@ -175,9 +175,8 @@ fun Execution(
                             .clip(shape = RoundedCornerShape(16.dp))
                             .background(Gray),
                         horizontalAlignment = Alignment.CenterHorizontally,
-                        verticalArrangement = Arrangement.spacedBy(8.dp, Alignment.CenterVertically),
+                        verticalArrangement = Arrangement.Center,
                     ) {
-
                         val sb = java.lang.StringBuilder()
                         LaunchedEffect(key1 = true) {
                             animationPlayed = true
@@ -212,21 +211,11 @@ fun Execution(
                                 fontWeight = FontWeight.Bold
                             )
                         }
-                        Text(text = viewModel.exercisesList.get(viewModel.exercisesListIndex.value).repetitions.toString(),
+                        Spacer(modifier = Modifier.height(16.dp))
+                        Text(text = "x" + viewModel.exercisesList.get(viewModel.exercisesListIndex.value).repetitions.toString(),
                             color = MaterialTheme.colors.primary,
+                            style = MaterialTheme.typography.h1,
                             fontSize = 30.sp,
-                            fontWeight = FontWeight.Bold,
-                            textAlign = TextAlign.Center,
-                            overflow = TextOverflow.Ellipsis,
-                            maxLines = 1
-                        )
-                        Text(text = stringResource(R.string.repetitions).uppercase(),
-                            color = MaterialTheme.colors.primary,
-                            fontSize = 10.sp,
-                            fontWeight = FontWeight.Bold,
-                            textAlign = TextAlign.Center,
-                            overflow = TextOverflow.Ellipsis,
-                            maxLines = 1
                         )
                     }
                 }
