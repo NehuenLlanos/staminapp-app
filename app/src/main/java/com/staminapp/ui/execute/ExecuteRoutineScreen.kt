@@ -94,11 +94,6 @@ fun Execution(
         }
     }
     else if (typeOfExecution == 1 && uiState.routine != null && uiState.cycles != null && uiState.exercises.isNotEmpty()) { // Time and Reps
-        var totalDivisions = 0
-        uiState.cycles.forEach {
-            totalDivisions += it.repetitions * viewModel.exercisesList.size
-        }
-        viewModel.setProgressBarInc(1/totalDivisions.toFloat())
 
         Column(modifier = Modifier
             .fillMaxHeight()
@@ -257,7 +252,7 @@ fun Execution(
                             if (viewModel.exercisesList.isNotEmpty() && viewModel.exercisesListIndex.value > 0) {
                                 viewModel.setExercisesListIndex(viewModel.exercisesListIndex.value - 1)
                                 val exercise = viewModel.exercisesList.get(viewModel.exercisesListIndex.value)
-
+                                viewModel.setProgressBarDec(1/viewModel.exercisesList.size.toFloat())
                                 if (exercise.duration != 0 && exercise.repetitions != 0) {
                                     typeOfExecution = 4 // Time and Reps
                                 } else if (exercise.duration == 0) {
@@ -286,7 +281,7 @@ fun Execution(
                             if (viewModel.exercisesList.isNotEmpty() && viewModel.exercisesListIndex.value < viewModel.exercisesList.size - 1) {
                                 viewModel.setExercisesListIndex(viewModel.exercisesListIndex.value + 1)
                                 val exercise = viewModel.exercisesList.get(viewModel.exercisesListIndex.value)
-
+                                viewModel.setProgressBarInc(1/viewModel.exercisesList.size.toFloat())
                                 if (exercise.duration != 0 && exercise.repetitions != 0) {
                                     typeOfExecution = 4 // Time and Reps
                                 } else if (exercise.duration == 0) {
@@ -323,11 +318,6 @@ fun Execution(
         }
     }
     else if (typeOfExecution == 2 && uiState.routine != null && uiState.cycles != null && uiState.exercises.isNotEmpty() ) { // Reps
-        var totalDivisions = 0
-        uiState.cycles.forEach {
-            totalDivisions += it.repetitions * viewModel.exercisesList.size
-        }
-        viewModel.setProgressBarInc(1/totalDivisions.toFloat())
 
         Column(modifier = Modifier
             .fillMaxHeight()
@@ -395,7 +385,7 @@ fun Execution(
                             if (viewModel.exercisesList.isNotEmpty() && viewModel.exercisesListIndex.value > 0) {
                                 viewModel.setExercisesListIndex(viewModel.exercisesListIndex.value - 1)
                                 val exercise = viewModel.exercisesList.get(viewModel.exercisesListIndex.value)
-
+                                viewModel.setProgressBarDec(1/viewModel.exercisesList.size.toFloat())
                                 if (exercise.duration != 0 && exercise.repetitions != 0) {
                                     typeOfExecution = 1 // Time and Reps
                                 } else if (exercise.duration == 0) {
@@ -424,7 +414,7 @@ fun Execution(
                             if (viewModel.exercisesList.isNotEmpty() && viewModel.exercisesListIndex.value < viewModel.exercisesList.size - 1) {
                                 viewModel.setExercisesListIndex(viewModel.exercisesListIndex.value + 1)
                                 val exercise = viewModel.exercisesList.get(viewModel.exercisesListIndex.value)
-
+                                viewModel.setProgressBarInc(1/viewModel.exercisesList.size.toFloat())
                                 if (exercise.duration != 0 && exercise.repetitions != 0) {
                                     typeOfExecution = 1 // Time and Reps
                                 } else if (exercise.duration == 0) {
@@ -461,11 +451,6 @@ fun Execution(
         }
     }
     else if (typeOfExecution == 3 && uiState.routine != null && uiState.cycles != null && uiState.exercises.isNotEmpty()) { // Time
-        var totalDivisions = 0
-        uiState.cycles.forEach {
-            totalDivisions += it.repetitions * viewModel.exercisesList.size
-        }
-        viewModel.setProgressBarInc(1/totalDivisions.toFloat())
 
         Column(modifier = Modifier
             .fillMaxHeight()
@@ -583,7 +568,19 @@ fun Execution(
                             animationPlayed = true
                         }
                     }) {
-                    Icon(Icons.Filled.Pause, contentDescription = "Inicio")
+                    if (animationPlayed) {
+                        Icon(
+                            Icons.Filled.Pause,
+                            contentDescription = null,
+                            tint = Color.White,
+                        )
+                    } else {
+                        Icon(
+                            Icons.Filled.PlayArrow,
+                            contentDescription = null,
+                            tint = Color.White,
+                        )
+                    }
                 }
                 Row(
                     horizontalArrangement = Arrangement.spacedBy(8.dp)
@@ -599,7 +596,7 @@ fun Execution(
                             if (viewModel.exercisesList.isNotEmpty() && viewModel.exercisesListIndex.value > 0) {
                                 viewModel.setExercisesListIndex(viewModel.exercisesListIndex.value - 1)
                                 val exercise = viewModel.exercisesList.get(viewModel.exercisesListIndex.value)
-
+                                viewModel.setProgressBarDec(1/viewModel.exercisesList.size.toFloat())
                                 if (exercise.duration != 0 && exercise.repetitions != 0) {
                                     typeOfExecution = 1 // Time and Reps
                                 } else if (exercise.duration == 0) {
@@ -628,7 +625,7 @@ fun Execution(
                             if (viewModel.exercisesList.isNotEmpty() && viewModel.exercisesListIndex.value < viewModel.exercisesList.size - 1) {
                                 viewModel.setExercisesListIndex(viewModel.exercisesListIndex.value + 1)
                                 val exercise = viewModel.exercisesList.get(viewModel.exercisesListIndex.value)
-
+                                viewModel.setProgressBarInc(1/viewModel.exercisesList.size.toFloat())
                                 if (exercise.duration != 0 && exercise.repetitions != 0) {
                                     typeOfExecution = 1 // Time and Reps
                                 } else if (exercise.duration == 0) {
