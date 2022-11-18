@@ -56,4 +56,6 @@
     <string name="try_again">Reintentar</string>
     <string name="api_error_message">Algo salió mal. Por favor verificá tu conexión a internet y volvé a intentarlo más tarde.</string>
     <string name="empty_routine_list">No hay nada acá</string>
+    <string name="end_routine_execution">Finalizar Rutina</string>
+    <string name="cancel">Cancel</string>
 </resources>

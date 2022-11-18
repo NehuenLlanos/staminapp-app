@@ -2,12 +2,12 @@ package com.staminapp.ui.execute
 
 import android.annotation.SuppressLint
 import androidx.compose.animation.core.LinearEasing
-import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.animateIntAsState
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
@@ -19,25 +19,23 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Color.Companion.White
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
-import androidx.navigation.compose.rememberNavController
 import com.staminapp.ui.theme.Gray
-import com.staminapp.ui.theme.StaminappAppTheme
 import androidx.compose.material.Icon as Icon
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.asImageBitmap
-import androidx.compose.ui.text.font.FontWeight
-import com.staminapp.R
+import androidx.compose.ui.res.stringResource
 import com.staminapp.ui.main.Destination
 import com.staminapp.util.decodeBase64Image
 import com.staminapp.util.getExecuteViewModelFactory
 import kotlinx.coroutines.delay
+import androidx.lifecycle.viewmodel.compose.viewModel
+import com.staminapp.R
+import kotlinx.coroutines.launch
 import java.util.concurrent.TimeUnit
 
 @SuppressLint("StateFlowValueCalledInComposition")
@@ -45,7 +43,7 @@ import java.util.concurrent.TimeUnit
 fun ExecuteRoutine2Screen(
     routineId : Int,
     navController: NavController,
-    viewModel: ExecuteViewModel = androidx.lifecycle.viewmodel.compose.viewModel(factory = getExecuteViewModelFactory())
+    viewModel: ExecuteViewModel = viewModel(factory = getExecuteViewModelFactory())
 ) {
     var selected by remember {
         mutableStateOf(false)
@@ -62,6 +60,9 @@ fun ExecuteRoutine2Screen(
 
     val uiState = viewModel.uiState
 
+    val listState = rememberLazyListState()
+    val coroutineScope = rememberCoroutineScope()
+
     var ticks by remember { mutableStateOf(0) }
 
     LaunchedEffect(Unit) {
@@ -70,8 +71,6 @@ fun ExecuteRoutine2Screen(
             ticks++
         }
     }
-
-
 
     if (!uiState.isFetching && uiState.routine == null) {
         viewModel.getRoutine(routineId)
@@ -82,16 +81,13 @@ fun ExecuteRoutine2Screen(
             if (uiState.cycles.size != uiState.exercises.keys.size) {
                 typeOfExecution = 1
             } else {
-                uiState.cycles!!.forEach {
+                uiState.cycles.forEach { cycle ->
                     var i = 0
-                    var cycle = it
-                    while (i < it.repetitions) {
-                        uiState.exercises!!.get(it.id)!!.forEach {
-//                        viewModel.exercisesList.add(Pair(it, cycle))
+                    while (i < cycle.repetitions) {
+                        uiState.exercises[cycle.id]!!.forEach {
                             viewModel.exercisesList.add(it)
                             viewModel.cyclesList.add(cycle)
                         }
-
                         i++
                     }
                 }
@@ -104,10 +100,7 @@ fun ExecuteRoutine2Screen(
 
 
     if (uiState.routine != null && uiState.cycles != null && uiState.exercises.isNotEmpty() && !uiState.isAllFetching && typeOfExecution == 2) {
-
-//        var animDurationSec = viewModel.uiState.exercises!!.get(viewModel.uiState.cycles!!.get(viewModel.currentCycleIndex.value).id)!!
-//            .get(viewModel.currentExerciseIndex.value).duration
-        var animDurationSec = viewModel.exercisesList.get(viewModel.exercisesListIndex.value).duration
+        val animDurationSec = viewModel.exercisesList[viewModel.exercisesListIndex.value].duration
 
         var animationPlayed by remember {
             mutableStateOf(false)
@@ -132,7 +125,7 @@ fun ExecuteRoutine2Screen(
         LaunchedEffect(key1 = true) {
             animationPlayed = true
         }
-        Scaffold() { paddingValues ->
+        Scaffold { paddingValues ->
             Column(
                 modifier = Modifier
                     .padding(paddingValues)
@@ -147,11 +140,11 @@ fun ExecuteRoutine2Screen(
                         modifier = Modifier
                             .width(40.dp)
                             .height(40.dp),
-                        bitmap = decodeBase64Image(uiState.routine!!.image).asImageBitmap(),
-                        contentDescription = "Imagen de Rutina",
+                        bitmap = decodeBase64Image(uiState.routine.image).asImageBitmap(),
+                        contentDescription = stringResource(R.string.routine_image),
                         contentScale = ContentScale.Crop
                     )
-                    Text(text = uiState.routine!!.name.uppercase(),
+                    Text(text = uiState.routine.name.uppercase(),
                         color = MaterialTheme.colors.primaryVariant,
                         fontSize = 20.sp,
                         style = MaterialTheme.typography.h1,
@@ -161,16 +154,19 @@ fun ExecuteRoutine2Screen(
                     )
                 }
                 LazyColumn(
+                    state = listState,
                     modifier = Modifier
                         .weight(1f)
                         .padding(horizontal = 16.dp)
                 ) {
-
                     items(viewModel.exercisesList.size) { i ->
-                        ExecutionExercise(idx = i,
-                            title = viewModel.exercisesList.get(i).name,
-                            cycle = viewModel.cyclesList.get(i).name,
-                            selected = i == viewModel.exercisesListIndex.value)
+                        ExecutionExercise(
+                            idx = i,
+                            title = viewModel.exercisesList[i].name,
+                            cycle = viewModel.cyclesList[i].name,
+                            selected = i == viewModel.exercisesListIndex.value,
+                            modifier = Modifier.padding(bottom = 8.dp)
+                        )
                     }
                 }
                 Spacer(
@@ -192,50 +188,36 @@ fun ExecuteRoutine2Screen(
                         .background(White)
                         .padding(16.dp)
                 ) {
-                    if (viewModel.exercisesList.get(viewModel.exercisesListIndex.value).repetitions == 0) {
+                    if (viewModel.exercisesList[viewModel.exercisesListIndex.value].duration > 0) {
                         val sb = java.lang.StringBuilder()
+
+                        val seconds = TimeUnit.SECONDS.toSeconds(((animDurationSec - curTime.value) % 60).toLong())
                         Text(
-                            text = sb.append(
-                                TimeUnit.SECONDS.toMinutes((animDurationSec - curTime.value).toLong())
-                                    .toString()
-                            )
+                            text = sb
+                                .append(
+                                    TimeUnit.SECONDS.toMinutes((animDurationSec - curTime.value)
+                                        .toLong())
+                                        .toString()
+                                )
                                 .append(":")
                                 .append(
-                                    TimeUnit.SECONDS.toSeconds(((animDurationSec - curTime.value) % 60).toLong())
-                                        .toString()
-                                ).toString(),
+                                    if (seconds < 10) {
+                                        "0"
+                                    } else {
+                                        ""
+                                    }
+                                )
+                                .append(seconds.toString())
+                                .toString(),
                             textAlign = TextAlign.Center,
                             color = MaterialTheme.colors.primaryVariant,
                             style = MaterialTheme.typography.h3,
                             modifier = Modifier.fillMaxWidth()
                         )
-                    } else if (viewModel.exercisesList.get(viewModel.exercisesListIndex.value).duration == 0) {
+                    }
+                    if (viewModel.exercisesList[viewModel.exercisesListIndex.value].repetitions > 0) {
                         Text(
-                            text = "x" + viewModel.exercisesList.get(viewModel.exercisesListIndex.value).repetitions.toString(),
-                            textAlign = TextAlign.Center,
-                            color = MaterialTheme.colors.primaryVariant,
-                            style = MaterialTheme.typography.h3,
-                            modifier = Modifier.fillMaxWidth()
-                        )
-                    } else {
-                        val sb = java.lang.StringBuilder()
-                        Text(
-                            text = sb.append(
-                                TimeUnit.SECONDS.toMinutes((animDurationSec - curTime.value).toLong())
-                                    .toString()
-                            )
-                                .append(":")
-                                .append(
-                                    TimeUnit.SECONDS.toSeconds(((animDurationSec - curTime.value) % 60).toLong())
-                                        .toString()
-                                ).toString(),
-                            textAlign = TextAlign.Center,
-                            color = MaterialTheme.colors.primaryVariant,
-                            style = MaterialTheme.typography.h3,
-                            modifier = Modifier.fillMaxWidth()
-                        )
-                        Text(
-                            text = "x" + viewModel.exercisesList.get(viewModel.exercisesListIndex.value).repetitions.toString(),
+                            text = "x" + viewModel.exercisesList[viewModel.exercisesListIndex.value].repetitions.toString(),
                             textAlign = TextAlign.Center,
                             color = MaterialTheme.colors.primaryVariant,
                             style = MaterialTheme.typography.h3,
@@ -246,6 +228,7 @@ fun ExecuteRoutine2Screen(
                         modifier = Modifier.fillMaxWidth(),
                         colors = ButtonDefaults.buttonColors(backgroundColor = MaterialTheme.colors.primary),
                         shape = RoundedCornerShape(16.dp),
+                        enabled = viewModel.exercisesList[viewModel.exercisesListIndex.value].duration > 0,
                         onClick = {
                             if (animationPlayed) {
                                 lastTime = curTime.value
@@ -280,11 +263,13 @@ fun ExecuteRoutine2Screen(
                                 .weight(1f),
                             colors = ButtonDefaults.buttonColors(backgroundColor = Color(0xFFFFD28C)),
                             shape = RoundedCornerShape(16.dp),
+                            enabled = viewModel.exercisesList.isNotEmpty() && viewModel.exercisesListIndex.value > 0,
                             onClick = {
-                                if (viewModel.exercisesList.isNotEmpty() && viewModel.exercisesListIndex.value > 0) {
-                                    viewModel.setExercisesListIndex(viewModel.exercisesListIndex.value - 1)
-                                    typeOfExecution = 3
+                                viewModel.setExercisesListIndex(viewModel.exercisesListIndex.value - 1)
+                                coroutineScope.launch {
+                                    listState.animateScrollToItem(index = viewModel.exercisesListIndex.value, -5)
                                 }
+                                typeOfExecution = 3
                             }
                         ) {
                             Icon(
@@ -303,6 +288,12 @@ fun ExecuteRoutine2Screen(
                             onClick = {
                                 if (viewModel.exercisesList.isNotEmpty() && viewModel.exercisesListIndex.value < viewModel.exercisesList.size - 1) {
                                     viewModel.setExercisesListIndex(viewModel.exercisesListIndex.value + 1)
+                                    coroutineScope.launch {
+                                        listState.animateScrollToItem(
+                                            index = viewModel.exercisesListIndex.value,
+                                            -5
+                                        )
+                                    }
                                     typeOfExecution = 3
                                 } else {
                                     navController.navigate(Destination.ExecutionFinishedRoutine.createRoute(routineId = routineId, totalTime = ticks))
@@ -324,7 +315,7 @@ fun ExecuteRoutine2Screen(
                             navController.navigate(Destination.ExecutionFinishedRoutine.createRoute(routineId = routineId, totalTime = ticks))
                         }
                     ) {
-                        Text(text = "Finalizar Rutina".uppercase(),
+                        Text(text = stringResource(R.string.end_routine_execution).uppercase(),
                             color = MaterialTheme.colors.error,
                             style = MaterialTheme.typography.button,
                         )
@@ -340,75 +331,6 @@ fun ExecuteRoutine2Screen(
     }
     else if (typeOfExecution == 3) {
         typeOfExecution = 2
-    }
-}
-
-@Composable
-fun ExecutionButtons(
-    modifier: Modifier = Modifier,
-) {
-    Button(
-        modifier = Modifier.fillMaxWidth(),
-        colors = ButtonDefaults.buttonColors(backgroundColor = MaterialTheme.colors.primary),
-        shape = RoundedCornerShape(16.dp),
-        onClick = {
-
-        }
-    ) {
-        Icon(
-            Icons.Filled.Pause,
-            contentDescription = null,
-            tint = White,
-        )
-    }
-    Row(
-        horizontalArrangement = Arrangement.spacedBy(8.dp)
-    ) {
-        Button(
-            modifier = Modifier
-                .fillMaxWidth()
-                .weight(1f),
-            colors = ButtonDefaults.buttonColors(backgroundColor = Color(0xFFFFD28C)),
-            shape = RoundedCornerShape(16.dp),
-            onClick = {
-
-            }
-        ) {
-            Icon(
-                Icons.Filled.FastRewind,
-                contentDescription = null,
-                tint = White,
-            )
-        }
-        Button(
-            modifier = Modifier
-                .fillMaxWidth()
-                .weight(1f),
-            colors = ButtonDefaults.buttonColors(backgroundColor = Color(0xFFFFD28C)),
-            shape = RoundedCornerShape(16.dp),
-            onClick = {
-
-            }
-        ) {
-            Icon(
-                Icons.Filled.FastForward,
-                contentDescription = null,
-                tint = White,
-            )
-        }
-    }
-    Button(
-        modifier = Modifier.fillMaxWidth(),
-        colors = ButtonDefaults.buttonColors(backgroundColor = Color(0XFFFBD5D1)),
-        shape = RoundedCornerShape(16.dp),
-        onClick = {
-
-        }
-    ) {
-        Text(text = "Finalizar Rutina".uppercase(),
-            color = MaterialTheme.colors.error,
-            style = MaterialTheme.typography.button,
-        )
     }
 }
 
@@ -474,11 +396,3 @@ fun ExecutionExercise(
         }
     }
 }
-
-//@Preview
-//@Composable
-//fun ExecuteRoutine2Preview() {
-//    StaminappAppTheme {
-//        ExecuteRoutine2Screen(rememberNavController())
-//    }
-//}
