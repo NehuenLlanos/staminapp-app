@@ -14,7 +14,7 @@ private val DarkColorPalette = darkColors(
     secondary = Secondary,
     error = Error,
     background = Background,
-    onBackground = Background
+    onBackground = Background,
 )
 
 private val LightColorPalette = lightColors(
