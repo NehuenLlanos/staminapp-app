@@ -70,7 +70,8 @@ fun AppConfigScreen(
                 Text(
                     stringResource(R.string.show_recent_routines),
                     style = MaterialTheme.typography.body1,
-                    color = MaterialTheme.colors.primaryVariant
+                    color = MaterialTheme.colors.primaryVariant,
+                    modifier = Modifier.weight(0.8f)
                 )
                 Switch(
                     checked = showRecents,
@@ -101,7 +102,8 @@ fun AppConfigScreen(
                 Text(
                     stringResource(R.string.dropdowns_open),
                     style = MaterialTheme.typography.body1,
-                    color = MaterialTheme.colors.primaryVariant
+                    color = MaterialTheme.colors.primaryVariant,
+                    modifier = Modifier.weight(0.8f)
                 )
                 Switch(
                     checked = dropdownsOpen,
