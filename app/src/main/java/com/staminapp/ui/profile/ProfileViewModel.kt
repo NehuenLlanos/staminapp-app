@@ -27,7 +27,7 @@ class ProfileViewModel (
             message = null
         )
         runCatching {
-            userRepository.getCurrentUser(uiState.currentUser == null)
+            userRepository.getCurrentUser()
         }.onSuccess { response ->
             uiState = uiState.copy(
                 isFetching = false,

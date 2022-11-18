@@ -13,9 +13,11 @@ class UserRepository (
 ){
     private val currentUserMutex = Mutex()
     private var currentUser: User? = null
+    private var currentUserLastFetch: Long = 0
 
     private val userRoutinesMutex = Mutex()
     private var userRoutinesList: List<Routine> = emptyList()
+    private var userRoutinesLastFetch: Long = 0
 
     suspend fun login(username: String, password: String) {
         remoteDataSource.login(username, password)
@@ -25,8 +27,10 @@ class UserRepository (
         remoteDataSource.logout()
     }
 
-    suspend fun getCurrentUser(refresh: Boolean) : User? {
-        if (refresh || currentUser == null) {
+    suspend fun getCurrentUser() : User? {
+        val now = System.currentTimeMillis()
+        if (currentUser == null || now - currentUserLastFetch > 120000) {
+            currentUserLastFetch = now
             val result = remoteDataSource.getCurrentUser()
             currentUserMutex.withLock {
                 this.currentUser = result.asModel()
@@ -35,11 +39,13 @@ class UserRepository (
         return currentUserMutex.withLock { this.currentUser }
     }
 
-    suspend fun getUserRoutines(refresh: Boolean = false) : List<Routine> {
-        if (refresh || userRoutinesList.isEmpty()) {
+    suspend fun getUserRoutines() : List<Routine> {
+        val now = System.currentTimeMillis()
+        if (userRoutinesList.isEmpty() || now - userRoutinesLastFetch > 120000) {
+            userRoutinesLastFetch = now
             val result = remoteDataSource.getUserRoutines()
             userRoutinesMutex.withLock {
-                var routines : MutableList<Routine> = mutableListOf()
+                val routines : MutableList<Routine> = mutableListOf()
                 result.content.forEach{
                     routines.add(it.asModel())
                 }

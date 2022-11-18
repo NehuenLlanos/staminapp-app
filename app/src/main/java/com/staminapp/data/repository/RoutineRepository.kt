@@ -12,25 +12,30 @@ class RoutineRepository (
 ) {
     private val currentRoutinesMutex = Mutex()
     private var currentRoutinesList: List<Routine> = emptyList()
+    private var currentRoutineListLastFetch: Long = 0
 
     private val currentRoutineMutex = Mutex()
     private var currentRoutine: Routine? = null
-
+    private var currentRoutineLastFetch: Long = 0
 
     private val currentCyclesForRoutineMutex = Mutex()
     private var currentCyclesForRoutineList: List<Cycle> = emptyList()
     private var lastRoutineId: Int = -1
+    private var currentCyclesLastFetch: Long = 0
 
     private val currentExercisesForCycleMutex = Mutex()
     private var currentExercisesForCycleList: List<Exercise> = emptyList()
     private var lastCycleId: Int = -1
+    private var currentExercisesLastFetch: Long = 0
 
 
-    suspend fun getAllRoutines(refresh: Boolean = false) : List<Routine> {
-        if (refresh || currentRoutinesList.isEmpty()) {
+    suspend fun getAllRoutines() : List<Routine> {
+        val now = System.currentTimeMillis()
+        if (currentRoutinesList.isEmpty() || now - currentRoutineListLastFetch > 120000) {
+            currentRoutineListLastFetch = now
             val result = remoteDataSource.getAllRoutines()
             currentRoutinesMutex.withLock {
-                var routines : MutableList<Routine> = mutableListOf()
+                val routines : MutableList<Routine> = mutableListOf()
                 result.content.forEach{
                     routines.add(it.asModel())
                 }
@@ -40,8 +45,10 @@ class RoutineRepository (
         return currentRoutinesMutex.withLock { this.currentRoutinesList }
     }
 
-    suspend fun getRoutine(refresh: Boolean = false, id: Int) : Routine {
-        if (refresh || currentRoutine == null || currentRoutine?.id != id) {
+    suspend fun getRoutine(id: Int) : Routine {
+        val now = System.currentTimeMillis()
+        if (currentRoutine == null || currentRoutine?.id != id || now - currentRoutineLastFetch > 120000) {
+            currentRoutineLastFetch = now
             val result = remoteDataSource.getRoutine(id)
             currentRoutineMutex.withLock {
                 this.currentRoutine = result.asModel()
@@ -50,11 +57,13 @@ class RoutineRepository (
         return currentRoutineMutex.withLock { this.currentRoutine!! }
     }
 
-    suspend fun getCyclesForRoutine(refresh: Boolean = false, id: Int) : List<Cycle> {
-        if (refresh || currentCyclesForRoutineList.isEmpty() || lastRoutineId != id) {
+    suspend fun getCyclesForRoutine(id: Int) : List<Cycle> {
+        val now = System.currentTimeMillis()
+        if (currentCyclesForRoutineList.isEmpty() || lastRoutineId != id || now - currentCyclesLastFetch > 120000) {
+            currentCyclesLastFetch = now
             val result = remoteDataSource.getCyclesForRoutine(id)
             currentCyclesForRoutineMutex.withLock {
-                var cycles : MutableList<Cycle> = mutableListOf()
+                val cycles : MutableList<Cycle> = mutableListOf()
                 result.content.forEach{
                     cycles.add(it.asModel())
                 }
@@ -65,11 +74,13 @@ class RoutineRepository (
         return currentCyclesForRoutineMutex.withLock { this.currentCyclesForRoutineList }
     }
 
-    suspend fun getExerciseForCycle(refresh: Boolean = false, id: Int) : List<Exercise> {
-        if (refresh || currentExercisesForCycleList.isEmpty() || lastCycleId != id) {
+    suspend fun getExerciseForCycle(id: Int) : List<Exercise> {
+        val now = System.currentTimeMillis()
+        if (currentExercisesForCycleList.isEmpty() || lastCycleId != id || now - currentExercisesLastFetch > 120000) {
+            currentExercisesLastFetch = now
             val result = remoteDataSource.getExercisesForCycle(id)
             currentExercisesForCycleMutex.withLock {
-                var exercises : MutableList<Exercise> = mutableListOf()
+                val exercises : MutableList<Exercise> = mutableListOf()
                 result.content.forEach{
                     exercises.add(it.asModel())
                 }

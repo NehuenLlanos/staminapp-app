@@ -9,14 +9,19 @@ import kotlinx.coroutines.sync.withLock
 class FavouriteRepository (
     private val remoteDataSource: FavouriteRemoteDataSource
 ) {
+    private var hardRefresh: Boolean = true
+    private var lastFetch: Long = 0
     private val favouriteRoutinesMutex = Mutex()
     private var favouriteRoutinesList: List<Routine> = emptyList()
 
-    suspend fun getFavourites(refresh: Boolean = false) : List<Routine> {
-        if (refresh || favouriteRoutinesList.isEmpty()) {
+    suspend fun getFavourites() : List<Routine> {
+        val now = System.currentTimeMillis()
+        if (hardRefresh || favouriteRoutinesList.isEmpty() || now - lastFetch > 120000) {
+            hardRefresh = false
+            lastFetch = now
             val result = remoteDataSource.getFavourites()
             favouriteRoutinesMutex.withLock {
-                var routines : MutableList<Routine> = mutableListOf()
+                val routines : MutableList<Routine> = mutableListOf()
                 result.content.forEach{
                     routines.add(it.asModel())
                 }
@@ -28,9 +33,11 @@ class FavouriteRepository (
 
     suspend fun putFavourite(id : Int) {
         remoteDataSource.putFavourite(id)
+        hardRefresh = true
     }
 
     suspend fun deleteFavourite(id : Int) {
         remoteDataSource.deleteFavourite(id)
+        hardRefresh = true
     }
 }
