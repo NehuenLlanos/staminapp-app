@@ -26,7 +26,9 @@ import com.staminapp.ui.main.CustomChip
 import com.staminapp.util.getExecuteViewModelFactory
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
+import com.staminapp.ui.main.ApiErrorDialog
 import com.staminapp.ui.main.Destination
+import com.staminapp.ui.main.LoadingIndicator
 import com.staminapp.util.decodeBase64Image
 import com.staminapp.util.translateDifficultyForApp
 
@@ -38,12 +40,21 @@ fun StartExecutionScreen(
     viewModel: ExecuteViewModel = viewModel ( factory = getExecuteViewModelFactory() )
 ) {
     val uiState = viewModel.uiState
-    if (!uiState.isFetching && uiState.routine == null) {
+    if (uiState.message == null && !uiState.isFetching && uiState.routine == null) {
         viewModel.getRoutine(id)
-        viewModel.getCyclesForRoutine(id)
-        viewModel.getExercisesForCycle(id)
     }
-    if (uiState.routine != null) {
+
+    if (uiState.message != null) {
+        ApiErrorDialog {
+            viewModel.getRoutine(id)
+        }
+    } else if (uiState.routine == null) {
+        Box(
+            modifier = Modifier.fillMaxSize()
+        ) {
+            LoadingIndicator()
+        }
+    } else {
         Column(
             modifier = Modifier.fillMaxSize(),
             horizontalAlignment = Alignment.CenterHorizontally,

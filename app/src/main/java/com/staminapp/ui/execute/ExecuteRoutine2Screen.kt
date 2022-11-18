@@ -35,6 +35,8 @@ import com.staminapp.util.getExecuteViewModelFactory
 import kotlinx.coroutines.delay
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.staminapp.R
+import com.staminapp.ui.main.ApiErrorDialog
+import com.staminapp.ui.main.LoadingIndicator
 import kotlinx.coroutines.launch
 import java.util.concurrent.TimeUnit
 
@@ -72,265 +74,283 @@ fun ExecuteRoutine2Screen(
         }
     }
 
-    if (!uiState.isFetching && uiState.routine == null) {
+    if (uiState.message == null && !uiState.isFetching && uiState.routine == null) {
         viewModel.getRoutine(routineId)
     }
 
-    if (typeOfExecution == -1) {
-        if (uiState.routine != null && uiState.cycles != null && uiState.exercises.isNotEmpty() && !uiState.isAllFetching) {
-            if (uiState.cycles.size != uiState.exercises.keys.size) {
-                typeOfExecution = 1
-            } else {
-                uiState.cycles.forEach { cycle ->
-                    var i = 0
-                    while (i < cycle.repetitions) {
-                        uiState.exercises[cycle.id]!!.forEach {
-                            viewModel.exercisesList.add(it)
-                            viewModel.cyclesList.add(cycle)
-                        }
-                        i++
-                    }
-                }
-                typeOfExecution = 2
-            }
-        } else {
-            typeOfExecution = 1
+    if (uiState.message != null) {
+        ApiErrorDialog {
+            viewModel.getRoutine(routineId)
         }
-    }
-
-
-    if (uiState.routine != null && uiState.cycles != null && uiState.exercises.isNotEmpty() && !uiState.isAllFetching && typeOfExecution == 2) {
-        val animDurationSec = viewModel.exercisesList[viewModel.exercisesListIndex.value].duration
-
-        var animationPlayed by remember {
-            mutableStateOf(false)
+    } else if (uiState.routine == null) {
+        Box(
+            modifier = Modifier.fillMaxSize()
+        ) {
+            LoadingIndicator()
         }
-
-        var lastTime by remember {
-            mutableStateOf(0)
-        }
-        var animationDuration by remember {
-            mutableStateOf(animDurationSec*1000)
-        }
-
-        val curTime = animateIntAsState(
-            targetValue =  if (animationPlayed) animDurationSec else lastTime,
-            animationSpec = tween (
-                durationMillis = if (animationPlayed) animationDuration else 0,
-                delayMillis = 0,
-                easing = LinearEasing
-            )
-        )
-
-        LaunchedEffect(key1 = true) {
-            animationPlayed = true
-        }
-        Scaffold { paddingValues ->
-            Column(
-                modifier = Modifier
-                    .padding(paddingValues)
-                    .fillMaxSize()
+    } else {
+        if (typeOfExecution == -1) {
+            Box(
+                modifier = Modifier.fillMaxSize()
             ) {
-                Row(
-                    horizontalArrangement = Arrangement.spacedBy(8.dp),
-                    verticalAlignment = Alignment.CenterVertically,
-                    modifier = Modifier.padding(16.dp)
-                ){
-                    Image(
-                        modifier = Modifier
-                            .width(40.dp)
-                            .height(40.dp),
-                        bitmap = decodeBase64Image(uiState.routine.image).asImageBitmap(),
-                        contentDescription = stringResource(R.string.routine_image),
-                        contentScale = ContentScale.Crop
-                    )
-                    Text(text = uiState.routine.name.uppercase(),
-                        color = MaterialTheme.colors.primaryVariant,
-                        fontSize = 20.sp,
-                        style = MaterialTheme.typography.h1,
-                        textAlign = TextAlign.Center,
-                        overflow = TextOverflow.Ellipsis,
-                        maxLines = 1
-                    )
-                }
-                LazyColumn(
-                    state = listState,
-                    modifier = Modifier
-                        .weight(1f)
-                        .padding(horizontal = 16.dp)
-                ) {
-                    items(viewModel.exercisesList.size) { i ->
-                        ExecutionExercise(
-                            idx = i,
-                            title = viewModel.exercisesList[i].name,
-                            cycle = viewModel.cyclesList[i].name,
-                            selected = i == viewModel.exercisesListIndex.value,
-                            modifier = Modifier.padding(bottom = 8.dp)
-                        )
-                    }
-                }
-                Spacer(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .height(8.dp)
-                        .background(
-                            Brush.verticalGradient(
-                                colors = listOf(
-                                    Color.Transparent,
-                                    Color(0x11000000)
-                                )
-                            )
-                        )
-                )
-                Column(
-                    verticalArrangement = Arrangement.Bottom,
-                    modifier = Modifier
-                        .background(White)
-                        .padding(16.dp)
-                ) {
-                    if (viewModel.exercisesList[viewModel.exercisesListIndex.value].duration > 0) {
-                        val sb = java.lang.StringBuilder()
+                LoadingIndicator()
+            }
 
-                        val seconds = TimeUnit.SECONDS.toSeconds(((animDurationSec - curTime.value) % 60).toLong())
-                        Text(
-                            text = sb
-                                .append(
-                                    TimeUnit.SECONDS.toMinutes((animDurationSec - curTime.value)
-                                        .toLong())
-                                        .toString()
-                                )
-                                .append(":")
-                                .append(
-                                    if (seconds < 10) {
-                                        "0"
-                                    } else {
-                                        ""
-                                    }
-                                )
-                                .append(seconds.toString())
-                                .toString(),
-                            textAlign = TextAlign.Center,
-                            color = MaterialTheme.colors.primaryVariant,
-                            style = MaterialTheme.typography.h3,
-                            modifier = Modifier.fillMaxWidth()
-                        )
-                    }
-                    if (viewModel.exercisesList[viewModel.exercisesListIndex.value].repetitions > 0) {
-                        Text(
-                            text = "x" + viewModel.exercisesList[viewModel.exercisesListIndex.value].repetitions.toString(),
-                            textAlign = TextAlign.Center,
-                            color = MaterialTheme.colors.primaryVariant,
-                            style = MaterialTheme.typography.h3,
-                            modifier = Modifier.fillMaxWidth()
-                        )
-                    }
-                    Button(
-                        modifier = Modifier.fillMaxWidth(),
-                        colors = ButtonDefaults.buttonColors(backgroundColor = MaterialTheme.colors.primary),
-                        shape = RoundedCornerShape(16.dp),
-                        enabled = viewModel.exercisesList[viewModel.exercisesListIndex.value].duration > 0,
-                        onClick = {
-                            if (animationPlayed) {
-                                lastTime = curTime.value
-                                animationPlayed = false
-                            } else {
-                                animationDuration = (animDurationSec - lastTime)*1000
-                                animationPlayed = true
+            if (uiState.cycles != null && uiState.exercises.isNotEmpty() && !uiState.isAllFetching) {
+                if (uiState.cycles.size != uiState.exercises.keys.size) {
+                    typeOfExecution = 1
+                } else {
+                    uiState.cycles.forEach { cycle ->
+                        var i = 0
+                        while (i < cycle.repetitions) {
+                            uiState.exercises[cycle.id]!!.forEach {
+                                viewModel.exercisesList.add(it)
+                                viewModel.cyclesList.add(cycle)
                             }
+                            i++
                         }
+                    }
+                    typeOfExecution = 2
+                }
+            } else {
+                typeOfExecution = 1
+            }
+        }
+
+
+        if (uiState.cycles != null && uiState.exercises.isNotEmpty() && !uiState.isAllFetching && typeOfExecution == 2) {
+            val animDurationSec = viewModel.exercisesList[viewModel.exercisesListIndex.value].duration
+
+            var animationPlayed by remember {
+                mutableStateOf(false)
+            }
+
+            var lastTime by remember {
+                mutableStateOf(0)
+            }
+            var animationDuration by remember {
+                mutableStateOf(animDurationSec*1000)
+            }
+
+            val curTime = animateIntAsState(
+                targetValue =  if (animationPlayed) animDurationSec else lastTime,
+                animationSpec = tween (
+                    durationMillis = if (animationPlayed) animationDuration else 0,
+                    delayMillis = 0,
+                    easing = LinearEasing
+                )
+            )
+
+            LaunchedEffect(key1 = true) {
+                animationPlayed = true
+            }
+            Scaffold { paddingValues ->
+                Column(
+                    modifier = Modifier
+                        .padding(paddingValues)
+                        .fillMaxSize()
+                ) {
+                    Row(
+                        horizontalArrangement = Arrangement.spacedBy(8.dp),
+                        verticalAlignment = Alignment.CenterVertically,
+                        modifier = Modifier.padding(16.dp)
+                    ){
+                        Image(
+                            modifier = Modifier
+                                .width(40.dp)
+                                .height(40.dp),
+                            bitmap = decodeBase64Image(uiState.routine.image).asImageBitmap(),
+                            contentDescription = stringResource(R.string.routine_image),
+                            contentScale = ContentScale.Crop
+                        )
+                        Text(text = uiState.routine.name.uppercase(),
+                            color = MaterialTheme.colors.primaryVariant,
+                            fontSize = 20.sp,
+                            style = MaterialTheme.typography.h1,
+                            textAlign = TextAlign.Center,
+                            overflow = TextOverflow.Ellipsis,
+                            maxLines = 1
+                        )
+                    }
+                    LazyColumn(
+                        state = listState,
+                        modifier = Modifier
+                            .weight(1f)
+                            .padding(horizontal = 16.dp)
                     ) {
-                        if (animationPlayed) {
-                            Icon(
-                                Icons.Filled.Pause,
-                                contentDescription = null,
-                                tint = White,
-                            )
-                        } else {
-                            Icon(
-                                Icons.Filled.PlayArrow,
-                                contentDescription = null,
-                                tint = White,
+                        items(viewModel.exercisesList.size) { i ->
+                            ExecutionExercise(
+                                idx = i,
+                                title = viewModel.exercisesList[i].name,
+                                cycle = viewModel.cyclesList[i].name,
+                                selected = i == viewModel.exercisesListIndex.value,
+                                modifier = Modifier.padding(bottom = 8.dp)
                             )
                         }
                     }
-                    Row(
-                        horizontalArrangement = Arrangement.spacedBy(8.dp)
+                    Spacer(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .height(8.dp)
+                            .background(
+                                Brush.verticalGradient(
+                                    colors = listOf(
+                                        Color.Transparent,
+                                        Color(0x11000000)
+                                    )
+                                )
+                            )
+                    )
+                    Column(
+                        verticalArrangement = Arrangement.Bottom,
+                        modifier = Modifier
+                            .background(White)
+                            .padding(16.dp)
                     ) {
-                        /* BOTON VOLVER PARA EL EJERCICIO ANTERIOR */
+                        if (viewModel.exercisesList[viewModel.exercisesListIndex.value].duration > 0) {
+                            val sb = java.lang.StringBuilder()
+
+                            val seconds = TimeUnit.SECONDS.toSeconds(((animDurationSec - curTime.value) % 60).toLong())
+                            Text(
+                                text = sb
+                                    .append(
+                                        TimeUnit.SECONDS.toMinutes((animDurationSec - curTime.value)
+                                            .toLong())
+                                            .toString()
+                                    )
+                                    .append(":")
+                                    .append(
+                                        if (seconds < 10) {
+                                            "0"
+                                        } else {
+                                            ""
+                                        }
+                                    )
+                                    .append(seconds.toString())
+                                    .toString(),
+                                textAlign = TextAlign.Center,
+                                color = MaterialTheme.colors.primaryVariant,
+                                style = MaterialTheme.typography.h3,
+                                modifier = Modifier.fillMaxWidth()
+                            )
+                        }
+                        if (viewModel.exercisesList[viewModel.exercisesListIndex.value].repetitions > 0) {
+                            Text(
+                                text = "x" + viewModel.exercisesList[viewModel.exercisesListIndex.value].repetitions.toString(),
+                                textAlign = TextAlign.Center,
+                                color = MaterialTheme.colors.primaryVariant,
+                                style = MaterialTheme.typography.h3,
+                                modifier = Modifier.fillMaxWidth()
+                            )
+                        }
                         Button(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .weight(1f),
-                            colors = ButtonDefaults.buttonColors(backgroundColor = Color(0xFFFFD28C)),
+                            modifier = Modifier.fillMaxWidth(),
+                            colors = ButtonDefaults.buttonColors(backgroundColor = MaterialTheme.colors.primary),
                             shape = RoundedCornerShape(16.dp),
-                            enabled = viewModel.exercisesList.isNotEmpty() && viewModel.exercisesListIndex.value > 0,
+                            enabled = viewModel.exercisesList[viewModel.exercisesListIndex.value].duration > 0,
                             onClick = {
-                                viewModel.setExercisesListIndex(viewModel.exercisesListIndex.value - 1)
-                                coroutineScope.launch {
-                                    listState.animateScrollToItem(index = viewModel.exercisesListIndex.value, -5)
+                                if (animationPlayed) {
+                                    lastTime = curTime.value
+                                    animationPlayed = false
+                                } else {
+                                    animationDuration = (animDurationSec - lastTime)*1000
+                                    animationPlayed = true
                                 }
-                                typeOfExecution = 3
                             }
                         ) {
-                            Icon(
-                                Icons.Filled.FastRewind,
-                                contentDescription = null,
-                                tint = White,
-                            )
+                            if (animationPlayed) {
+                                Icon(
+                                    Icons.Filled.Pause,
+                                    contentDescription = null,
+                                    tint = White,
+                                )
+                            } else {
+                                Icon(
+                                    Icons.Filled.PlayArrow,
+                                    contentDescription = null,
+                                    tint = White,
+                                )
+                            }
                         }
-                        /* BOTON IR AL SIGUIENTE EJERCICIO */
-                        Button(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .weight(1f),
-                            colors = ButtonDefaults.buttonColors(backgroundColor = Color(0xFFFFD28C)),
-                            shape = RoundedCornerShape(16.dp),
-                            onClick = {
-                                if (viewModel.exercisesList.isNotEmpty() && viewModel.exercisesListIndex.value < viewModel.exercisesList.size - 1) {
-                                    viewModel.setExercisesListIndex(viewModel.exercisesListIndex.value + 1)
+                        Row(
+                            horizontalArrangement = Arrangement.spacedBy(8.dp)
+                        ) {
+                            /* BOTON VOLVER PARA EL EJERCICIO ANTERIOR */
+                            Button(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .weight(1f),
+                                colors = ButtonDefaults.buttonColors(backgroundColor = Color(0xFFFFD28C)),
+                                shape = RoundedCornerShape(16.dp),
+                                enabled = viewModel.exercisesList.isNotEmpty() && viewModel.exercisesListIndex.value > 0,
+                                onClick = {
+                                    viewModel.setExercisesListIndex(viewModel.exercisesListIndex.value - 1)
                                     coroutineScope.launch {
-                                        listState.animateScrollToItem(
-                                            index = viewModel.exercisesListIndex.value,
-                                            -5
-                                        )
+                                        listState.animateScrollToItem(index = viewModel.exercisesListIndex.value, -5)
                                     }
                                     typeOfExecution = 3
-                                } else {
-                                    navController.navigate(Destination.ExecutionFinishedRoutine.createRoute(routineId = routineId, totalTime = ticks))
                                 }
+                            ) {
+                                Icon(
+                                    Icons.Filled.FastRewind,
+                                    contentDescription = null,
+                                    tint = White,
+                                )
+                            }
+                            /* BOTON IR AL SIGUIENTE EJERCICIO */
+                            Button(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .weight(1f),
+                                colors = ButtonDefaults.buttonColors(backgroundColor = Color(0xFFFFD28C)),
+                                shape = RoundedCornerShape(16.dp),
+                                onClick = {
+                                    if (viewModel.exercisesList.isNotEmpty() && viewModel.exercisesListIndex.value < viewModel.exercisesList.size - 1) {
+                                        viewModel.setExercisesListIndex(viewModel.exercisesListIndex.value + 1)
+                                        coroutineScope.launch {
+                                            listState.animateScrollToItem(
+                                                index = viewModel.exercisesListIndex.value,
+                                                -5
+                                            )
+                                        }
+                                        typeOfExecution = 3
+                                    } else {
+                                        navController.navigate(Destination.ExecutionFinishedRoutine.createRoute(routineId = routineId, totalTime = ticks))
+                                    }
+                                }
+                            ) {
+                                Icon(
+                                    Icons.Filled.FastForward,
+                                    contentDescription = null,
+                                    tint = White,
+                                )
+                            }
+                        }
+                        Button(
+                            modifier = Modifier.fillMaxWidth(),
+                            colors = ButtonDefaults.buttonColors(backgroundColor = Color(0XFFFBD5D1)),
+                            shape = RoundedCornerShape(16.dp),
+                            onClick = {
+                                navController.navigate(Destination.ExecutionFinishedRoutine.createRoute(routineId = routineId, totalTime = ticks))
                             }
                         ) {
-                            Icon(
-                                Icons.Filled.FastForward,
-                                contentDescription = null,
-                                tint = White,
+                            Text(text = stringResource(R.string.end_routine_execution).uppercase(),
+                                color = MaterialTheme.colors.error,
+                                style = MaterialTheme.typography.button,
                             )
                         }
                     }
-                    Button(
-                        modifier = Modifier.fillMaxWidth(),
-                        colors = ButtonDefaults.buttonColors(backgroundColor = Color(0XFFFBD5D1)),
-                        shape = RoundedCornerShape(16.dp),
-                        onClick = {
-                            navController.navigate(Destination.ExecutionFinishedRoutine.createRoute(routineId = routineId, totalTime = ticks))
-                        }
-                    ) {
-                        Text(text = stringResource(R.string.end_routine_execution).uppercase(),
-                            color = MaterialTheme.colors.error,
-                            style = MaterialTheme.typography.button,
-                        )
-                    }
+
                 }
-
             }
-        }
 
-    }
-    if (typeOfExecution == 1) {
-        typeOfExecution = -1
-    }
-    else if (typeOfExecution == 3) {
-        typeOfExecution = 2
+        }
+        if (typeOfExecution == 1) {
+            typeOfExecution = -1
+        }
+        else if (typeOfExecution == 3) {
+            typeOfExecution = 2
+        }
     }
 }
 

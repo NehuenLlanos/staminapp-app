@@ -23,6 +23,8 @@ import com.staminapp.ui.main.RatingBar
 import com.staminapp.util.getExecuteViewModelFactory
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.staminapp.R
+import com.staminapp.ui.main.ApiErrorDialog
+import com.staminapp.ui.main.LoadingIndicator
 import com.staminapp.ui.theme.Gray
 
 @Composable
@@ -34,7 +36,7 @@ fun FinishedExecutionScreen (
 ){
     val uiState = viewModel.uiState
 
-    if (!uiState.isFetching && uiState.routine == null) {
+    if (uiState.message == null && !uiState.isFetching && uiState.routine == null) {
         viewModel.getRoutine(routineId)
     }
 
@@ -57,7 +59,17 @@ fun FinishedExecutionScreen (
 
     val s = String.format("%02d : %02d : %02d", hours, minutes, seconds)
 
-    if (!uiState.isAllFetching && uiState.routine != null) {
+    if (uiState.message != null) {
+        ApiErrorDialog {
+            viewModel.getRoutine(routineId)
+        }
+    } else if (uiState.routine == null) {
+        Box(
+            modifier = Modifier.fillMaxSize()
+        ) {
+            LoadingIndicator()
+        }
+    } else {
         Column(modifier = Modifier
             .fillMaxSize()
             .padding(16.dp),
