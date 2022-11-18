@@ -92,10 +92,14 @@ fun CustomChip(
 }
 
 @Composable
-fun RoutineCard(navController: NavController, routine: Routine, modifier: Modifier = Modifier) {
+fun RoutineCard(
+    action: () -> Unit,
+    routine: Routine,
+    modifier: Modifier = Modifier
+) {
     Card(
         modifier = modifier.clickable{
-            navController.navigate(Destination.Routine.createRoute(routine.id))
+             action()
         },
         shape = RoundedCornerShape(15.dp),
         elevation = 5.dp

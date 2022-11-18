@@ -150,7 +150,12 @@ fun ExploreScreen(
                         else -> uiState.displayedRoutines
                     }
                 ) {
-                    RoutineCard(navController = navController, routine = it)
+                    RoutineCard(
+                        action = {
+                            navController.navigate(Destination.Routine.createRoute(it.id))
+                        },
+                        routine = it
+                    )
                 }
             }
         }

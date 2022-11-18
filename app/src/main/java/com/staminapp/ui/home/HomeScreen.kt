@@ -16,6 +16,7 @@ import androidx.compose.material.icons.outlined.Home
 import androidx.compose.material.icons.outlined.Person
 import androidx.compose.material.icons.outlined.Search
 import androidx.compose.runtime.*
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.layout.ContentScale
@@ -42,10 +43,22 @@ fun HomeScreen(
     navController: NavController,
     viewModel: HomeViewModel = viewModel(factory = getHomeViewModelFactory())
 ) {
+//    LaunchedEffect(key1 = System.currentTimeMillis()) {
+//        viewModel.getFavourites()
+//    }
+
+    var checkedFavourites by remember { mutableStateOf(false) }
     val uiState = viewModel.uiState
-    if (!uiState.isFetching && uiState.routines == null && uiState.favouriteRoutines == null) {
-        viewModel.getUserRoutines()
-        viewModel.getFavourites()
+
+    println(checkedFavourites)
+    if (!uiState.isFetching) {
+        if (uiState.routines == null) {
+            viewModel.getUserRoutines()
+        }
+        if (!checkedFavourites || uiState.favouriteRoutines == null) {
+            viewModel.getFavourites()
+            checkedFavourites = true
+        }
     }
 
     if (uiState.message != null) {
@@ -118,11 +131,23 @@ fun HomeScreen(
                     )
                 }
             }
-            val list = mutableListOf<Routine>()
-            list.addAll(uiState.routines)
-            list.addAll(uiState.favouriteRoutines)
-            items(list) {
-                RoutineCard(navController = navController, it)
+            items(uiState.routines) {
+                RoutineCard(
+                    action = {
+                        navController.navigate(Destination.Routine.createRoute(it.id))
+                        checkedFavourites = false
+                    },
+                    it
+                )
+            }
+            items(uiState.favouriteRoutines) {
+                RoutineCard(
+                    action = {
+                        navController.navigate(Destination.Routine.createRoute(it.id))
+                        checkedFavourites = false
+                    },
+                    it
+                )
             }
         }
     }
@@ -143,7 +168,9 @@ fun RecentCard(navController: NavController, modifier: Modifier = Modifier, rout
                 .fillMaxWidth()
                 .height(64.dp)
         ) {
-            Row {
+            Row(
+                verticalAlignment = Alignment.CenterVertically
+            ) {
                 Image(
                     modifier = Modifier
                         .fillMaxHeight()

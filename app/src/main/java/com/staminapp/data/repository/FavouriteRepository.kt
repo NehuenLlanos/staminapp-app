@@ -12,16 +12,14 @@ class FavouriteRepository (
     private val favouriteRoutinesMutex = Mutex()
     private var favouriteRoutinesList: List<Routine> = emptyList()
 
-    suspend fun getFavourites(refresh: Boolean = false) : List<Routine> {
-        if (refresh || favouriteRoutinesList.isEmpty()) {
-            val result = remoteDataSource.getFavourites()
-            favouriteRoutinesMutex.withLock {
-                var routines : MutableList<Routine> = mutableListOf()
-                result.content.forEach{
-                    routines.add(it.asModel())
-                }
-                this.favouriteRoutinesList = routines
+    suspend fun getFavourites() : List<Routine> {
+        val result = remoteDataSource.getFavourites()
+        favouriteRoutinesMutex.withLock {
+            val routines : MutableList<Routine> = mutableListOf()
+            result.content.forEach{
+                routines.add(it.asModel())
             }
+            this.favouriteRoutinesList = routines
         }
         return favouriteRoutinesMutex.withLock { this.favouriteRoutinesList }
     }
