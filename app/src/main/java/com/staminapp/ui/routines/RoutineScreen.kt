@@ -404,7 +404,7 @@ fun Cycle(
                     if (exercise.duration > 0 ) {
                         info += exercise.duration.toString() + " " + stringResource(R.string.second) + if (exercise.duration == 1) "" else "s"
                     }
-                    if (info != "") {
+                    if (info != "" && exercise.repetitions > 0 ) {
                         info += " | "
                     }
                     if (exercise.repetitions > 0 ) {

@@ -180,7 +180,7 @@ fun NavigationAppHost(navController: NavHostController) {
         )) { entry ->
             val id = entry.arguments?.getInt("id")
             if (id == null || id == -1) {
-                Toast.makeText(ctx, "ERROR FATAL. Volver a correr la aplicación", Toast.LENGTH_SHORT).show()
+                Toast.makeText(ctx, stringResource(R.string.fatal_error_navigation), Toast.LENGTH_SHORT).show()
             } else {
                 StartExecutionScreen(id, sessionManager.getExecutionMode(), navController)
             }
@@ -195,7 +195,7 @@ fun NavigationAppHost(navController: NavHostController) {
             )) { entry ->
             val id = entry.arguments?.getInt("id")
             if (id == null || id == -1) {
-                Toast.makeText(ctx, "ERROR FATAL. Volver a correr la aplicación", Toast.LENGTH_SHORT).show()
+                Toast.makeText(ctx, stringResource(R.string.fatal_error_navigation), Toast.LENGTH_SHORT).show()
             } else {
                 Execution(id, navController)
             }
@@ -210,7 +210,7 @@ fun NavigationAppHost(navController: NavHostController) {
             )) { entry ->
             val id = entry.arguments?.getInt("id")
             if (id == null || id == -1) {
-                Toast.makeText(ctx, "ERROR FATAL. Volver a correr la aplicación", Toast.LENGTH_SHORT).show()
+                Toast.makeText(ctx, stringResource(R.string.fatal_error_navigation), Toast.LENGTH_SHORT).show()
             } else {
                 ExecuteRoutine2Screen(id, navController)
             }
@@ -230,7 +230,7 @@ fun NavigationAppHost(navController: NavHostController) {
             val id = entry.arguments?.getInt("id")
             val totalTime = entry.arguments?.getInt("totalTime")
             if (id == null || id == -1 || totalTime == null) {
-                Toast.makeText(ctx, "ERROR FATAL. Volver a correr la aplicación", Toast.LENGTH_SHORT).show()
+                Toast.makeText(ctx, stringResource(R.string.fatal_error_navigation), Toast.LENGTH_SHORT).show()
             } else {
                 FinishedExecutionScreen(id, totalTime, navController)
             }

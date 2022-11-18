@@ -1,13 +1,11 @@
 package com.staminapp.ui.execute
 
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.Button
-import androidx.compose.material.ButtonDefaults
-import androidx.compose.material.MaterialTheme
-import androidx.compose.material.Text
+import androidx.compose.material.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -16,6 +14,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
@@ -27,10 +26,12 @@ import com.staminapp.ui.main.CustomChip
 import com.staminapp.util.getExecuteViewModelFactory
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
+import com.staminapp.ui.main.ApiErrorDialog
 import com.staminapp.ui.main.Destination
+import com.staminapp.ui.main.LoadingIndicator
 import com.staminapp.util.decodeBase64Image
+import com.staminapp.util.translateDifficultyForApp
 
-/* Vista Previa para la Ejecución de una rutina */
 @Composable
 fun StartExecutionScreen(
     id : Int = 1,
@@ -39,52 +40,52 @@ fun StartExecutionScreen(
     viewModel: ExecuteViewModel = viewModel ( factory = getExecuteViewModelFactory() )
 ) {
     val uiState = viewModel.uiState
-    if (!uiState.isFetching && uiState.routine == null) {
+    if (uiState.message == null && !uiState.isFetching && uiState.routine == null) {
         viewModel.getRoutine(id)
-        viewModel.getCyclesForRoutine(id)
-        viewModel.getExercisesForCycle(id)
     }
-    if (uiState.routine != null){
+
+    if (uiState.message != null) {
+        ApiErrorDialog {
+            viewModel.getRoutine(id)
+        }
+    } else if (uiState.routine == null) {
+        Box(
+            modifier = Modifier.fillMaxSize()
+        ) {
+            LoadingIndicator()
+        }
+    } else {
         Column(
             modifier = Modifier.fillMaxSize(),
-            horizontalAlignment = Alignment.CenterHorizontally
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.Center
         ) {
             Column(
                 modifier = Modifier
-                    .fillMaxHeight(0.6f)
                     .fillMaxWidth()
                     .padding(32.dp),
                 horizontalAlignment = Alignment.CenterHorizontally,
                 verticalArrangement = Arrangement.spacedBy(20.dp, Alignment.CenterVertically)
             ) {
-                Image(
-                    modifier = Modifier
-                        .width(120.dp)
-                        .height(120.dp),
-                    bitmap = decodeBase64Image(uiState.routine!!.image).asImageBitmap(),
-                    contentDescription = "Imagen de Rutina",
-                    contentScale = ContentScale.Crop
-                )
+                Card(
+                    modifier = Modifier.width(160.dp).height(160.dp),
+                    shape = RoundedCornerShape(15.dp),
+                    elevation = 5.dp
+                ) {
+                    Image(
+                        bitmap = decodeBase64Image(uiState.routine.image).asImageBitmap(),
+                        contentDescription = stringResource(R.string.routine_image),
+                        contentScale = ContentScale.Crop,
+                        modifier = Modifier.fillMaxSize()
+                    )
+                }
                 CustomChip(selected = false,
-                    text =
-                        if (uiState.routine.difficulty == "rookie") {
-                            "novato".uppercase()
-                        } else if (uiState.routine.difficulty == "beginner") {
-                            "principiante".uppercase()
-                        } else if (uiState.routine.difficulty == "intermediate") {
-                            "intermedio".uppercase()
-                        } else if (uiState.routine.difficulty == "advanced") {
-                            "avanzado".uppercase()
-                        } else {
-                            "experto".uppercase()
-                        }
-                    ,
+                    text = translateDifficultyForApp(string = uiState.routine.difficulty),
                     modifier = Modifier
                 )
-                Text(text = uiState.routine!!.name.uppercase(),
+                Text(text = uiState.routine.name.uppercase(),
                     color = MaterialTheme.colors.primaryVariant,
-                    fontSize = 25.sp,
-                    fontWeight = FontWeight.Bold,
+                    style = MaterialTheme.typography.h3,
                     textAlign = TextAlign.Center,
                     overflow = TextOverflow.Ellipsis,
                     maxLines = 2
@@ -102,9 +103,9 @@ fun StartExecutionScreen(
                 }
             ) {
                 Text(
-                    text = "Iniciar".uppercase(),
+                    text = stringResource(R.string.start).uppercase(),
                     color = Color.White,
-                    style = MaterialTheme.typography.body2,
+                    style = MaterialTheme.typography.button,
                 )
             }
 
@@ -112,11 +113,11 @@ fun StartExecutionScreen(
                 modifier = Modifier.fillMaxWidth(0.5f),
                 colors = ButtonDefaults.buttonColors(backgroundColor = Color(0XFFFBD5D1)),
                 shape = RoundedCornerShape(16.dp),
-                onClick = { navController.navigate(Destination.Routine.createRoute(routineId = id)) }) {
+                onClick = { navController.popBackStack() }) {
                 Text(
-                    text = "Cancelar".uppercase(),
+                    text = stringResource(R.string.cancel).uppercase(),
                     color = MaterialTheme.colors.error,
-                    style = MaterialTheme.typography.body2,
+                    style = MaterialTheme.typography.button,
                 )
             }
         }

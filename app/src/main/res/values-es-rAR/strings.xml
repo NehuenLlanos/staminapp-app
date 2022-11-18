@@ -1,3 +1,4 @@
+<?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="app_name">StaminApp</string>
     <string name="rookie">novato</string>
@@ -56,4 +57,10 @@
     <string name="try_again">Reintentar</string>
     <string name="api_error_message">Algo salió mal. Por favor verificá tu conexión a internet y volvé a intentarlo más tarde.</string>
     <string name="empty_routine_list">No hay nada acá</string>
+    <string name="end_routine_execution">Finalizar ejecución</string>
+    <string name="cancel">Cancelar</string>
+    <string name="finished">¡Terminó!</string>
+    <string name="estimated_time">Tiempo estimado</string>
+    <string name="rate_routine">Calificá la rutina</string>
+    <string name="finish">Finalizar</string>
 </resources>
