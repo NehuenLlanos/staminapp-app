@@ -63,4 +63,5 @@
     <string name="estimated_time">Tiempo estimado</string>
     <string name="rate_routine">Calificá la rutina</string>
     <string name="finish">Finalizar</string>
+    <string name="qr_code">Código QR</string>
 </resources>

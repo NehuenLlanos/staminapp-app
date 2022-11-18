@@ -14,6 +14,8 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color.Companion.White
+import androidx.compose.ui.graphics.ImageBitmap
+import androidx.compose.ui.graphics.asAndroidBitmap
 import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
@@ -31,6 +33,8 @@ import com.staminapp.data.model.Exercise
 import com.staminapp.data.model.Routine
 import com.staminapp.ui.main.*
 import com.staminapp.util.*
+import dev.shreyaspatil.capturable.Capturable
+import dev.shreyaspatil.capturable.controller.rememberCaptureController
 
 @Composable
 fun RoutineScreen(
@@ -54,12 +58,24 @@ fun RoutineScreen(
         }
     }
 
-    val sendIntent: Intent = Intent().apply {
-        action = Intent.ACTION_SEND
-        putExtra(Intent.EXTRA_TEXT, stringResource(R.string.share_text) + " https://www.staminapp.com/routine/" + routineId.toString())
-        type = "text/plain"
+    val captureController = rememberCaptureController()
+    var bitmapImage: ImageBitmap? by remember { mutableStateOf(null)}
+    Capturable(
+        controller = captureController,
+        onCaptured = { bitmap, _ ->
+            if (bitmap != null) {
+                bitmapImage = bitmap
+            }
+        }
+    ) {
+        CapturableImage(
+            url = "https://www.staminapp.com/routine/$routineId",
+            title = if (uiState.routine != null) uiState.routine.name else stringResource(R.string.app_name)
+        )
     }
-    val shareIntent = Intent.createChooser(sendIntent, stringResource(R.string.share_title))
+
+    val sendString = stringResource(R.string.share_text)
+    val intentString = stringResource(R.string.share_title)
     val context = LocalContext.current
 
     val windowInfo = rememberWindowInfo()
@@ -92,6 +108,20 @@ fun RoutineScreen(
 
                     }
                     IconButton(onClick = {
+                        val sendIntent: Intent = Intent().apply {
+                            action = Intent.ACTION_SEND
+
+                            bitmapImage?.let {
+                                putExtra(Intent.EXTRA_STREAM, saveImage(it.asAndroidBitmap(), context))
+                            }
+                            putExtra(Intent.EXTRA_TEXT,
+                                "$sendString https://www.staminapp.com/routine/$routineId"
+                            )
+                            addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
+
+                            type = "image/*"
+                        }
+                        val shareIntent = Intent.createChooser(sendIntent, intentString)
                         context.startActivity(shareIntent)
                     }) {
                         Icon(Icons.Filled.Share, contentDescription = stringResource(R.string.share), tint = White)
@@ -161,6 +191,7 @@ fun RoutineScreen(
                     LoadingIndicator()
                 }
             } else {
+                captureController.capture()
                 if (windowInfo.screenWidthInfo !is WindowInfo.WindowType.Compact && windowInfo.orientation is WindowInfo.Orientation.Landscape) {
                     Row(
                         modifier = Modifier
