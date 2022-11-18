@@ -43,10 +43,22 @@ fun HomeScreen(
     navController: NavController,
     viewModel: HomeViewModel = viewModel(factory = getHomeViewModelFactory())
 ) {
+//    LaunchedEffect(key1 = System.currentTimeMillis()) {
+//        viewModel.getFavourites()
+//    }
+
+    var checkedFavourites by remember { mutableStateOf(false) }
     val uiState = viewModel.uiState
-    if (!uiState.isFetching && uiState.routines == null && uiState.favouriteRoutines == null) {
-        viewModel.getUserRoutines()
-        viewModel.getFavourites()
+
+    println(checkedFavourites)
+    if (!uiState.isFetching) {
+        if (uiState.routines == null) {
+            viewModel.getUserRoutines()
+        }
+        if (!checkedFavourites || uiState.favouriteRoutines == null) {
+            viewModel.getFavourites()
+            checkedFavourites = true
+        }
     }
 
     if (uiState.message != null) {
@@ -119,11 +131,23 @@ fun HomeScreen(
                     )
                 }
             }
-            val list = mutableListOf<Routine>()
-            list.addAll(uiState.routines)
-            list.addAll(uiState.favouriteRoutines)
-            items(list) {
-                RoutineCard(navController = navController, it)
+            items(uiState.routines) {
+                RoutineCard(
+                    action = {
+                        navController.navigate(Destination.Routine.createRoute(it.id))
+                        checkedFavourites = false
+                    },
+                    it
+                )
+            }
+            items(uiState.favouriteRoutines) {
+                RoutineCard(
+                    action = {
+                        navController.navigate(Destination.Routine.createRoute(it.id))
+                        checkedFavourites = false
+                    },
+                    it
+                )
             }
         }
     }
